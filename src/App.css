@@ -1,0 +1,20 @@
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.App.dark {
+  color: white;
+  background-color: #282c34;
+}
+
+.App.light {
+  background-color: white;
+  color: #282c34;
+}
+
+.App.dark button {
+  color: white;
+  background-color: #282c34;
+}

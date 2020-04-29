@@ -1,0 +1,32 @@
+.ts-datatable {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+
+  .ts-datatable-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: auto;
+  }
+
+  .ts-datatable-table {
+    border-collapse: collapse;
+  }
+
+  thead {
+    .ts-datatable-header-row {
+      th {
+        vertical-align: bottom;
+
+        &[scope=colgroup] {
+          text-align: center;
+          border-bottom: 1px solid;
+        }
+
+        &[scope=col] {
+          border-bottom: 2px solid;
+        }
+      }
+    }
+  }
+}
