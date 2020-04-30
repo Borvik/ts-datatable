@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, useState, useEffect } from 'react';
 import { DataTableProperties, ColumnVisibilityStorage } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
+import { useQueryState } from '../../utils/useQueryState';
 import { transformColumns, getHeaderRows, getFlattenedColumns } from '../../utils/transformColumnProps';
 import { useLocalState } from '../../utils/useLocalState';
 import { ColumnContext } from './contexts';
@@ -48,19 +49,20 @@ export const DataTable = function<T>(props: PropsWithChildren<DataTablePropertie
     }
   }, [ props.id, columnVisibility, props.columns ]);
 
-
-  const [stateDataList, setDataList] = useState<T[]>([]);
-  useEffect(() => {
-    async function getData() {
-      if (typeof props.data === 'function') {
-        let returnedData = await props.data();
-        setDataList(returnedData);
-      } else {
-        setDataList(props.data);
-      }
-    }
-    getData();
-  }, []); // TODO: Turn into useDeepEffect and memoize on pagination/search/filters
+  const [pagination, setPagination] = useQueryState({page: 1, limit: 10});
+  console.log('Pagination:', pagination);
+  // const [stateDataList, setDataList] = useState<T[]>([]);
+  // useEffect(() => {
+  //   async function getData() {
+  //     if (typeof props.data === 'function') {
+  //       let returnedData = await props.data();
+  //       setDataList(returnedData);
+  //     } else {
+  //       setDataList(props.data);
+  //     }
+  //   }
+  //   getData();
+  // }, []); // TODO: Turn into useDeepEffect and memoize on pagination/search/filters
 
   /**
    * Finally we setup the contexts that will house all the data
@@ -78,7 +80,7 @@ export const DataTable = function<T>(props: PropsWithChildren<DataTablePropertie
               <TableHeader />
               <TableBody
                 getRowKey={props.getRowKey}
-                data={stateDataList}
+                data={props.data as T[]}
               />
             </table>
           </div>
