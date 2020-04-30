@@ -1,5 +1,5 @@
-import React from 'react';
-
+import React, { useContext } from 'react';
+import { PaginationContext } from '../table/contexts';
 /**
  * Guidelines
  * 
@@ -10,5 +10,6 @@ import React from 'react';
  *    - button triggers edit form, styled in place so it doesn't move (too much anyway)
  */
 export const PageNav: React.FC<any> = (props) => {
-  return <div>pages</div>;
+  const context = useContext(PaginationContext);
+  return <div>Pages: {context.page}</div>;
 };

@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { isEqual } from './isEqual';
 import qs from 'qs';
 

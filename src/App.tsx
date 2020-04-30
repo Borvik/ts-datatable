@@ -28,6 +28,7 @@ function App() {
             {
               header: 'Image',
               accessor: 'img',
+              sortable: false,
               render: (value: any) => <img alt='' src={value} style={{maxHeight: '50px'}} />
             },
             {

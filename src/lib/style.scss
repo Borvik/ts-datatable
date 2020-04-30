@@ -26,6 +26,16 @@
         &[scope=col] {
           border-bottom: 2px solid;
         }
+
+        .ts-datatable-header-cell {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          .sort-icon {
+            margin-left: .1em;
+          }
+        }
       }
     }
   }

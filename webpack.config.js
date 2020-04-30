@@ -16,11 +16,21 @@ module.exports = {
     libraryTarget: 'umd',
     globalObject: 'this',
   },
-  externals: [nodeExternals()],
+  externals: [nodeExternals({
+    whitelist: [
+      /^\@fortawesome/,
+      'lodash',
+      'qs',
+    ]
+  })],
   target: 'node',
   devtool: 'source-map',
   module: {
     rules: [
+      {
+        test: /\.svg$/,
+        use: ['@svgr/webpack']
+      },
       {
         test: /\.tsx?$/,
         use: [
@@ -60,7 +70,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|jpe?g|svg)$/,
+        test: /\.(png|jpe?g)$/,
         loader: 'file-loader?name=images/[name].[ext]'
       }
     ]
@@ -70,5 +80,8 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: "style.css"
     }),
-  ]
+  ],
+  optimization: {
+    usedExports: true,
+  }
 };

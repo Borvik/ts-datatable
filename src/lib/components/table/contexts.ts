@@ -12,3 +12,17 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   headerRows: [],
   setColumnVisibility: () => {},
 });
+
+interface PaginationContextInterface {
+  page: number;
+  limit: number;
+  setQueryParams: Function;
+  setRecordData: Function;
+}
+
+export const PaginationContext = createContext<PaginationContextInterface>({
+  page: 1,
+  limit: 25,
+  setQueryParams: () => {},
+  setRecordData: () => {},
+});
