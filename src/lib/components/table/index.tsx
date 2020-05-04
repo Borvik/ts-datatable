@@ -51,6 +51,17 @@ export const DataTable = function<T>(props: PropsWithChildren<DataTablePropertie
 
   const [pagination, setPagination] = useQueryState({page: 1, limit: 10});
   console.log('Pagination:', pagination);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setPagination({page: 5, limit: 10});
+  //   }, 5000);
+  //   setTimeout(() => {
+  //     setPagination({page: 1, limit: 10});
+  //   }, 10000);
+  //   setTimeout(() => {
+  //     setPagination({page: 3, limit: 10});
+  //   }, 15000);
+  // }, []);
   // const [stateDataList, setDataList] = useState<T[]>([]);
   // useEffect(() => {
   //   async function getData() {

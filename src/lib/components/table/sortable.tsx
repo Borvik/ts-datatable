@@ -13,7 +13,7 @@ interface HeaderSortProps {
 export const HeaderSort: React.FC<HeaderSortProps> = (props) => {
   const { column } = props;
   if (!column.sortable || column.colSpan > 1) return null;
-  if (column.header == 'ID')
+  if (column.header === 'ID')
     return <FontAwesomeIcon icon={faSortUp} className='sort-icon' />;
   return <FontAwesomeIcon icon={faSort} style={{opacity: .3}} className='sort-icon' />;
 }
