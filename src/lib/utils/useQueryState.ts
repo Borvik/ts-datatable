@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import cloneDeep from 'lodash/cloneDeep';
 import cleanDeep from 'clean-deep';
@@ -117,7 +117,7 @@ function getQueryStringState<State>(queryString: string, initialState: State, op
     if (typeof qsValue !== 'undefined') {
       let newValue = convertQsValue(qsValue, dataTypes[key]);
       if (typeof newValue !== 'undefined')
-        (newState as any)[key] = newValue;
+        set(newState as any, key, newValue);
     }
   }
   return newState;
@@ -126,6 +126,8 @@ function getQueryStringState<State>(queryString: string, initialState: State, op
 function getQueryString<State>(origQueryString: string, newState: State, initialState: State, prefix?: string): string {
   let qsObject = qs.parse(origQueryString, {
     ignoreQueryPrefix: true,
+    comma: true,
+    allowDots: true,
   });
 
   // set values from clonedState to qsObject
@@ -178,35 +180,17 @@ options: {
 }
 */
 
-interface QueryStateOptions {
+export interface QueryStateOptions {
   prefix?: string; // prefix for the container to this set of values
   internalState?: boolean; // store in qs or not (doesn't allow portability, but could be nicer for multiple on same page)
   properties?: PropertyTypes;
 }
 
-export function useQueryState<State>(initialState: State, options?: QueryStateOptions): [State, (newState: State | ((state: State) => State)) => void] {
+export function useQueryState<State>(initialState: State, options?: QueryStateOptions): [State, (newState: Partial<State> | ((state: State) => Partial<State>)) => void] {
   const [localState, setLocalState] = useState<{init: false} | {init: true, publicState: State, search: string}>({init: false});
   const location = useLocation();
   const history = useHistory();
 
-  // useEffect(() => {
-  //   // const unlisten = history.listen((location, action) => {
-  //   //   setLocalState(v => {
-  //   //     if (!v.init) return v;
-
-  //   //     // Search will change causing next if to reset and properly get new state
-  //   //     return {
-  //   //       init: true,
-  //   //       publicState: v.publicState,
-  //   //       search: location.search
-  //   //     }
-  //   //   });
-  //   // });
-
-  //   setTimeout(() => { console.log('Change History'); history.push('?page=2'); }, 5000);
-  //   // return function cleanup() { unlisten(); }
-  // }, [ history ]);
-  
   let currPublicState: State;
   if (!localState.init || (!options?.internalState && location.search !== localState.search)) {
     let potentialPublicState = options?.internalState
@@ -234,27 +218,30 @@ export function useQueryState<State>(initialState: State, options?: QueryStateOp
   let [derivedInitialState] = useDeepDerivedState(() => { return initialState; }, [initialState]);
   
   const publicSetState = useCallback(
-    (newState: (State | ((state: State) => State))) => {
+    (newState: (Partial<State> | ((state: State) => Partial<State>))) => {
       setLocalState(localState => {
-        if (!localState.init) throw new Error();
+        if (!localState.init) throw new Error('Set Query State called before it was initialized');
 
-        // saveLocalState(key, localState);
         /**
          * get FULL qs, and update it
          */
-        const publicState = typeof newState === 'function'
+        const mergeState = typeof newState === 'function'
           ? (newState as any)(localState.publicState)
           : newState;
 
+        const publicState = { ...localState.publicState, ...mergeState };
+
+        let newQS = getQueryString(location.search, publicState, derivedInitialState, optionPrefix);
         if (!optionInternalState) {
-          let newQS = getQueryString(location.search, publicState, derivedInitialState, optionPrefix);
-          history.push({
-            ...location,
-            search: newQS
+          setImmediate(() => {
+            history.push({
+              ...location,
+              search: newQS
+            });
           });
         }
 
-        return {...localState, publicState};
+        return { init: true, publicState, search: newQS };
       });
     },
     [ location, history, optionPrefix, optionInternalState, derivedInitialState ]

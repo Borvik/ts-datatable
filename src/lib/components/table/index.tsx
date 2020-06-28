@@ -1,5 +1,5 @@
-import React, { PropsWithChildren, useState, useEffect } from 'react';
-import { DataTableProperties, ColumnVisibilityStorage } from './types';
+import React, { PropsWithChildren, useState } from 'react';
+import { DataTableProperties, ColumnVisibilityStorage, DataFnResult } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { useQueryState } from '../../utils/useQueryState';
 import { transformColumns, getHeaderRows, getFlattenedColumns } from '../../utils/transformColumnProps';
@@ -7,8 +7,10 @@ import { useLocalState } from '../../utils/useLocalState';
 import { ColumnContext } from './contexts';
 import { TableHeader } from './header';
 import { TableBody } from './body';
+import { PageNav } from '../pagination';
+import { useDeepEffect } from '../../utils/useDeepEffect';
 
-export const DataTable = function<T>(props: PropsWithChildren<DataTableProperties<T>>) {
+export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChildren<DataTableProperties<T>>) {
   /**
    * First let's get the user-defined column visibility
    * 
@@ -49,31 +51,44 @@ export const DataTable = function<T>(props: PropsWithChildren<DataTablePropertie
     }
   }, [ props.id, columnVisibility, props.columns ]);
 
-  const [pagination, setPagination] = useQueryState({page: 1, limit: 10});
-  console.log('Pagination:', pagination);
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setPagination({page: 5, limit: 10});
-  //   }, 5000);
-  //   setTimeout(() => {
-  //     setPagination({page: 1, limit: 10});
-  //   }, 10000);
-  //   setTimeout(() => {
-  //     setPagination({page: 3, limit: 10});
-  //   }, 15000);
-  // }, []);
-  // const [stateDataList, setDataList] = useState<T[]>([]);
-  // useEffect(() => {
-  //   async function getData() {
-  //     if (typeof props.data === 'function') {
-  //       let returnedData = await props.data();
-  //       setDataList(returnedData);
-  //     } else {
-  //       setDataList(props.data);
-  //     }
-  //   }
-  //   getData();
-  // }, []); // TODO: Turn into useDeepEffect and memoize on pagination/search/filters
+  const [pagination, setPagination] = useQueryState({page: 1, limit: 10}, {
+    ...props.qs
+  });
+  
+  const [stateDataList, setDataList] = useState<DataFnResult<T[]>>({ data: [], total: 0 });
+  const [dataLoading, setLoading] = useState(true);
+  
+  useDeepEffect(() => {
+    async function getData() {
+      if (typeof props.data === 'function') {
+        let returnedData = await props.data({ pagination });
+        if (Array.isArray(returnedData)) {
+          setDataList({ data: returnedData, total: returnedData.length });
+        } else {
+          setDataList(returnedData);
+        }
+      } else {
+        setPagination({ limit: props.data.length });
+        setDataList({
+          data: props.data,
+          total: typeof props.totalCount === 'undefined'
+            ? props.data.length
+            : props.totalCount
+        });
+      }
+      setLoading(false);
+    }
+    setLoading(true);
+    getData();
+
+    // TODO: Add search/filter/order by
+  }, [ pagination ]);
+
+  const Paginate = props.components?.Paginate ?? PageNav;
+
+  let wrapperStyle: any = {
+    '--ts-dt-fixed-bg': props.fixedColBg ?? 'white'
+  };
 
   /**
    * Finally we setup the contexts that will house all the data
@@ -85,16 +100,36 @@ export const DataTable = function<T>(props: PropsWithChildren<DataTablePropertie
         ...columnData,
         setColumnVisibility,
       }}>
-        <div id={props.id} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
+        <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
+          <div className='ts-datatable-top-page-filters'>
+            {(pageNav === 'top' || pageNav === 'both') &&
+              <Paginate
+                {...props.paginateOptions}
+                {...pagination}
+                changePage={(page) => setPagination({ page })}
+                total={stateDataList.total}
+            />}
+          </div>
           <div {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
             <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
               <TableHeader />
               <TableBody
                 getRowKey={props.getRowKey}
-                data={props.data as T[]}
+                data={stateDataList.data}
+                loading={dataLoading}
+                LoadingComponent={props.components?.Loading}
               />
             </table>
           </div>
+          {(pageNav === 'bottom' || pageNav === 'both') &&
+            <div className='ts-datatable-bottom-page'>
+              <Paginate
+                {...props.paginateOptions}
+                {...pagination}
+                changePage={(page) => setPagination({ page })}
+                total={stateDataList.total}
+              />
+            </div>}
         </div>
       </ColumnContext.Provider>
     </React.Fragment>

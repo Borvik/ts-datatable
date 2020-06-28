@@ -16,7 +16,7 @@ export const TableHeader: React.FC = () => {
 
             let colScope = col.colSpan > 1 ? 'colgroup' : 'col';
             return (
-              <th key={colIdx} colSpan={col.colSpan > 1 ? col.colSpan : undefined} rowSpan={col.rowSpan > 1 ? col.rowSpan : undefined} scope={colScope}>
+              <th key={colIdx} className={`${col.className ?? ''} ${col.fixed ? `fixed fixed-${col.fixed}` : ''}`.trim()} colSpan={col.colSpan > 1 ? col.colSpan : undefined} rowSpan={col.rowSpan > 1 ? col.rowSpan : undefined} scope={colScope}>
                 <span className='ts-datatable-header-cell'>
                   <span className='ts-datatable-header-content'>{col.header}</span>
                   <HeaderSort column={col} />

@@ -4,20 +4,46 @@ import {
   TableHTMLAttributes,
   HTMLProps
 } from 'react';
+import { QueryStateOptions } from '../../utils/useQueryState';
+import { PaginateRequiredProps, PaginateOptions, PageChange } from '../pagination/types';
 
-// type DataFn<T> = (() => T[]) | (() => Promise<T[]>);
 // export type EditFn<T> = (row: T, changes: Partial<T>) => Promise<boolean>;
+
+export interface DataFnResult<T> {
+  data: T;
+  total: number;
+}
+
+type DataResultUnion<T> = T | DataFnResult<T>;
+export type DataFn<T> = (props: {
+  pagination: PageChange;
+  search?: string;
+  filters?: unknown;
+  sort?: unknown;
+}) => DataResultUnion<T> | Promise<DataResultUnion<T>>;
 
 export interface DataTableProperties<T> {
   id: string;
   columns: Partial<DataColumnProp<T>>[];
-  data: Fn<T[]> | T[];
+  data: DataFn<T[]> | T[];
+  totalCount?: number;
+
+  qs?: QueryStateOptions;
+  paginateOptions?: PaginateOptions;
 
   getRowKey?: (row: T) => string | number;
 
-  tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id'>;
-  tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id'>;
+  tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
+  tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableProps?: DetailedHTMLProps<TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>;
+
+  pageNav?: false | 'top' | 'bottom' | 'both';
+  fixedColBg?: string;
+
+  components?: {
+    Paginate?: React.ReactType<PaginateRequiredProps>;
+    Loading?: ReactRenderable;
+  }
 }
 // //  React.DetailedHTMLProps<React.TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>
 // interface TableContainerProps extends Omit<HTMLProps<HTMLDivElement>, 'id'> {
@@ -72,4 +98,6 @@ export interface ColumnVisibilityStorage {
 export interface TableBodyProps {
   data: any[];
   getRowKey?: (row: any) => string | number;
+  loading: boolean;
+  LoadingComponent?: ReactRenderable;
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { DataTable } from './lib';
 import './App.css';
 
-const pokemon = require('./dataset.json').pokemon;
+const pokemon: any[] = require('./dataset.json').pokemon;
 
 function App() {
   const [theme, setTheme] = React.useState('dark');
@@ -15,11 +15,39 @@ function App() {
       <div>
         <DataTable<any>
           id='pokemon'
-          data={pokemon}
+          // data={pokemon}
+          data={async ({ pagination }) => {
+            return await new Promise((resolve) => {
+              setTimeout(() => {
+                // do fake filters
+
+                let offset = (pagination.page - 1) * pagination.limit;
+                let len = (pagination.page * pagination.limit);
+                resolve({
+                  total: pokemon.length,
+                  data: pokemon.slice(offset, len),
+                });
+              }, 750);
+            });
+
+            // let offset = (pagination.page - 1) * pagination.limit;
+            // let len = (pagination.page * pagination.limit);
+                
+            // return {
+            //   total: pokemon.length,
+            //   data: pokemon.slice(offset, len),
+            // };
+          }}
+          fixedColBg='var(--dt-fixed-bg, white)'
+          paginateOptions={{
+            buttonPosition: 'split',
+            showFirstLast: true,
+          }}
           columns={[
             {
               header: 'ID',
-              accessor: 'id'
+              accessor: 'id',
+              fixed: 'left',
             },
             {
               header: 'Num',
@@ -68,10 +96,12 @@ function App() {
             },
             {
               header: 'Candy',
-              accessor: 'candy'
+              accessor: 'candy',
+              className: 'no-wrap fw',
             },
             {
               header: 'Candy Count',
+              className: 'no-wrap',
               accessor: 'candy_count'
             },
             {
@@ -81,6 +111,7 @@ function App() {
             {
               header: 'Evolves To',
               accessor: 'next_evolution',
+              className: 'no-wrap',
               render: (value: any) => {
                 if (!value) return null;
                 if (!Array.isArray(value)) return value;
@@ -90,6 +121,7 @@ function App() {
             {
               header: 'Evolves From',
               accessor: 'prev_evolution',
+              className: 'no-wrap',
               render: (value: any) => {
                 if (!value) return null;
                 if (!Array.isArray(value)) return value;
@@ -99,16 +131,18 @@ function App() {
             {
               header: 'Spawn Chance',
               accessor: 'spawn_chance',
+              className: 'no-wrap',
               render: (value: any) => `${(value * 100).toPrecision(3)}%`
             },
             {
               header: 'Avg. Spawns',
               accessor: 'avg_spawns',
-              fixed: 'right',
+              className: 'no-wrap',
             },
             {
               header: 'Spawn Time',
               accessor: 'spawn_time',
+              className: 'no-wrap',
               fixed: 'right'
             },
           ]}

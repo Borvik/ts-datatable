@@ -1,20 +1,33 @@
 .App {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.App > div {
+  min-height: 0;
+  flex: 1 1 auto;
 }
 
 .App.dark {
   color: white;
   background-color: #282c34;
+  --dt-fixed-bg: #282c34;
 }
 
 .App.light {
   background-color: white;
   color: #282c34;
+  --dt-fixed-bg: white;
 }
 
 .App.dark button {
   color: white;
   background-color: #282c34;
 }
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.fw { width: 975px; }
