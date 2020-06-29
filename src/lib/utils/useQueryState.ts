@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import cloneDeep from 'lodash/cloneDeep';
 import cleanDeep from 'clean-deep';
@@ -217,34 +217,71 @@ export function useQueryState<State>(initialState: State, options?: QueryStateOp
   // derive state so reference can be the same
   let [derivedInitialState] = useDeepDerivedState(() => { return initialState; }, [initialState]);
   
-  const publicSetState = useCallback(
-    (newState: (Partial<State> | ((state: State) => Partial<State>))) => {
-      setLocalState(localState => {
-        if (!localState.init) throw new Error('Set Query State called before it was initialized');
+  const publicSetState = (newState: (Partial<State> | ((state: State) => Partial<State>))) => {
+    setLocalState(localState => {
+      if (!localState.init) throw new Error('Set Query State called before it was initialized');
 
-        /**
-         * get FULL qs, and update it
-         */
-        const mergeState = typeof newState === 'function'
-          ? (newState as any)(localState.publicState)
-          : newState;
+      /**
+       * get FULL qs, and update it
+       */
+      const mergeState = typeof newState === 'function'
+        ? (newState as any)(localState.publicState)
+        : newState;
 
-        const publicState = { ...localState.publicState, ...mergeState };
+      const publicState = { ...localState.publicState, ...mergeState };
 
-        let newQS = getQueryString(location.search, publicState, derivedInitialState, optionPrefix);
-        if (!optionInternalState) {
-          setImmediate(() => {
-            history.push({
-              ...location,
-              search: newQS
-            });
+      if (BATCHING_UPDATES) {
+        performBatchedUpdate(history, location, publicState, derivedInitialState, optionPrefix);
+        return localState;
+      }
+
+      let newQS = getQueryString(location.search, publicState, derivedInitialState, optionPrefix);
+      if (!optionInternalState) {
+        setImmediate(() => {
+          history.push({
+            ...location,
+            search: newQS
           });
-        }
+        });
+      }
 
-        return { init: true, publicState, search: newQS };
-      });
-    },
-    [ location, history, optionPrefix, optionInternalState, derivedInitialState ]
-  );
+      return { init: true, publicState, search: newQS };
+    });
+  };
+
   return [currPublicState, publicSetState];
+}
+
+type HistoryType = ReturnType<typeof useHistory>;
+type HistoryCreateRefProps = Parameters<HistoryType['createHref']>;
+type LocationDescriptorObject = HistoryCreateRefProps[0];
+
+let BATCHING_UPDATES: boolean = false;
+let batchedHistoryObj: HistoryType | null;
+let batchUpdateLoc: LocationDescriptorObject | null;
+
+function performBatchedUpdate(history: HistoryType, location: LocationDescriptorObject, newState: any, initialState: any, optionPrefix?: string): void {
+  console.log('Performing Batch QS Update:', newState);
+  if (!batchUpdateLoc) {
+    batchUpdateLoc = location;
+    batchedHistoryObj = history;
+  }
+
+  let newQS = getQueryString(batchUpdateLoc.search ?? '', newState, initialState, optionPrefix);
+  batchUpdateLoc.search = newQS;
+}
+
+export function batchedQSUpdate(fn: Function) {
+  BATCHING_UPDATES = true;
+
+  fn();
+  
+  BATCHING_UPDATES = false;
+
+  if (batchedHistoryObj) {
+    batchedHistoryObj.push(batchUpdateLoc!);
+  }
+
+  batchUpdateLoc = null;
+  batchedHistoryObj = null;
 }
