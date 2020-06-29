@@ -51,7 +51,7 @@ export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChil
     }
   }, [ props.id, columnVisibility, props.columns ]);
 
-  const [pagination, setPagination] = useQueryState({page: 1, limit: 10}, {
+  const [pagination, setPagination] = useQueryState({page: 1, perPage: 10}, {
     ...props.qs
   });
   
@@ -68,7 +68,7 @@ export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChil
           setDataList(returnedData);
         }
       } else {
-        setPagination({ limit: props.data.length });
+        setPagination({ perPage: props.data.length });
         setDataList({
           data: props.data,
           total: typeof props.totalCount === 'undefined'

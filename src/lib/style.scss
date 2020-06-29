@@ -75,7 +75,13 @@
 }
 
 .ts-pagination {
-  display: inline-flex;
+  .ts-pagination-nav {
+    display: inline-flex;
+  }
+
+  .ts-pagination-totals {
+    text-align: center;
+  }
 
   .ts-pagination-btn-group {
     &:first-child {
@@ -84,6 +90,17 @@
     &:last-child {
       margin-left: .25em;
     }
+  }
+
+  .ts-paginate-current-page {
+    border: 1px solid;
+    border-radius: 4px;
+    padding: 0 .1em;
+    cursor: pointer;
+  }
+
+  .ts-paginate-goto-page {
+    max-width: 3em;
   }
 }
 

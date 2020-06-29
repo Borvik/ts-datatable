@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft } from '@fortawesome/free-solid-svg-icons/faCaretLeft';
 import { faCaretRight } from '@fortawesome/free-solid-svg-icons/faCaretRight';
 import { faWindowMinimize } from '@fortawesome/free-solid-svg-icons/faWindowMinimize';
+import { useDerivedState } from '../../utils/useDerivedState';
 
 /**
  * Guidelines
@@ -17,27 +18,76 @@ import { faWindowMinimize } from '@fortawesome/free-solid-svg-icons/faWindowMini
  */
 export const PageNav: React.FC<PaginateProps> = ({buttonPosition = 'split', ...props}) => {
   const [id] = useState(uniqueId('pageSelect_'));
+  const [editing, setEditing] = useState(false);
+  const [pageNum, setPageNum] = useDerivedState(() => props.page, [props.page, editing]);
 
   let totalPages: number = 0;
   if (typeof props.total !== 'undefined') {
-    totalPages = (Math.ceil(props.total / props.limit) || 1);
+    totalPages = (Math.ceil(props.total / props.perPage) || 1);
+  }
+
+  function gotoPage() {
+    if (!Number.isNaN(pageNum) && pageNum !== props.page) {
+      props.changePage(pageNum);
+    }
+    setEditing(false);
   }
 
   return <div key={id} className='ts-pagination'>
-    <PaginateButtons
-      {...props}
-      position='before'
-      buttonPosition={buttonPosition}
-      totalPages={totalPages}
-    />
-    <span>Page {props.page} of {totalPages}</span>
-    <PaginateButtons
-      {...props}
-      position='after'
-      buttonPosition={buttonPosition}
-      totalPages={totalPages}
-    />
+    <div className='ts-pagination-nav'>
+      <PaginateButtons
+        {...props}
+        position='before'
+        buttonPosition={buttonPosition}
+        totalPages={totalPages}
+      />
+      <span>Page <>
+        {!editing && <span className='ts-paginate-current-page' onClick={() => setEditing(true)}>{props.page}</span>}
+        {editing && <>
+          <input
+            className='ts-paginate-goto-page'
+            value={Number.isNaN(pageNum) ? '' : pageNum}
+            type='number'
+            min={1}
+            max={totalPages}
+            onChange={(e) => setPageNum(e.target.valueAsNumber)}
+          />
+          <button type='button' onClick={gotoPage}>go</button>
+        </>}
+      </> of {totalPages}</span>
+      <PaginateButtons
+        {...props}
+        position='after'
+        buttonPosition={buttonPosition}
+        totalPages={totalPages}
+      />
+    </div>
+    <TotalLabel {...props} />
   </div>;
+};
+
+interface TotalProps extends Pick<PaginateProps, 'totalLabel' | 'totalVisible'> {
+  total?: number;
+}
+
+const TotalLabel: React.FC<TotalProps> = (props) => {
+  if (!props.totalVisible || typeof props.total === 'undefined')
+    return null;
+
+  let label: string = 'total record(s)';
+  if (props.totalLabel === false)
+    label = '';
+  else if (typeof props.totalLabel === 'string')
+    label = props.totalLabel
+  else if (props.totalLabel) {
+    if (props.total === 1)
+      label = props.totalLabel.singular;
+    else
+      label = props.totalLabel.plural;
+  }
+  label = ' ' + label;
+
+  return <div className='ts-pagination-totals'>{props.total}{label}</div>;
 };
 
 const PaginateButtons: React.FC<PaginateButtonProps> = ({

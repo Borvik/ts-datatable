@@ -15,20 +15,33 @@ function App() {
       <div>
         <DataTable<any>
           id='pokemon'
-          // data={pokemon}
+          
+          // data={pokemon} // Pass Data in directly
+          // totalCount={5} // Total count to enable pagination
+
+          // Async data loading (recommended way)
           data={async ({ pagination }) => {
+            // This promise, timeout, and filter is all to
+            // simulate an API call.
             return await new Promise((resolve) => {
               setTimeout(() => {
                 // do fake filters
 
-                let offset = (pagination.page - 1) * pagination.limit;
-                let len = (pagination.page * pagination.limit);
+                let offset = (pagination.page - 1) * pagination.perPage;
+                let len = (pagination.page * pagination.perPage);
+
+                // Can return either just the array, or
+                // an object containing the total number of items
+                // for pagination
                 resolve({
                   total: pokemon.length,
                   data: pokemon.slice(offset, len),
                 });
               }, 750);
             });
+
+            // Function doesn't _need_ to be async, could
+            // be synchronous, though wouldn't really be an api call
 
             // let offset = (pagination.page - 1) * pagination.limit;
             // let len = (pagination.page * pagination.limit);

@@ -2,7 +2,7 @@ export type ButtonPosition = 'before' | 'after';
 
 export interface PageChange {
   page: number;
-  limit: number;
+  perPage: number;
 }
 
 export interface PaginateOptions {
@@ -45,7 +45,7 @@ export interface PaginateRequiredProps {
   /**
    * Limit per page
    */
-  limit: number;
+  perPage: number;
 
   /**
    * Total number of records, without this paging doesn't work

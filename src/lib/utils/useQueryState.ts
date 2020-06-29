@@ -156,7 +156,7 @@ function getQueryString<State>(origQueryString: string, newState: State, initial
 }
 
 /*
-{page: 1, limit: 10}
+{page: 1, perPage: 10}
 {column1: 'data', column2: 'search', column3: 4, column4: [4,5,6]}
 Some properties are optional, some required - required ones should have a default.
 If no properties specified - assume all are required and in default value
@@ -164,7 +164,7 @@ All properties should have an optional prefix
 table1: {
   pages: {
     page: 1,
-    limit: 10
+    perPage: 10
   },
   filters: {
     column1: 'data',
