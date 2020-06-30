@@ -212,8 +212,6 @@ export function useQueryState<State>(initialState: State, options?: QueryStateOp
     currPublicState = localState.publicState;
   }
 
-  let optionPrefix = options?.prefix;
-  let optionInternalState = options?.internalState;
   // derive state so reference can be the same
   let [derivedInitialState] = useDeepDerivedState(() => { return initialState; }, [initialState]);
   
@@ -230,14 +228,15 @@ export function useQueryState<State>(initialState: State, options?: QueryStateOp
 
       const publicState = { ...localState.publicState, ...mergeState };
 
-      if (BATCHING_UPDATES) {
-        performBatchedUpdate(history, location, publicState, derivedInitialState, optionPrefix);
+      if (BATCHING_UPDATES && !options?.internalState) {
+        performBatchedUpdate(history, location, publicState, derivedInitialState, options?.prefix);
         return localState;
       }
 
-      let newQS = getQueryString(location.search, publicState, derivedInitialState, optionPrefix);
-      if (!optionInternalState) {
+      let newQS = getQueryString(location.search, publicState, derivedInitialState, options?.prefix);
+      if (!options?.internalState) {
         setImmediate(() => {
+          console.log('history push');
           history.push({
             ...location,
             search: newQS
@@ -279,6 +278,7 @@ export function batchedQSUpdate(fn: Function) {
   BATCHING_UPDATES = false;
 
   if (batchedHistoryObj) {
+    console.log(' History Push');
     batchedHistoryObj.push(batchUpdateLoc!);
   }
 
