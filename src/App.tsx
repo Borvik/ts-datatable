@@ -20,12 +20,24 @@ function App() {
           // totalCount={5} // Total count to enable pagination
 
           // Async data loading (recommended way)
-          data={async ({ pagination }) => {
+          data={async ({ pagination, search }) => {
             // This promise, timeout, and filter is all to
             // simulate an API call.
             return await new Promise((resolve) => {
               setTimeout(() => {
                 // do fake filters
+                let filteredPokemon = pokemon.filter(p => {
+                  if (!search) return true;
+
+                  let matched: boolean = false;
+                  if (search && p.type) {
+                    let re = new RegExp(`${search.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}`, 'i');
+                    let type: string = Array.isArray(p.type) ? p.type.join(', ') : p.type;
+                    matched = !!type.match(re);
+                  }
+
+                  return matched;
+                });
 
                 let offset = (pagination.page - 1) * pagination.perPage;
                 let len = (pagination.page * pagination.perPage);
@@ -34,8 +46,8 @@ function App() {
                 // an object containing the total number of items
                 // for pagination
                 resolve({
-                  total: pokemon.length,
-                  data: pokemon.slice(offset, len),
+                  total: filteredPokemon.length,
+                  data: filteredPokemon.slice(offset, len),
                 });
               }, 750);
             });

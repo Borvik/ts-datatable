@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useState } from 'react';
 import { DataTableProperties, ColumnVisibilityStorage, DataFnResult } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
-import { useQueryState } from '../../utils/useQueryState';
+import { useQueryState, batchedQSUpdate } from '../../utils/useQueryState';
 import { transformColumns, getHeaderRows, getFlattenedColumns } from '../../utils/transformColumnProps';
 import { useLocalState } from '../../utils/useLocalState';
 import { ColumnContext } from './contexts';
@@ -9,6 +9,7 @@ import { TableHeader } from './header';
 import { TableBody } from './body';
 import { PageNav } from '../pagination';
 import { useDeepEffect } from '../../utils/useDeepEffect';
+import { SearchForm as SearchFormComponent } from '../search';
 
 export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChildren<DataTableProperties<T>>) {
   /**
@@ -54,6 +55,10 @@ export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChil
   const [pagination, setPagination] = useQueryState({page: 1, perPage: 10}, {
     ...props.qs
   });
+
+  const [searchQuery, setSearchQuery] = useQueryState({query: ''}, {
+    ...props.qs
+  });
   
   const [stateDataList, setDataList] = useState<DataFnResult<T[]>>({ data: [], total: 0 });
   const [dataLoading, setLoading] = useState(true);
@@ -61,7 +66,11 @@ export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChil
   useDeepEffect(() => {
     async function getData() {
       if (typeof props.data === 'function') {
-        let returnedData = await props.data({ pagination });
+        let returnedData = await props.data({
+          pagination,
+          search: searchQuery.query
+        });
+
         if (Array.isArray(returnedData)) {
           setDataList({ data: returnedData, total: returnedData.length });
         } else {
@@ -81,10 +90,11 @@ export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChil
     setLoading(true);
     getData();
 
-    // TODO: Add search/filter/order by
-  }, [ pagination ]);
+    // TODO: Add filter/order by
+  }, [ pagination, searchQuery.query ]);
 
   const Paginate = props.components?.Paginate ?? PageNav;
+  const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
 
   let wrapperStyle: any = {
     '--ts-dt-fixed-bg': props.fixedColBg ?? 'white'
@@ -101,6 +111,17 @@ export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChil
         setColumnVisibility,
       }}>
         <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
+          <div className='ts-datatable-search-actions'>
+            <SearchForm
+              searchQuery={searchQuery.query}
+              onSearch={(query) => {
+                batchedQSUpdate(() => {
+                  setSearchQuery({ query });
+                  setPagination({ page: 1 });
+                });
+              }}
+            />
+          </div>
           <div className='ts-datatable-top-page-filters'>
             {(pageNav === 'top' || pageNav === 'both') &&
               <Paginate

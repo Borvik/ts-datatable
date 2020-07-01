@@ -26,6 +26,12 @@
   background-color: #282c34;
 }
 
+.App.dark input {
+  background-color: #282c34;
+  color: white;
+  border-color: white;
+}
+
 .no-wrap {
   white-space: nowrap;
 }

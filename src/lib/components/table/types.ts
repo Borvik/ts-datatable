@@ -6,6 +6,7 @@ import {
 } from 'react';
 import { QueryStateOptions } from '../../utils/useQueryState';
 import { PaginateRequiredProps, PaginateOptions, PageChange } from '../pagination/types';
+import { SearchRequiredProps } from '../search/types';
 
 // export type EditFn<T> = (row: T, changes: Partial<T>) => Promise<boolean>;
 
@@ -42,6 +43,7 @@ export interface DataTableProperties<T> {
 
   components?: {
     Paginate?: React.ReactType<PaginateRequiredProps>;
+    SearchForm?: React.ReactType<SearchRequiredProps>;
     Loading?: ReactRenderable;
   }
 }

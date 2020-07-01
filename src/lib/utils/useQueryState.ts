@@ -236,7 +236,6 @@ export function useQueryState<State>(initialState: State, options?: QueryStateOp
       let newQS = getQueryString(location.search, publicState, derivedInitialState, options?.prefix);
       if (!options?.internalState) {
         setImmediate(() => {
-          console.log('history push');
           history.push({
             ...location,
             search: newQS
@@ -260,7 +259,6 @@ let batchedHistoryObj: HistoryType | null;
 let batchUpdateLoc: LocationDescriptorObject | null;
 
 function performBatchedUpdate(history: HistoryType, location: LocationDescriptorObject, newState: any, initialState: any, optionPrefix?: string): void {
-  console.log('Performing Batch QS Update:', newState);
   if (!batchUpdateLoc) {
     batchUpdateLoc = location;
     batchedHistoryObj = history;
@@ -278,7 +276,6 @@ export function batchedQSUpdate(fn: Function) {
   BATCHING_UPDATES = false;
 
   if (batchedHistoryObj) {
-    console.log(' History Push');
     batchedHistoryObj.push(batchUpdateLoc!);
   }
 
