@@ -11,7 +11,7 @@ import { PageNav } from '../pagination';
 import { useDeepEffect } from '../../utils/useDeepEffect';
 import { SearchForm as SearchFormComponent } from '../search';
 
-export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChildren<DataTableProperties<T>>) {
+export const DataTable = function<T>({paginate = 'both', hideSearchForm = false, ...props}: PropsWithChildren<DataTableProperties<T>>) {
   /**
    * First let's get the user-defined column visibility
    * 
@@ -68,7 +68,7 @@ export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChil
       if (typeof props.data === 'function') {
         let returnedData = await props.data({
           pagination,
-          search: searchQuery.query
+          search: hideSearchForm ? '' : searchQuery.query
         });
 
         if (Array.isArray(returnedData)) {
@@ -112,7 +112,7 @@ export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChil
       }}>
         <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
           <div className='ts-datatable-search-actions'>
-            <SearchForm
+            {!hideSearchForm && <SearchForm
               searchQuery={searchQuery.query}
               onSearch={(query) => {
                 batchedQSUpdate(() => {
@@ -120,10 +120,10 @@ export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChil
                   setPagination({ page: 1 });
                 });
               }}
-            />
+            />}
           </div>
           <div className='ts-datatable-top-page-filters'>
-            {(pageNav === 'top' || pageNav === 'both') &&
+            {(paginate === 'top' || paginate === 'both') &&
               <Paginate
                 {...props.paginateOptions}
                 {...pagination}
@@ -142,7 +142,7 @@ export const DataTable = function<T>({pageNav = 'both', ...props}: PropsWithChil
               />
             </table>
           </div>
-          {(pageNav === 'bottom' || pageNav === 'both') &&
+          {(paginate === 'bottom' || paginate === 'both') &&
             <div className='ts-datatable-bottom-page'>
               <Paginate
                 {...props.paginateOptions}

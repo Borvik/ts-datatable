@@ -30,7 +30,10 @@ export interface DataTableProperties<T> {
   totalCount?: number;
 
   qs?: QueryStateOptions;
+
+  paginate?: false | 'top' | 'bottom' | 'both';
   paginateOptions?: PaginateOptions;
+  hideSearchForm?: boolean;
 
   getRowKey?: (row: T) => string | number;
 
@@ -38,7 +41,6 @@ export interface DataTableProperties<T> {
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableProps?: DetailedHTMLProps<TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>;
 
-  pageNav?: false | 'top' | 'bottom' | 'both';
   fixedColBg?: string;
 
   components?: {
