@@ -1,4 +1,6 @@
-.ts-datatable {
+@import './components/dialog/style.scss';
+
+.ts-datatable { //
   display: flex;
   flex-direction: column;
   max-height: 100%;

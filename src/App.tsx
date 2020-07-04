@@ -2,15 +2,33 @@ import React from 'react';
 import { DataTable } from './lib';
 import './App.css';
 
+import { useDialog } from './lib/components/dialog';
+import { EditDialog } from './lib/components/dialog/test';
+
 const pokemon: any[] = require('./dataset.json').pokemon;
+
+const userData: any[] = [
+  {first_name: 'Chris', last_name: 'Kolkman'},
+  {first_name: 'Ash', last_name: 'Ketchum'},
+];
 
 function App() {
   const [theme, setTheme] = React.useState('dark');
+  const [dataIdx, setDataIdx] = React.useState<number | null>(null);
+  const {dialog: EditUserDialog, showDialog} = useDialog(<EditDialog data={userData[dataIdx]} />);
 
   return (
     <div className={`App ${theme}`}>
+      {EditUserDialog}
       <header className="App-header">
         <button type='button' onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Toggle Theme</button>
+        <button type='button' onClick={async () => {
+          if (dataIdx === null) setDataIdx(0);
+          else setDataIdx(1 - dataIdx);
+
+          let result = await showDialog();
+          console.log('Dialog Result:', result);
+        }}>Dialog?</button>
       </header>
       <div>
         <DataTable<any>
