@@ -49,7 +49,8 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 function pageComponent() {
   /**
    * EditDialog is the form component taking the data to use in it.
-   * While it gets "rendered", it's not actually put into the context tree.
+   * It doesn't _actually_ get rendered at this point (console.log
+   * confirmed within EditDialog).
    * 
    * `dialog` - if open, will contain the rendered dialog - wrapped with a DialogContext and a dialog element. THIS is what should be rendered.
    * 

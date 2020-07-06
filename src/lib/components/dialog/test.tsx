@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Dialog } from './index';
+import { Dialog, DialogHeader, DialogFooter, DialogBody } from './index';
 import { useFormState } from '../../utils/usePartialState';
 
 interface FormState {
@@ -23,19 +23,256 @@ export const EditDialog: React.FC<{data?: FormState}> = (props) => {
       throw new Error('test');
     close(form);
   }}>
-    <div>
-      <label>First Name:</label>
-      <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
-    </div>
-    <div>
-      <label>Last Name:</label>
-      <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
-    </div>
-    <div>
+    <DialogHeader>
+      Edit User
+    </DialogHeader>
+    <DialogBody>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+      <div>
+        <label>First Name:</label>
+        <input value={form.first_name ?? ''} onChange={(e) => setForm({ first_name: e.target.value })} />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input value={form.last_name ?? ''} onChange={(e) => setForm({ last_name: e.target.value })} />
+      </div>
+    </DialogBody>
+    <DialogFooter>
       <button type='button' onClick={() => {
         dialogEl.current?.close();
       }}>Close</button>
       <button type='submit'>Submit</button>
-    </div>
+    </DialogFooter>
   </Dialog>;
 }

@@ -2,9 +2,25 @@
 
 dialog {
   border: none;
+  top: 0; bottom: 0;
+  padding: 0;
+  border-radius: .3rem;
 
-  /* native, polyfill */
-  &::backdrop, + .backdrop {
+  &:not(.dialog-form), &.dialog-form > form {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    // flex-direction: column;
+  }
+  &.dialog-form > form {
+    max-height: 100%;
+  }
+
+  &::backdrop {
+    /* native */
+    background: rgba(0, 0, 0, 0.6);
+  }
+  + .backdrop {
+    /* polyfill - needs to be separate */
     background: rgba(0, 0, 0, 0.6);
   }
 
@@ -16,5 +32,22 @@ dialog {
         opacity: .5;
       }
     }
+  }
+
+  .react-dialog-header {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #dee2e6;
+    padding: .6rem;
+
+    > div:first-child {
+      flex: 1 1 auto;
+    }
+  }
+
+  .react-dialog-body {
+    // flex: 1 1 auto;
+    overflow: auto;
+    max-height: 80vh;
   }
 }
