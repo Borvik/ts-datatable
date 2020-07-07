@@ -12,6 +12,16 @@ interface DialogProps {
   dialogRef?: React.MutableRefObject<HTMLDialogElement | null>;
 }
 
+const focusableItems = ['button', '[href]', 'input', 'select', 'textarea', '[tabindex]'].map(f => `${f}:not([tabindex="-1"])`).join(', ');
+function firstFocusable(el: Element): HTMLElement | null {
+  let autofocus = el.querySelector('[autofocus], .autofocus');
+  if (autofocus) return autofocus as HTMLElement;
+
+  let focusable = el.querySelector(focusableItems);
+  if (!focusable) return null;
+  return focusable as HTMLElement;
+}
+
 /**
  * Need options:
  * Click-outside to close: boolean
@@ -55,10 +65,18 @@ export const Dialog: React.FC<DialogProps> = ({ onSubmit, children, dialogRef })
     dialogEl.current = el;
     if (dialogRef) {
       dialogRef.current = el;
-    }//
+    }
     dialogEl.current.addEventListener('close', dialogClose);
     dialogEl.current.addEventListener('click', backdropClick);
     dialogEl.current.showModal();
+
+    let dialogBody = dialogEl.current.querySelector('.dialog-body');
+    if (dialogBody) {
+      let focusable = firstFocusable(dialogBody);
+      if (focusable) {
+        focusable.focus();
+      }
+    }
     // dialogEl.current.show();
 
     // Notes: show() - Backdrop Click doesn't work (obviously), but neither does Esc which _is_ weird
@@ -73,7 +91,7 @@ export const Dialog: React.FC<DialogProps> = ({ onSubmit, children, dialogRef })
   if (!modalRoot)
     return null;
 
-  return ReactDOM.createPortal(<dialog className={`react-dialog ${!!onSubmit ? 'dialog-form' : ''} ${submitting ? 'submitting' : ''}`.trim()} ref={dialogCreated}>
+  return ReactDOM.createPortal(<dialog className={`${!!onSubmit ? 'dialog-form' : ''} ${submitting ? 'submitting' : ''}`.trim()} ref={dialogCreated}>
     {!!onSubmit && <form onSubmit={(e) => {
       e.preventDefault();
       setSubmitting(true);
@@ -103,26 +121,26 @@ interface HeaderProps {
 
 export const DialogHeader: React.FC<HeaderProps> = ({ showClose = true, children }) => {
   const { dialog: dialogEl } = useContext(DialogContext);
-  return <div className='react-dialog-header'>
+  return <div className='dialog-header'>
     <div>
       {children}
     </div>
     {showClose && <div>
-      <button type='button' onClick={() => {
+      <button type='button' className='close' onClick={() => {
         dialogEl?.current?.close();
-      }}>X</button>
+      }}>×</button>
     </div>}
   </div>
 };
 
 export const DialogBody: React.FC = ({ children }) => {
-  return <div className='react-dialog-body'>
+  return <div className='dialog-body'>
     {children}
   </div>
 };
 
 export const DialogFooter: React.FC = ({ children }) => {
-  return <div className='react-dialog-footer'>
+  return <div className='dialog-footer'>
     {children}
   </div>
 };

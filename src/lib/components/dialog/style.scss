@@ -5,14 +5,15 @@ dialog {
   top: 0; bottom: 0;
   padding: 0;
   border-radius: .3rem;
+  max-height: 80vh;
 
   &:not(.dialog-form), &.dialog-form > form {
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    // flex-direction: column;
+    display: flex;
+    flex-direction: column;
   }
-  &.dialog-form > form {
-    max-height: 100%;
+
+  &, & > form {
+    max-height: 80vh;
   }
 
   &::backdrop {
@@ -34,7 +35,7 @@ dialog {
     }
   }
 
-  .react-dialog-header {
+  .dialog-header {
     display: flex;
     align-items: center;
     border-bottom: 1px solid #dee2e6;
@@ -43,11 +44,51 @@ dialog {
     > div:first-child {
       flex: 1 1 auto;
     }
+
+    .close {
+      padding: .6rem;
+      margin: -.6rem -.6rem -.6rem auto;
+      border: 0;
+      background-color: transparent;
+      font-size: 1.5rem;
+      font-weight: bold;
+      line-height: 1;
+      color: #000;
+      text-shadow: 0 1px 0 #fff;
+      opacity: .5;
+      cursor: pointer;
+    }
   }
 
-  .react-dialog-body {
-    // flex: 1 1 auto;
-    overflow: auto;
-    max-height: 80vh;
+  .dialog-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .dialog-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: .6rem;
+    border-top: 1px solid #dee2e6;
+
+    > .right {
+      margin-left: auto;
+    }
+
+    > :not(:first-child):not(.right) {
+      margin-left: .25rem;
+    }
+
+    > .left {
+      margin-right: auto;
+    }
+    > :not(:last-child):not(.left) {
+      margin-right: .25rem;
+    }
   }
 }
