@@ -34,6 +34,9 @@ export interface PaginateOptions {
    * The className to add to the next/prev buttons
    */
   buttonClass?: string;
+
+  perPageOptions?: 'default' | 'any' | number[];
+  perPageLoc?: false | ButtonPosition;
 }
 
 export interface PaginateRequiredProps {
@@ -55,10 +58,14 @@ export interface PaginateRequiredProps {
   /**
    * Function to enable changing the page
    */
-  changePage: (pageNum: number) => void | Promise<void>;
+  changePage: (data: Partial<PageChange>) => void | Promise<void>;
 }
 
 export type PaginateProps = PaginateOptions & PaginateRequiredProps;
+
+export type PaginateLimitSelectProps = Required<PaginateRequiredProps & Pick<PaginateOptions, 'perPageOptions'>> & {
+  totalPages: number;
+}
 
 export interface PaginateButtonProps extends PaginateProps {
   position: ButtonPosition;

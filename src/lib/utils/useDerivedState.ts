@@ -1,14 +1,18 @@
 // Adapted from: https://hackernoon.com/whats-the-right-way-to-fetch-data-in-react-hooks-a-deep-dive-2jc13230
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useDebugValue } from 'react';
 import { deepCompare, simpleCompare, ComparatorFn } from './comparators';
 
 export function useDeepDerivedState<State>(onDepChange: () => State, depList: any[]): [State, (newState: State | ((state: State) => State)) => void] {
-  return useCommonDerivedState(onDepChange, depList, deepCompare);
+  let value = useCommonDerivedState(onDepChange, depList, deepCompare);
+  useDebugValue(value[0]);
+  return value;
 }
 
 export function useDerivedState<State>(onDepChange: () => State, depList: any[]): [State, (newState: State | ((state: State) => State)) => void] {
-  return useCommonDerivedState(onDepChange, depList, simpleCompare);
+  let value = useCommonDerivedState(onDepChange, depList, simpleCompare);
+  useDebugValue(value[0]);
+  return value;
 }
 
 function useCommonDerivedState<State>(onDepChange: () => State, depList: any[], comparator: ComparatorFn): [State, (newState: State | ((state: State) => State)) => void] {

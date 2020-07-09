@@ -85,6 +85,7 @@ function App() {
           paginateOptions={{
             buttonPosition: 'split',
             showFirstLast: true,
+            perPageOptions: 'any'
           }}
           columns={[
             {

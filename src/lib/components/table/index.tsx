@@ -127,7 +127,7 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
               <Paginate
                 {...props.paginateOptions}
                 {...pagination}
-                changePage={(page) => setPagination({ page })}
+                changePage={(page) => setPagination(page)}
                 total={stateDataList.total}
             />}
           </div>
@@ -147,7 +147,7 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
               <Paginate
                 {...props.paginateOptions}
                 {...pagination}
-                changePage={(page) => setPagination({ page })}
+                changePage={(page) => setPagination(page)}
                 total={stateDataList.total}
               />
             </div>}
