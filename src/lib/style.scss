@@ -94,23 +94,22 @@
     }
   }
 
+  .ts-paginate-label {
+    margin: 0 .5em;
+  }
+
   .ts-paginate-current-page {
-    border: 1px solid;
-    border-radius: 4px;
-    padding: 0 .1em;
+    border-bottom: 2px solid;
+    padding: 0 .5em;
     cursor: pointer;
   }
 
-  .ts-paginate-goto-page {
-    max-width: 3em;
-  }
-
   input {
-    width: 3.5em;
     text-align: center;
     border-top: none;
     border-left: none;
     border-right: none;
+    border-bottom-width: 2px;
     -moz-appearance: textfield;
 
     &::-webkit-inner-spin-button, &::-webkit-outer-spin-button {
@@ -127,17 +126,21 @@
 
   .per-page-select {
     &:first-child {
-      margin-right: .3em;
+      margin-right: .5em;
     }
 
     select {
       background: none;
       border: none;
     }
+
+    input {
+      width: 3.5em;
+    }
   }
 
   .ts-pagination-btn-group + .per-page-select {
-    margin-left: .3em;
+    margin-left: .5em;
   }
 }
 

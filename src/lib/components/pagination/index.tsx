@@ -42,18 +42,29 @@ export const PageNav: React.FC<PaginateProps> = ({buttonPosition = 'split', perP
         buttonPosition={buttonPosition}
         totalPages={totalPages}
       />
-      <span>Page <>
+      <span className="ts-paginate-label">Page <>
         {!editing && <span className='ts-paginate-current-page' onClick={() => setEditing(true)}>{props.page}</span>}
         {editing && <>
           <input
             className='ts-paginate-goto-page'
+            ref={(ref) => ref?.focus()}
             value={Number.isNaN(pageNum) ? '' : pageNum}
             type='number'
             min={1}
             max={totalPages}
+            size={totalPages.toString().length}
             onChange={(e) => setPageNum(e.target.valueAsNumber)}
+            onKeyUp={(e) => {
+              let key = detectKey(e);
+              if (key.isEscape) {
+                setEditing(false);
+              }
+              else if (key.isEnter) {
+                gotoPage();
+              }
+            }}
+            onBlur={() => gotoPage()}
           />
-          <button type='button' onClick={gotoPage}>go</button>
         </>}
       </> of {totalPages}</span>
       <PaginateButtons
@@ -241,7 +252,6 @@ const PerPageLimitSelect: React.FC<PaginateLimitSelectProps> = ({ page, total, t
 }
 
 function detectKey(e: React.KeyboardEvent<HTMLInputElement>) {
-  let evt = e.nativeEvent;
   console.log('Key:', e.key, e.which, e.keyCode);
   if (e.key) {
     return {
