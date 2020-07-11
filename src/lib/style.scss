@@ -62,6 +62,10 @@
           justify-content: center;
           align-items: center;
 
+          &.sortable {
+            cursor: pointer;
+          }
+
           .sort-icon {
             margin-left: .25em;
           }

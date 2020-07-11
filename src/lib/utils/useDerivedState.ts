@@ -35,7 +35,7 @@ function useCommonDerivedState<State>(onDepChange: () => State, depList: any[], 
       setLocalState(localState => {
         if (!localState.init) throw new Error();
         const publicState = typeof newState === 'function'
-          ? (newState as any)(localState.publicState)
+          ? (newState as any)(localState.publicState) as State
           : newState;
         return {...localState, publicState};
       });

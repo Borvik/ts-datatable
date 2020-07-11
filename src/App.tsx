@@ -12,6 +12,10 @@ const userData: any[] = [
   {first_name: 'Ash', last_name: 'Ketchum'},
 ];
 
+function notEmpty<T>(value: T | null | undefined): value is T {
+  return (value !== null && typeof value !== 'undefined');
+}
+
 function App() {
   const [theme, setTheme] = React.useState('dark');
   const [dataIdx, setDataIdx] = React.useState<number | null>(null);
@@ -36,9 +40,9 @@ function App() {
           
           // data={pokemon} // Pass Data in directly
           // totalCount={5} // Total count to enable pagination
-
+          multiColumnSorts={true}
           // Async data loading (recommended way)
-          data={async ({ pagination, search }) => {
+          data={async ({ pagination, search, sorts }) => {
             // This promise, timeout, and filter is all to
             // simulate an API call.
             return await new Promise((resolve) => {
@@ -48,14 +52,52 @@ function App() {
                   if (!search) return true;
 
                   let matched: boolean = false;
-                  if (search && p.type) {
+                  if (search) {
                     let re = new RegExp(`${search.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}`, 'i');
-                    let type: string = Array.isArray(p.type) ? p.type.join(', ') : p.type;
-                    matched = !!type.match(re);
+                    if (p.type) {
+                      let type: string = Array.isArray(p.type) ? p.type.join(', ') : p.type;
+                      matched = !!type.match(re);
+                    }
+
+                    if (!matched && p.name) {
+                      matched = !!p.name.match(re);
+                    }
                   }
 
                   return matched;
                 });
+
+                // Do simulated Sort
+                if (sorts.length) {
+                  filteredPokemon = filteredPokemon.sort((a, b) => {
+                    // loop sorts
+                    for (let sort of sorts) {
+                      let aValue = a[sort.column];
+                      let bValue = b[sort.column];
+                      if (typeof aValue === 'string')
+                        aValue = aValue.toLowerCase();
+                      if (typeof bValue === 'string')
+                        bValue = bValue.toLowerCase();
+                        
+                      if (sort.direction === 'asc') {
+                        if (notEmpty(aValue) && !notEmpty(bValue))
+                          return 1;
+                        if (!notEmpty(aValue) && notEmpty(bValue))
+                          return -1;
+                        if (aValue < bValue) return -1;
+                        if (aValue > bValue) return 1;
+                      } else {
+                        if (notEmpty(aValue) && !notEmpty(bValue))
+                          return -1;
+                        if (!notEmpty(aValue) && notEmpty(bValue))
+                          return 1;
+                        if (aValue < bValue) return 1;
+                        if (aValue > bValue) return -1;
+                      }
+                    }
+                    return 0;
+                  });
+                }
 
                 let offset = (pagination.page - 1) * pagination.perPage;
                 let len = (pagination.page * pagination.perPage);
@@ -87,6 +129,9 @@ function App() {
             showFirstLast: true,
             perPageOptions: 'any',
           }}
+          defaultSort={[
+            {column: 'id', direction: 'asc'}
+          ]}
           columns={[
             {
               header: 'ID',
@@ -95,7 +140,8 @@ function App() {
             },
             {
               header: 'Num',
-              accessor: 'num'
+              accessor: 'num',
+              defaultSortDir: 'desc',
             },
             {
               header: 'Image',
@@ -110,6 +156,7 @@ function App() {
             {
               header: 'Type',
               accessor: 'type',
+              sortable: false,
               render: (value: any) => {
                 if (!value) return null;
                 if (!Array.isArray(value)) return value;
@@ -132,6 +179,7 @@ function App() {
             {
               header: 'Weaknesses',
               accessor: 'weaknesses',
+              sortable: false,
               render: (value: any) => {
                 if (!value) return null;
                 if (!Array.isArray(value)) return value;
@@ -156,6 +204,7 @@ function App() {
               header: 'Evolves To',
               accessor: 'next_evolution',
               className: 'no-wrap',
+              sortable: false,
               render: (value: any) => {
                 if (!value) return null;
                 if (!Array.isArray(value)) return value;
@@ -166,6 +215,7 @@ function App() {
               header: 'Evolves From',
               accessor: 'prev_evolution',
               className: 'no-wrap',
+              sortable: false,
               render: (value: any) => {
                 if (!value) return null;
                 if (!Array.isArray(value)) return value;

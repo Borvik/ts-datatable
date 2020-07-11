@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useState } from 'react';
-import { DataTableProperties, ColumnVisibilityStorage, DataFnResult } from './types';
+import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { useQueryState, batchedQSUpdate } from '../../utils/useQueryState';
 import { transformColumns, getHeaderRows, getFlattenedColumns } from '../../utils/transformColumnProps';
@@ -10,6 +10,8 @@ import { TableBody } from './body';
 import { PageNav } from '../pagination';
 import { useDeepEffect } from '../../utils/useDeepEffect';
 import { SearchForm as SearchFormComponent } from '../search';
+import { useParsedQs } from '../../utils/useParsedQS';
+import { notEmpty } from '../../utils/comparators';
 
 export const DataTable = function<T>({paginate = 'both', hideSearchForm = false, ...props}: PropsWithChildren<DataTableProperties<T>>) {
   /**
@@ -59,7 +61,31 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
   const [searchQuery, setSearchQuery] = useQueryState({query: ''}, {
     ...props.qs
   });
-  
+
+  const [columnSort, setColumnSort] = useParsedQs<ColumnSorts, QSColumnSorts>(
+    { sort: props.defaultSort ?? [] },
+    (qsSort) => ({ // parse
+      sort: qsSort.sort.map(v => {
+        let parts = v.split(' ').filter(a => !!a);
+        if (parts.length !== 2) return null;
+        return {
+          column: parts[0],
+          direction: (parts[1].toLowerCase() === 'desc' ? 'desc' : 'asc') as 'asc' | 'desc'
+        }
+      })
+      .filter(notEmpty)
+    }),
+    (state) => ({ // encode
+      sort: state.sort.map(v => `${v.column} ${v.direction}`)
+    }),
+    {
+      ...props.qs,
+      properties: {
+        sort: 'string[]'
+      }
+    }
+  );
+
   const [stateDataList, setDataList] = useState<DataFnResult<T[]>>({ data: [], total: 0 });
   const [dataLoading, setLoading] = useState(true);
   
@@ -68,7 +94,8 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
       if (typeof props.data === 'function') {
         let returnedData = await props.data({
           pagination,
-          search: hideSearchForm ? '' : searchQuery.query
+          search: hideSearchForm ? '' : searchQuery.query,
+          sorts: columnSort.sort,
         });
 
         if (Array.isArray(returnedData)) {
@@ -90,8 +117,8 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
     setLoading(true);
     getData();
 
-    // TODO: Add filter/order by
-  }, [ pagination, searchQuery.query ]);
+    // TODO: Add filter
+  }, [ pagination, searchQuery.query, columnSort ]);
 
   const Paginate = props.components?.Paginate ?? PageNav;
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
@@ -108,7 +135,10 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
     <React.Fragment key={props.id}>
       <ColumnContext.Provider value={{
         ...columnData,
+        columnSorts: columnSort.sort,
+        multiColumnSorts: props.multiColumnSorts ?? false,
         setColumnVisibility,
+        setColumnSort,
       }}>
         <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
           <div className='ts-datatable-search-actions'>

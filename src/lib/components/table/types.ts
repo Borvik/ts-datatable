@@ -20,7 +20,7 @@ export type DataFn<T> = (props: {
   pagination: PageChange;
   search?: string;
   filters?: unknown;
-  sort?: unknown;
+  sorts: ColumnSort[];
 }) => DataResultUnion<T> | Promise<DataResultUnion<T>>;
 
 export interface DataTableProperties<T> {
@@ -28,6 +28,9 @@ export interface DataTableProperties<T> {
   columns: Partial<DataColumnProp<T>>[];
   data: DataFn<T[]> | T[];
   totalCount?: number;
+
+  multiColumnSorts?: boolean;
+  defaultSort?: ColumnSort[];
 
   qs?: QueryStateOptions;
 
@@ -61,6 +64,7 @@ interface ResolvableColumnTypes {
   header: ReactRenderable;
   fixed: FixedType;
   sortable: boolean;
+  defaultSortDir: 'asc' | 'desc';
   filterable: boolean;
   enabled: boolean;
   visibleByDefault: boolean;
@@ -73,6 +77,7 @@ interface BaseColumnProps<T> {
   accessor?: string | number;
   getValue?: (row: T, column: DataColumn<T>) => any;
   className?: string;
+  name?: string; // used for qs filter/sorts
 }
 
 /** Provides definition for columns as they are to be passed in */
@@ -104,4 +109,17 @@ export interface TableBodyProps {
   getRowKey?: (row: any) => string | number;
   loading: boolean;
   LoadingComponent?: ReactRenderable;
+}
+
+export interface ColumnSort {
+  column: string;
+  direction: 'asc' | 'desc';
+}
+
+export interface ColumnSorts {
+  sort: ColumnSort[];
+}
+
+export interface QSColumnSorts {
+  sort: string[];
 }

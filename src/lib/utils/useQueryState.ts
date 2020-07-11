@@ -80,7 +80,9 @@ function convertQsValue(value: any, toType: typeofWithArrays) {
 
   if (toType === 'string[]') {
     if (!value) return undefined;
-    throw new Error('Not Yet Implemented');
+    if (typeof value !== 'string')
+      throw new Error(`Unable to convert value to string array`);
+    return value.split(',');
   }
 
   return value;
@@ -136,7 +138,7 @@ function getQueryString<State>(origQueryString: string, newState: State, initial
   let stateKeys = Object.keys(initialState);
   for (let key of stateKeys) {
     let qsKey = prefix ? `${prefix}.${key}` : key;
-    if (newState[key as keyof State] === initialState[key as keyof State]) {
+    if (isEqual(newState[key as keyof State], initialState[key as keyof State])) {
       set(qsObject, qsKey, null);
     } else {
       set(qsObject, qsKey, newState[key as keyof State]);

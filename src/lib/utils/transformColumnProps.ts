@@ -34,10 +34,12 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       accessor: column.accessor,
       getValue: column.getValue,
       className: column.className,
+      name: column.name ?? (typeof column.accessor === 'string' ? column.accessor : undefined),
 
       header: resolve(column.header, ''),
       fixed: resolve(column.fixed, false),
       sortable: resolve(column.sortable, true), // TODO: Pull default from table options
+      defaultSortDir: resolve(column.defaultSortDir, 'asc'),
       filterable: resolve(column.filterable, true), // TODO: Pull default from table options
       enabled,
       visibleByDefault,
