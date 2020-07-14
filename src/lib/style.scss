@@ -1,4 +1,5 @@
 @import './components/dialog/style.scss';
+@import './components/column-picker/style.scss';
 
 .ts-datatable { //
   display: flex;
@@ -16,12 +17,18 @@
     flex-direction: row-reverse;
   }
 
+  .ts-datatable-search-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .ts-datatable-table {
     border-collapse: collapse;
 
     th, td {
       &.fixed {
         position: sticky;
+        background-clip: padding-box;
         background-color: var(--ts-dt-fixed-bg, white);
         z-index: 2;
 
@@ -103,8 +110,8 @@
   }
 
   .ts-paginate-current-page {
-    border-bottom: 2px solid;
-    padding: 0 .5em;
+    border-bottom: 1px solid;
+    padding: 0 .25em;
     cursor: pointer;
   }
 
@@ -113,7 +120,7 @@
     border-top: none;
     border-left: none;
     border-right: none;
-    border-bottom-width: 2px;
+    border-bottom-width: 1px;
     -moz-appearance: textfield;
 
     &::-webkit-inner-spin-button, &::-webkit-outer-spin-button {

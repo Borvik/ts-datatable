@@ -12,6 +12,7 @@ import { useDeepEffect } from '../../utils/useDeepEffect';
 import { SearchForm as SearchFormComponent } from '../search';
 import { useParsedQs } from '../../utils/useParsedQS';
 import { notEmpty } from '../../utils/comparators';
+import { ColumnPickerButton } from '../column-picker';
 
 export const DataTable = function<T>({paginate = 'both', hideSearchForm = false, ...props}: PropsWithChildren<DataTableProperties<T>>) {
   /**
@@ -151,6 +152,9 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
                 });
               }}
             />}
+            <div className="ts-datatable-actions">
+              <ColumnPickerButton />
+            </div>
           </div>
           <div className='ts-datatable-top-page-filters'>
             {(paginate === 'top' || paginate === 'both') &&

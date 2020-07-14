@@ -21,10 +21,10 @@ export function useLocalState<State>(key: string, defaultValue: State, depList: 
     (newState: (State | ((state: State) => State))) => {
       setLocalState(localState => {
         if (!localState.init) throw new Error();
-        saveLocalState(key, localState);
         const publicState = typeof newState === 'function'
-          ? (newState as any)(localState.publicState)
-          : newState;
+        ? (newState as any)(localState.publicState)
+        : newState;
+        saveLocalState(key, publicState);
         return {...localState, publicState};
       });
     },

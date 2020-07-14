@@ -5,7 +5,7 @@ import './App.css';
 import { useDialog } from './lib/components/dialog';
 import { EditDialog } from './lib/components/dialog/test';
 
-const pokemon: any[] = require('./dataset.json').pokemon;
+const pokemon: Pokemon[] = require('./dataset.json').pokemon;
 
 const userData: any[] = [
   {first_name: 'Chris', last_name: 'Kolkman'},
@@ -35,7 +35,7 @@ function App() {
         }}>Dialog?</button>
       </header>
       <div>
-        <DataTable<any>
+        <DataTable<Pokemon>
           id='pokemon'
           
           // data={pokemon} // Pass Data in directly
@@ -54,12 +54,11 @@ function App() {
                   let matched: boolean = false;
                   if (search) {
                     let re = new RegExp(`${search.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}`, 'i');
-                    if (p.type) {
-                      let type: string = Array.isArray(p.type) ? p.type.join(', ') : p.type;
-                      matched = !!type.match(re);
-                    }
 
-                    if (!matched && p.name) {
+                    let type: string = Array.isArray(p.type) ? p.type.join(', ') : p.type;
+                    matched = !!type.match(re);
+
+                    if (!matched) {
                       matched = !!p.name.match(re);
                     }
                   }
@@ -137,6 +136,7 @@ function App() {
               header: 'ID',
               accessor: 'id',
               fixed: 'left',
+              canToggleVisibility: false,
             },
             {
               header: 'Num',
@@ -247,3 +247,28 @@ function App() {
 }
 
 export default App;
+
+interface Pokemon {
+  id: number;
+  num: string;
+  name: string;
+  img: string;
+  type: string[];
+  height: string;
+  weight: string;
+  candy: string;
+  candy_count?: number;
+  egg: string;
+  spawn_chance: number;
+  avg_spawns: number;
+  spawn_time: string;
+  multipliers: number[] | null;
+  weaknesses: string[];
+  prev_evolution?: Evolution[];
+  next_evolution?: Evolution[];
+}
+
+interface Evolution {
+  num: string;
+  name: string;
+}

@@ -13,7 +13,7 @@ export const TableHeader: React.FC = () => {
       {headerRows.map((row, rowIdx) => (
         <tr key={rowIdx} className='ts-datatable-header-row'>
           {row.map((col, colIdx) => {
-            if (!col) return null;
+            if (!col.isVisible) return null;
 
             let colScope = col.colSpan > 1 ? 'colgroup' : 'col';
             const isSortable = (col.sortable && col.colSpan === 1 && col.name);

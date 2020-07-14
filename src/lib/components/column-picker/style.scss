@@ -1,0 +1,22 @@
+.config-column {
+  display: flex;
+  justify-content: space-between;
+
+  .column-header {
+    margin-right: 1.5em;
+  }
+
+  + .config-column {
+    margin-top: .15em;
+  }
+
+  button.visibility-toggle {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}

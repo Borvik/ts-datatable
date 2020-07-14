@@ -91,28 +91,30 @@ export const Dialog: React.FC<DialogProps> = ({ onSubmit, children, dialogRef })
   if (!modalRoot)
     return null;
 
-  return ReactDOM.createPortal(<dialog className={`${!!onSubmit ? 'dialog-form' : ''} ${submitting ? 'submitting' : ''}`.trim()} ref={dialogCreated}>
-    {!!onSubmit && <form onSubmit={(e) => {
-      e.preventDefault();
-      setSubmitting(true);
-      onSubmit((result?: any) => {
-        if (result !== null && typeof result !== 'undefined') {
-          dialogEl?.current!.close(JSON.stringify(result));
-          return;
-        }
-        dialogEl?.current!.close();
-      })
-      .catch(() => {}) // empty catch to catch form errors
-      .finally(() => {
-        setSubmitting(false);
-      }); // setSubmitting...
-    }}>
-      {children}
-    </form>}
-    {!onSubmit && <>
-      {children}
-    </>}
-  </dialog>, modalRoot);  
+  return ReactDOM.createPortal(<div className='dialog-container'>
+    <dialog className={`${!!onSubmit ? 'dialog-form' : ''} ${submitting ? 'submitting' : ''}`.trim()} ref={dialogCreated}>
+      {!!onSubmit && <form onSubmit={(e) => {
+        e.preventDefault();
+        setSubmitting(true);
+        onSubmit((result?: any) => {
+          if (result !== null && typeof result !== 'undefined') {
+            dialogEl?.current!.close(JSON.stringify(result));
+            return;
+          }
+          dialogEl?.current!.close();
+        })
+        .catch(() => {}) // empty catch to catch form errors
+        .finally(() => {
+          setSubmitting(false);
+        }); // setSubmitting...
+      }}>
+        {children}
+      </form>}
+      {!onSubmit && <>
+        {children}
+      </>}
+    </dialog>
+  </div>, modalRoot);  
 };
 
 interface HeaderProps {
