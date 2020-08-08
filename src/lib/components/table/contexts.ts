@@ -1,5 +1,11 @@
 import { createContext } from 'react';
-import { DataColumn, ColumnVisibilityStorage, ColumnSorts, ColumnSort } from './types';
+import {
+  DataColumn,
+  ColumnVisibilityStorage,
+  ColumnSorts,
+  ColumnSort,
+  OnShowColumnPicker,
+} from './types';
 
 interface ColumnContextInterface<T> {
   actualColumns: DataColumn<T>[]; // the flat list of columns (lowest level)
@@ -8,6 +14,7 @@ interface ColumnContextInterface<T> {
   multiColumnSorts: boolean;
   setColumnVisibility: (newState: (ColumnVisibilityStorage | ((state: ColumnVisibilityStorage) => ColumnVisibilityStorage))) => void;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
+  onShowColumnPicker?: OnShowColumnPicker;
 }
 
 export const ColumnContext = createContext<ColumnContextInterface<any>>({

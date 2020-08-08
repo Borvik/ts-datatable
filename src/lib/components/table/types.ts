@@ -39,6 +39,7 @@ export interface DataTableProperties<T> {
   hideSearchForm?: boolean;
 
   getRowKey?: (row: T) => string | number;
+  onShowColumnPicker?: OnShowColumnPicker;
 
   tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
@@ -103,6 +104,8 @@ export interface DataColumn<T> extends ResolvableColumnTypes, BaseColumnProps<T>
 export interface ColumnVisibilityStorage {
   [x: string]: boolean;
 }
+type SetColumnVisibilityCallback = (columnVisibility: ColumnVisibilityStorage) => void;
+export type OnShowColumnPicker = (columns: DataColumn<any>[], setColumnVisibility: SetColumnVisibilityCallback, btnElement: HTMLButtonElement) => void | Promise<void>;
 
 export interface TableBodyProps {
   data: any[];

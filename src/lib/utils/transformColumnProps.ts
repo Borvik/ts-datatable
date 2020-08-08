@@ -79,7 +79,7 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
 
 function getColumnKey<T>(tableId: string, parentKey: string, index: number, column: Partial<DataColumnProp<T>>): string {
   let key: string = '';
-  if ((!!column.key || !column.accessor) && !column.columns) {
+  if ((!!column.key || !!column.accessor) && !column.columns) {
     if (typeof column.key !== 'undefined') key = column.key;
     else if (typeof column.accessor === 'undefined')
       throw new Error(`Column key must be defined in the absense of a column accessor`);

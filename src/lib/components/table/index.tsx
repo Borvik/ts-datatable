@@ -140,6 +140,7 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
         multiColumnSorts: props.multiColumnSorts ?? false,
         setColumnVisibility,
         setColumnSort,
+        onShowColumnPicker: props.onShowColumnPicker,
       }}>
         <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
           <div className='ts-datatable-search-actions'>
