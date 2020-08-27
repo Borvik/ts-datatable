@@ -1,0 +1,1 @@
+Borrowed and modified from https://github.com/fkhadra/react-contexify

@@ -1,5 +1,5 @@
-import React, { PropsWithChildren, useState } from 'react';
-import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts } from './types';
+import React, { PropsWithChildren, useState, useEffect, useRef } from 'react';
+import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { useQueryState, batchedQSUpdate } from '../../utils/useQueryState';
 import { transformColumns, getHeaderRows, getFlattenedColumns } from '../../utils/transformColumnProps';
@@ -13,6 +13,8 @@ import { SearchForm as SearchFormComponent } from '../search';
 import { useParsedQs } from '../../utils/useParsedQS';
 import { notEmpty } from '../../utils/comparators';
 import { ColumnPickerButton } from '../column-picker';
+import { FilterButton, FilterBar } from '../filter';
+import { convertFromQS, convertToQS } from '../../utils/transformFilter';
 
 export const DataTable = function<T>({paginate = 'both', hideSearchForm = false, ...props}: PropsWithChildren<DataTableProperties<T>>) {
   /**
@@ -63,6 +65,18 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
     ...props.qs
   });
 
+  const [filter, setFilter] = useParsedQs<QueryFilterGroup, {filter?: any}>(
+    { groupOperator: 'and', filters: [] },
+    (qsFilter) => convertFromQS(qsFilter, columnData.actualColumns),
+    (state) => convertToQS(state, columnData.actualColumns),
+    {
+      ...props.qs,
+      properties: {
+        filter: 'any'
+      }
+    }
+  )
+
   const [columnSort, setColumnSort] = useParsedQs<ColumnSorts, QSColumnSorts>(
     { sort: props.defaultSort ?? [] },
     (qsSort) => ({ // parse
@@ -97,6 +111,7 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
           pagination,
           search: hideSearchForm ? '' : searchQuery.query,
           sorts: columnSort.sort,
+          filters: filter.filters.length ? filter : undefined,
         });
 
         if (Array.isArray(returnedData)) {
@@ -117,9 +132,7 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
     }
     setLoading(true);
     getData();
-
-    // TODO: Add filter
-  }, [ pagination, searchQuery.query, columnSort ]);
+  }, [ pagination, searchQuery.query, filter, columnSort ]);
 
   const Paginate = props.components?.Paginate ?? PageNav;
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
@@ -127,6 +140,37 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
   let wrapperStyle: any = {
     '--ts-dt-fixed-bg': props.fixedColBg ?? 'white'
   };
+
+  // const [wrapTop, setWrapTop] = useState({width: 99999, wrap: false});
+  const topEl = useRef<HTMLDivElement>(null);
+
+  // useEffect(() => {
+  //   let newWrapTop = {...wrapTop};
+  //   // if top width < value set
+  //   newWrapTop.width = topEl.current?.offsetWidth ?? 99999;
+  //   if (newWrapTop.width < 800) {
+  //     if (!wrapTop) newWrapTop.wrap = true;
+  //   } else {
+  //     if (wrapTop) newWrapTop.wrap = false;
+  //   }
+  //   if (newWrapTop.width !== wrapTop.width || newWrapTop.wrap !== wrapTop.wrap)
+  //     setWrapTop(newWrapTop);
+  // }, [wrapTop, setWrapTop]);
+  useEffect(() => {
+    function topResize() {
+      let width = topEl.current?.offsetWidth ?? 99999;
+      if (width < 800) {
+        topEl.current!.classList.add('wrap');
+      } else {
+        topEl.current!.classList.remove('wrap');
+      }
+    }
+    window.addEventListener('resize', topResize)
+    topResize();
+    return () => {
+      window.removeEventListener('resize', topResize);
+    }
+  }, []);
 
   /**
    * Finally we setup the contexts that will house all the data
@@ -138,34 +182,50 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
         ...columnData,
         columnSorts: columnSort.sort,
         multiColumnSorts: props.multiColumnSorts ?? false,
+        filter,
+        filterSettings: props.filterSettings,
+        setFilter,
         setColumnVisibility,
         setColumnSort,
         onShowColumnPicker: props.onShowColumnPicker,
+        setPagination,
       }}>
         <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
-          <div className='ts-datatable-search-actions'>
-            {!hideSearchForm && <SearchForm
-              searchQuery={searchQuery.query}
-              onSearch={(query) => {
-                batchedQSUpdate(() => {
-                  setSearchQuery({ query });
-                  setPagination({ page: 1 });
-                });
-              }}
-            />}
-            <div className="ts-datatable-actions">
-              <ColumnPickerButton />
+          <div ref={topEl} className={`ts-datatable-top`}>
+            <div className='ts-datatable-search-filters'>
+              {!hideSearchForm && <SearchForm
+                searchQuery={searchQuery.query}
+                onSearch={(query) => {
+                  batchedQSUpdate(() => {
+                    setSearchQuery({ query });
+                    setPagination({ page: 1 });
+                  });
+                }}
+              />}
+              <FilterBar />
+            </div>
+            <div className='ts-datatable-page-actions'>
+              <div className="ts-datatable-actions">
+                <FilterButton />
+                <ColumnPickerButton />
+              </div>
+              {(paginate === 'top' || paginate === 'both') &&
+                <Paginate
+                  {...props.paginateOptions}
+                  {...pagination}
+                  changePage={(page) => setPagination(page)}
+                  total={stateDataList.total}
+              />}
             </div>
           </div>
-          <div className='ts-datatable-top-page-filters'>
-            {(paginate === 'top' || paginate === 'both') &&
-              <Paginate
-                {...props.paginateOptions}
-                {...pagination}
-                changePage={(page) => setPagination(page)}
-                total={stateDataList.total}
-            />}
+          {/* <div className='ts-datatable-search-actions'>
+            
+            
           </div>
+          <div className='ts-datatable-top-page-filters'>
+            
+            
+          </div> */}
           <div {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
             <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
               <TableHeader />

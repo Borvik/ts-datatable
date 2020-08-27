@@ -9,24 +9,24 @@
   flex: 1 1 auto;
 }
 
-.App.dark {
+.dark .App {
   color: white;
   background-color: #282c34;
   --dt-fixed-bg: #282c34;
 }
 
-.App.light {
+.light .App {
   background-color: white;
   color: #282c34;
   --dt-fixed-bg: white;
 }
 
-.App.dark button {
+.dark button {
   color: white;
   background-color: #282c34;
 }
 
-.App.dark input, .App.dark select {
+.dark input, .dark select {
   background-color: #282c34;
   color: white;
   border-color: white;
@@ -37,3 +37,50 @@
 }
 
 .fw { width: 975px; }
+
+.dark dialog {
+  color: white;
+  background-color: #282c34;
+}
+
+.dark dialog .dialog-header .close {
+  color: white;
+  text-shadow: 0 1px 0 black;
+}
+
+/* .react-contexify__theme--dark {
+  
+  & .react-contexify__submenu {
+    
+  }
+  .react-contexify__separator {
+    background-color: #eee;
+  }
+
+  .react-contexify__item {
+    &__content {
+      color: #ffffff;
+    }
+    &__icon {
+      margin-right: 8px;
+      width: 12px;
+      text-align: center;
+    }
+  }
+} */
+.dark .react-contexify {
+  background-color: rgba(40, 40, 40, 0.98);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, .4), 0 0 0 1px #222;
+}
+
+.dark .react-contexify .react-contexify__submenu {
+  background-color: rgba(40, 40, 40, 0.98);
+}
+
+.dark .react-contexify .react-contexify__separator {
+  color: #eee;
+}
+
+.dark .react-contexify .react-contexify__item__content {
+  color: #fff;
+}

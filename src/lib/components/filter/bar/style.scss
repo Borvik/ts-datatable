@@ -1,0 +1,18 @@
+.filter-bar {
+  border: 1px solid;
+  border-radius: 4px;
+
+  display: flex;
+  align-items: flex-start;
+  padding: .15em;
+
+  button {
+    margin-top: .25em;
+    border: none;
+    background: transparent;
+    opacity: .5;
+    cursor: pointer;
+
+    &:hover { opacity: 1; }
+  }
+}

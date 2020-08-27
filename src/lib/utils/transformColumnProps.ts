@@ -1,5 +1,6 @@
 import { DataColumnProp, DataColumn, ColumnVisibilityStorage } from '../components/table/types';
 import { resolve } from '../types';
+import { cloneDeep } from 'lodash';
 
 /**
  * Transform columns from the table prop to an internal form.
@@ -28,6 +29,11 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
     let visibleByDefault: boolean = resolve(column.visibleByDefault, true);
     let isVisible: boolean = getColumnIsVisible(key, {enabled, visibleByDefault}, columnVisibility);
 
+    let filter = cloneDeep(column.filter);
+    if (filter && !filter.filterKey) {
+      filter.filterKey = column.name ?? (typeof column.accessor === 'string' ? column.accessor : undefined);
+    }
+
     let transformedColumn: DataColumn<T> = {
       key,
       render: column.render,
@@ -35,12 +41,12 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       getValue: column.getValue,
       className: column.className,
       name: column.name ?? (typeof column.accessor === 'string' ? column.accessor : undefined),
+      filter,
 
       header: resolve(column.header, ''),
       fixed: resolve(column.fixed, false),
       sortable: resolve(column.sortable, true), // TODO: Pull default from table options
       defaultSortDir: resolve(column.defaultSortDir, 'asc'),
-      filterable: resolve(column.filterable, true), // TODO: Pull default from table options
       enabled,
       visibleByDefault,
       canToggleVisibility: resolve(column.canToggleVisibility, true),

@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext } from 'react';
 import { useDialog } from '../dialog';
 import { ColumnContext } from '../table/contexts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,7 +10,6 @@ export const ColumnPickerButton: React.FC = (props) => {
   const { actualColumns, setColumnVisibility, onShowColumnPicker } = useContext(ColumnContext);
 
   async function onButtonClick(e: React.MouseEvent<HTMLButtonElement>) {
-    // if custom function, call that - otherwise - showDialog
     try {
       if (onShowColumnPicker) {
         await onShowColumnPicker(actualColumns, setColumnVisibility, e.currentTarget);

@@ -10,9 +10,11 @@ const modalRoot = (typeof document !== 'undefined')
 interface DialogProps {
   onSubmit?: (close: (result?: any) => void) => Promise<void>;
   dialogRef?: React.MutableRefObject<HTMLDialogElement | null>;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
-const focusableItems = ['button', '[href]', 'input', 'select', 'textarea', '[tabindex]'].map(f => `${f}:not([tabindex="-1"])`).join(', ');
+const focusableItems = ['button', '[href]', 'input', 'select', 'textarea', '[tabindex]'].map(f => `${f}:not([tabindex="-1"]):not([data-noautofocus])`).join(', ');
 function firstFocusable(el: Element): HTMLElement | null {
   let autofocus = el.querySelector('[autofocus], .autofocus');
   if (autofocus) return autofocus as HTMLElement;
@@ -26,7 +28,7 @@ function firstFocusable(el: Element): HTMLElement | null {
  * Need options:
  * Click-outside to close: boolean
  */
-export const Dialog: React.FC<DialogProps> = ({ onSubmit, children, dialogRef }) => {
+export const Dialog: React.FC<DialogProps> = ({ className, style, onSubmit, children, dialogRef }) => {
   const [submitting, setSubmitting] = useState(false);
   const { close, dialog: dialogEl } = useContext(DialogContext);
   
@@ -92,7 +94,7 @@ export const Dialog: React.FC<DialogProps> = ({ onSubmit, children, dialogRef })
     return null;
 
   return ReactDOM.createPortal(<div className='dialog-container'>
-    <dialog className={`${!!onSubmit ? 'dialog-form' : ''} ${submitting ? 'submitting' : ''}`.trim()} ref={dialogCreated}>
+    <dialog style={style} className={`${className ?? ''} ${!!onSubmit ? 'dialog-form' : ''} ${submitting ? 'submitting' : ''}`.trim()} ref={dialogCreated}>
       {!!onSubmit && <form onSubmit={(e) => {
         e.preventDefault();
         setSubmitting(true);
