@@ -204,6 +204,25 @@ export const OperatorLabels: OperatorMap<AllFilterOperators> = {
   'none': 'Is none of',
 };
 
+export const QuickOperatorLabels: OperatorMap<AllFilterOperators> = {
+  'eq': '=',
+  'neq': '≠',
+  'gt': '>',
+  'gte': '≥',
+  'lt': '<',
+  'lte': '≤',
+  'bet': 'between',
+  'nbet': 'not between',
+  'con': 'contains',
+  'ncon': 'not contains',
+  'beg': 'starts with',
+  'end': 'ends with',
+  'nul': 'is not set',
+  'nnul': 'is set',
+  'any': 'is in',
+  'none': 'is not in',
+}
+
 export type ColumnFilter = StringColumnFilter | NumberColumnFilter | BooleanColumnFilter | CustomColumnFilter;
 
 export interface QueryFilterItem {

@@ -55,7 +55,7 @@ export const FilterFieldEditor: React.FC<Props> = ({ canLimitConditions, filter,
   let availableOperators: AllFilterOperators[] = getAvailableOperators(column?.filter);
 
   /**
-   * Unline the group - PATH is the _group_ path, all operations must include self index
+   * Unlike the group - PATH is the _group_ path, all operations must include self index
    */
   function remove() {
     setState(path, { filters: { $splice: [[index, 1]] } });

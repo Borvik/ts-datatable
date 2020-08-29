@@ -28,7 +28,9 @@ function sqliteParams(obj: any): any {
 }
 
 function query(sql: string, params?: any) {
-  console.log('Running Query:', sql);
+  console.groupCollapsed('Running Query:', sql.trim().replace(/\s{2,}/g, ' '));
+  console.log('Params:', params);
+
   let stmt = DB.prepare(sql);
   if (params) stmt.bind(params);
 
@@ -38,6 +40,9 @@ function query(sql: string, params?: any) {
     result.push(dbRes);
   }
   stmt.free();
+  
+  console.log('Result:', result);
+  console.groupEnd();
   return result;
 }
 

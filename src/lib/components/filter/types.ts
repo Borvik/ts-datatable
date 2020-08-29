@@ -13,6 +13,7 @@ export interface FilterSettings {
    */
   limitOneColumnUse?: boolean;
   operatorLabels?: Partial<OperatorMap<AllFilterOperators>>;
+  quickOperatorLabels?: Partial<OperatorMap<AllFilterOperators>>;
 }
 
 export type SetEditorStateFn = (path: number[], $spec: Spec<QueryFilterGroup>) => void;

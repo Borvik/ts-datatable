@@ -7,12 +7,74 @@
   padding: .15em;
 
   button {
-    margin-top: .25em;
     border: none;
-    background: transparent;
-    opacity: .5;
+    background-color: transparent !important;
     cursor: pointer;
+    opacity: .5;
+    color: inherit !important;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
 
-    &:hover { opacity: 1; }
+  > button {
+    margin-top: .25em;
+  }
+
+  .quick-filter-group-container, .quick-filter-field-container {
+    display: inline-flex;
+
+    .quick-filter-item-remove-btn {
+      order: 2;
+      padding: 0;
+      margin-right: .25em;
+      margin-left: .15em;
+
+      &:hover {
+        color: #db3412 !important;
+
+        + .quick-filter-group, + .quick-filter-field {
+          color: #db3412;
+        }
+      }
+    }
+  }
+
+  .quick-filter-field-container {
+    .quick-filter-field-operator {
+      margin-left: .25em;
+      margin-right: .25em;
+    }
+
+    .double-value-separator {
+      margin-left: .25em;
+      margin-right: .25em;
+    }
+
+    .multi-value-value {
+      display: inline-flex;
+
+      .quick-filter-value-remove-btn {
+        order: 2;
+        padding: 0;
+        margin-left: .15em;
+
+        &:hover {
+          color: #db3412 !important;
+
+          + span {
+            color: #db3412;
+          }
+        }
+      }
+
+      + .multi-value-value {
+        &::before {
+          content: ',';
+          margin-right: .25em;
+        }
+      }
+    }
   }
 }
