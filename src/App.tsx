@@ -1,112 +1,182 @@
-import React from 'react';
-import { DataTable } from './lib';
+import React, { useEffect } from 'react';
+import { DataTable, CustomEditorProps } from './lib';
+import initSqlJs from 'sql.js';
 import './App.css';
+import { cloneDeep } from 'lodash';
+import { buildSQL } from './sqlFilterBuilder';
 
-import { useDialog } from './lib/components/dialog';
-import { EditDialog } from './lib/components/dialog/test';
+type ThenArg<T> = T extends Promise<infer U> ? U : T;
+type SQL = ThenArg<ReturnType<typeof initSqlJs>>;
+type SQLDatabase = InstanceType<SQL['Database']>;
 
+let DB: SQLDatabase | null = null;
 const pokemon: Pokemon[] = require('./dataset.json').pokemon;
 
-const userData: any[] = [
-  {first_name: 'Chris', last_name: 'Kolkman'},
-  {first_name: 'Ash', last_name: 'Ketchum'},
-];
+// function notEmpty<T>(value: T | null | undefined): value is T {
+//   return (value !== null && typeof value !== 'undefined');
+// }
 
-function notEmpty<T>(value: T | null | undefined): value is T {
-  return (value !== null && typeof value !== 'undefined');
+const addBodyClass = (className: string) => document.body.classList.add(className);
+const removeBodyClass = (className: string) => document.body.classList.remove(className);
+
+function sqliteParams(obj: any): any {
+  let result: any = {};
+  let keys = Object.keys(obj);
+  for (let k of keys) {
+    result[':' + k] = obj[k];
+  }
+  return result;
+}
+
+function query(sql: string, params?: any) {
+  console.groupCollapsed('Running Query:', sql.trim().replace(/\s{2,}/g, ' '));
+  console.log('Params:', params);
+
+  let stmt = DB.prepare(sql);
+  if (params) stmt.bind(params);
+
+  let result: any[] = [];
+  while (stmt.step()) {
+    let dbRes = stmt.getAsObject();
+    result.push(dbRes);
+  }
+  stmt.free();
+
+  console.log('Result:', result);
+  console.groupEnd();
+  return result;
 }
 
 function App() {
   const [theme, setTheme] = React.useState('dark');
-  const [dataIdx, setDataIdx] = React.useState<number | null>(null);
-  const {dialog: EditUserDialog, showDialog} = useDialog(<EditDialog data={userData[dataIdx]} />);
+  const [, setDB] = React.useState<SQLDatabase | null>(null);
+  useEffect(() => {
+    addBodyClass(theme);
+    return () => removeBodyClass(theme);
+  }, [theme]);
+
+  useEffect(() => {
+    initSqlJs()
+      .then(SQL => {
+        DB = new SQL.Database();
+        DB.run(`CREATE TABLE pokemon (
+          id INTEGER primary key,
+          num TEXT,
+          name TEXT,
+          img TEXT,
+          type TEXT,
+          height TEXT,
+          weight TEXT,
+          candy TEXT,
+          candy_count INTEGER,
+          egg TEXT,
+          spawn_chance NUMERIC,
+          avg_spawns NUMERIC,
+          spawn_time TEXT,
+          weaknesses TEXT,
+          prev_evolution TEXT,
+          next_evolution TEXT,
+          evolves_to INTEGER
+        );`);
+        DB.run(`CREATE TABLE pokemon_types (name);`)
+
+        let uniqueTypes = new Set<string>();
+        let insertStmt = `INSERT INTO pokemon VALUES (:id,:num,:name,:img,:type,:height,:weight,:candy,:candy_count,:egg,:spawn_chance,:avg_spawns,:spawn_time,:weaknesses,:prev_evolution,:next_evolution,:evolves_to)`;
+        for (let creature of pokemon) {
+          uniqueTypes = new Set<string>([...uniqueTypes, ...creature.type]);
+
+          let obj: any = cloneDeep(creature);
+
+          if (Array.isArray(obj.type)) obj.type = obj.type.join(', ');
+          if (Array.isArray(obj.weaknesses)) obj.weaknesses = obj.weaknesses.join(', ');
+          if (Array.isArray(obj.prev_evolution)) obj.prev_evolution = obj.prev_evolution.map((v: any) => v.name).join(' => ');
+          if (Array.isArray(obj.next_evolution)) {
+            obj.evolves_to = Number(obj.next_evolution[0].num);
+            obj.next_evolution = obj.next_evolution.map((v: any) => v.name).join(' => ');
+          }
+          
+          DB.run(insertStmt, sqliteParams(obj));
+        }
+
+        for (let typeName of uniqueTypes) {
+          DB.run(`INSERT INTO pokemon_types VALUES(?);`, [typeName]);
+        }
+        
+        setDB(DB); // Needed for re-render
+      })
+      .catch(err => console.error(err));
+  }, []);
+
+  if (!DB) return <></>;
 
   return (
-    <div className={`App ${theme}`}>
-      {EditUserDialog}
+    <div className={`App`}>
       <header className="App-header">
         <button type='button' onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Toggle Theme</button>
-        <button type='button' onClick={async () => {
-          if (dataIdx === null) setDataIdx(0);
-          else setDataIdx(1 - dataIdx);
-
-          let result = await showDialog();
-          console.log('Dialog Result:', result);
-        }}>Dialog?</button>
+        <span> Note: Because Type/Weakness are actually stored as a comma separated list - the filter is there as an example only and doesn't work as expected.</span>
       </header>
       <div>
         <DataTable<Pokemon>
           id='pokemon'
-          
+          filterSettings={{
+            allowOr: true,
+            allowNested: true,
+            limitOneColumnUse: true,
+          }}
           // data={pokemon} // Pass Data in directly
           // totalCount={5} // Total count to enable pagination
           multiColumnSorts={true}
           // Async data loading (recommended way)
-          data={async ({ pagination, search, sorts }) => {
+          data={async ({ pagination, search, sorts, filters }) => {
+            console.log('Running with filters:', filters);
+
+            let filterSql = buildSQL(filters);
+            console.log('Filter Sql:', filterSql);
+            
             // This promise, timeout, and filter is all to
-            // simulate an API call.
-            return await new Promise((resolve) => {
+            // simulate an API call (sqlite calls synchrounous).
+            return await new Promise(resolve => {
               setTimeout(() => {
-                // do fake filters
-                let filteredPokemon = pokemon.filter(p => {
-                  if (!search) return true;
-
-                  let matched: boolean = false;
-                  if (search) {
-                    let re = new RegExp(`${search.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}`, 'i');
-
-                    let type: string = Array.isArray(p.type) ? p.type.join(', ') : p.type;
-                    matched = !!type.match(re);
-
-                    if (!matched) {
-                      matched = !!p.name.match(re);
-                    }
-                  }
-
-                  return matched;
-                });
-
-                // Do simulated Sort
-                if (sorts.length) {
-                  filteredPokemon = filteredPokemon.sort((a, b) => {
-                    // loop sorts
-                    for (let sort of sorts) {
-                      let aValue = a[sort.column];
-                      let bValue = b[sort.column];
-                      if (typeof aValue === 'string')
-                        aValue = aValue.toLowerCase();
-                      if (typeof bValue === 'string')
-                        bValue = bValue.toLowerCase();
-                        
-                      if (sort.direction === 'asc') {
-                        if (notEmpty(aValue) && !notEmpty(bValue))
-                          return 1;
-                        if (!notEmpty(aValue) && notEmpty(bValue))
-                          return -1;
-                        if (aValue < bValue) return -1;
-                        if (aValue > bValue) return 1;
-                      } else {
-                        if (notEmpty(aValue) && !notEmpty(bValue))
-                          return -1;
-                        if (!notEmpty(aValue) && notEmpty(bValue))
-                          return 1;
-                        if (aValue < bValue) return 1;
-                        if (aValue > bValue) return -1;
-                      }
-                    }
-                    return 0;
-                  });
+                let params: any = {};
+                let whereClauses: string[] = [];
+                if (search) {
+                  params[':search'] = `%${search}%`;
+                  whereClauses.push(`(num LIKE :search OR name LIKE :search OR type LIKE :search)`);
                 }
 
+                if (filterSql.sql) {
+                  Object.assign(params, filterSql.params);
+                  whereClauses.push(filterSql.sql);
+                }
+  
                 let offset = (pagination.page - 1) * pagination.perPage;
-                let len = (pagination.page * pagination.perPage);
+                let len = pagination.perPage;
+  
+                let whereQuery = whereClauses.length
+                  ? 'WHERE ' + whereClauses.join(' AND ')
+                  : '';
+  
+                let orderBy = sorts.length
+                  ? 'ORDER BY ' + sorts.map(s => `${s.column} ${s.direction}`).join(', ')
+                  : '';
+  
+                let countResult = query(`
+                  SELECT COUNT(*) as total
+                  FROM pokemon
+                  ${whereQuery}
+                `, params);
+  
+                let fullResult = query(`
+                  SELECT *
+                  FROM pokemon
+                  ${whereQuery}
+                  ${orderBy}
+                  LIMIT ${len} OFFSET ${offset}
+                `, params);
 
-                // Can return either just the array, or
-                // an object containing the total number of items
-                // for pagination
                 resolve({
-                  total: filteredPokemon.length,
-                  data: filteredPokemon.slice(offset, len),
+                  total: countResult[0].total,
+                  data: fullResult,
                 });
               }, 750);
             });
@@ -137,21 +207,34 @@ function App() {
               accessor: 'id',
               fixed: 'left',
               canToggleVisibility: false,
+              filter: {
+                type: 'number',
+                parseAsType: 'number',
+              },
             },
             {
               header: 'Num',
               accessor: 'num',
               defaultSortDir: 'desc',
+              filter: {
+                type: 'string',
+              }
             },
             {
               header: 'Image',
               accessor: 'img',
               sortable: false,
-              render: (value: any) => <img alt='' src={value} style={{maxHeight: '50px'}} />
+              render: (value: any) => <img alt='' src={value} style={{maxHeight: '50px'}} />,
+              filter: {
+                type: 'boolean'
+              }
             },
             {
               header: 'Name',
-              accessor: 'name'
+              accessor: 'name',
+              filter: {
+                type: 'string',
+              },
             },
             {
               header: 'Type',
@@ -161,6 +244,11 @@ function App() {
                 if (!value) return null;
                 if (!Array.isArray(value)) return value;
                 return value.join(', ');
+              },
+              filter: {
+                type: 'custom',
+                toDisplay: (value: any) => value,
+                Editor: CustomTypeSelectEditor
               }
             },
             {
@@ -184,17 +272,29 @@ function App() {
                 if (!value) return null;
                 if (!Array.isArray(value)) return value;
                 return value.join(', ');
+              },
+              filter: {
+                type: 'custom',
+                toDisplay: (value: any) => value,
+                Editor: CustomTypeSelectEditor
               }
             },
             {
               header: 'Candy',
               accessor: 'candy',
               className: 'no-wrap fw',
+              filter: {
+                type: 'string',
+              }
             },
             {
               header: 'Candy Count',
               className: 'no-wrap',
-              accessor: 'candy_count'
+              accessor: 'candy_count',
+              filter: {
+                type: 'number',
+                parseAsType: 'number',
+              }
             },
             {
               header: 'Egg',
@@ -270,5 +370,38 @@ interface Pokemon {
 
 interface Evolution {
   num: string;
+  name: string;
+}
+
+interface TypeEditorState {
+  options: DBPokemonType[];
+}
+
+class CustomTypeSelectEditor extends React.Component<CustomEditorProps, TypeEditorState> {
+  state = {
+    options: [] as DBPokemonType[]
+  }
+
+  componentDidMount() {
+    let types: DBPokemonType[] = query('SELECT * FROM pokemon_types;');
+    this.setState({ options: types });
+  }
+  render() {
+    const { inputRef, value, allValues, setValue, onLoseFocus } = this.props;
+    const { options } = this.state;
+    
+    let hideable = Array.isArray(allValues);
+    return <select ref={(el) => inputRef.current = el} value={value ?? ''} onBlur={onLoseFocus} onChange={(e) => setValue(e.target.value)}>
+      <option></option>
+      {options.map(t => {
+        if (hideable && value !== t.name && allValues.includes(t.name))
+          return null;
+        return <option key={t.name} value={t.name}>{t.name}</option>
+      }).filter(e => !!e)}
+    </select>
+  }
+}
+
+interface DBPokemonType {
   name: string;
 }

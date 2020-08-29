@@ -252,7 +252,6 @@ const PerPageLimitSelect: React.FC<PaginateLimitSelectProps> = ({ page, total, t
 }
 
 function detectKey(e: React.KeyboardEvent<HTMLInputElement>) {
-  console.log('Key:', e.key, e.which, e.keyCode);
   if (e.key) {
     return {
       isEscape: (e.key === 'Escape' || e.key === 'Esc'),

@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useEffect, useMemo, useContext } 
 import ReactDOM from 'react-dom';
 import { DialogProvider, DialogContext } from './provider';
 import dialogPolyfill from 'dialog-polyfill';
+import { firstFocusable } from '../../utils/firstFocusable';
 
 const modalRoot = (typeof document !== 'undefined')
   ? document.getElementsByTagName('body').item(0)
@@ -10,23 +11,15 @@ const modalRoot = (typeof document !== 'undefined')
 interface DialogProps {
   onSubmit?: (close: (result?: any) => void) => Promise<void>;
   dialogRef?: React.MutableRefObject<HTMLDialogElement | null>;
-}
-
-const focusableItems = ['button', '[href]', 'input', 'select', 'textarea', '[tabindex]'].map(f => `${f}:not([tabindex="-1"])`).join(', ');
-function firstFocusable(el: Element): HTMLElement | null {
-  let autofocus = el.querySelector('[autofocus], .autofocus');
-  if (autofocus) return autofocus as HTMLElement;
-
-  let focusable = el.querySelector(focusableItems);
-  if (!focusable) return null;
-  return focusable as HTMLElement;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
 /**
  * Need options:
  * Click-outside to close: boolean
  */
-export const Dialog: React.FC<DialogProps> = ({ onSubmit, children, dialogRef }) => {
+export const Dialog: React.FC<DialogProps> = ({ className, style, onSubmit, children, dialogRef }) => {
   const [submitting, setSubmitting] = useState(false);
   const { close, dialog: dialogEl } = useContext(DialogContext);
   
@@ -92,7 +85,7 @@ export const Dialog: React.FC<DialogProps> = ({ onSubmit, children, dialogRef })
     return null;
 
   return ReactDOM.createPortal(<div className='dialog-container'>
-    <dialog className={`${!!onSubmit ? 'dialog-form' : ''} ${submitting ? 'submitting' : ''}`.trim()} ref={dialogCreated}>
+    <dialog style={style} className={`${className ?? ''} ${!!onSubmit ? 'dialog-form' : ''} ${submitting ? 'submitting' : ''}`.trim()} ref={dialogCreated}>
       {!!onSubmit && <form onSubmit={(e) => {
         e.preventDefault();
         setSubmitting(true);
@@ -128,7 +121,7 @@ export const DialogHeader: React.FC<HeaderProps> = ({ showClose = true, children
       {children}
     </div>
     {showClose && <div>
-      <button type='button' className='close' onClick={() => {
+      <button type='button' className='close' data-noautofocus onClick={() => {
         dialogEl?.current?.close();
       }}>×</button>
     </div>}

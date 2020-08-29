@@ -1,0 +1,144 @@
+.filter-editor {
+
+  .filter-btn {
+    border: none;
+    padding: 0;
+    margin: 0 0 0 .3em;
+    background: transparent;
+    opacity: .5;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &.filter-item-remove-btn, &.filter-mv-item-remove {
+      &:hover {
+        color: #db3412;
+      }
+    }
+    &.filter-group-add-btn, &.filter-mv-item-add {
+      &:hover {
+        color: #44a147;
+      }
+    }
+  }
+
+  .filter-group-options {
+    display: flex;
+    align-items: center;
+
+    .filter-group-operator {
+      color: #db3412;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .filter-group-filters {
+    padding-left: 1em;
+  }
+
+  .filter-item-editor {
+    display: flex;
+    align-items: center;
+
+    .filter-column {
+      margin-right: .75em;
+      color: #F78119;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      .no-column {
+        font-style: italic;
+      }
+    }
+
+    .filter-operator {
+      margin-right: .75em;
+      color: #64B5F6;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .filter-value {
+      margin-right: .5em;
+      &:empty {
+        margin-right: 0;
+      }
+      
+      .filter-editor-value {
+        cursor: pointer;
+        &:hover {
+          text-decoration: underline;
+        }
+
+        .no-value {
+          font-style: italic;
+        }
+      }
+
+      .double-value-separator {
+        margin-left: .5em;
+        margin-right: .5em;
+      }
+
+      .multi-value-editor {
+        &:first-child {
+          margin-left: .25em;
+        }
+        &:last-child {
+          margin-right: .25em;
+        }
+        + .multi-value-editor {
+          &::before {
+            content: ',';
+            margin-right: .25em;
+          }
+        }
+      }
+
+      .input-sizer {
+        display: inline-grid;
+        vertical-align: top;
+        align-items: center;
+        position: relative;
+        
+        &::after, input {
+          box-sizing: border-box;
+          width: auto;
+          min-width: 4em;
+          grid-area: 1 / 1;
+          font: inherit;
+          padding: 0;
+          margin: 0;
+          resize: none;
+          appearance: none;
+          border: none;
+          border-bottom: 1px solid;
+        }
+
+        input:focus {
+          outline: none;
+          border-bottom-color: #64B5F6;
+        }
+
+        &::after {
+          position: absolute;
+          content: attr(data-value) ' ';
+          visibility: hidden;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}

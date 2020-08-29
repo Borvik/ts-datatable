@@ -5,13 +5,15 @@ import cleanDeep from 'clean-deep';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import { isEqual } from './isEqual';
-import qs from 'qs';
 import { useDeepDerivedState } from './useDerivedState';
+import { QueryString } from './querystring';
+import { isset } from '../components/filter/editor/value-editors/isEmpty';
 
-const VALID_TYPES: string[] = ["string", "number", "bigint", "boolean", "string[]", "number[]", "bigint[]", "boolean[]"];
-type typeofResult = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function";
+const VALID_TYPES: string[] = ["any", "string", "number", "bigint", "boolean", "string[]", "number[]", "bigint[]", "boolean[]"];
+type typeofResult = "any" | "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function";
 type typeofWithArrays = typeofResult | "string[]" | "number[]" | "bigint[]" | "boolean[]";
-type validQSTypes = "string" | "number" | "bigint" | "boolean" | "string[]" | "number[]" | "bigint[]" | "boolean[]";
+type validQSTypes = "any" | "string" | "number" | "bigint" | "boolean" | "string[]" | "number[]" | "bigint[]" | "boolean[]";
+export type QueryStringFilterTypes = "any" | "string" | "number" | "bigint" | "boolean";
 
 function isValidQSType(value: string): value is validQSTypes {
   return VALID_TYPES.includes(value);
@@ -21,65 +23,105 @@ interface PropertyTypes {
   [x: string]: validQSTypes;
 }
 
-function convertQsValue(value: any, toType: typeofWithArrays) {
+function convertToNumber(value: any): number | undefined {
+  if (typeof value === 'undefined' || value === null)
+    return undefined;
+
+  if (typeof value !== 'string')
+    throw new Error(`Unable to convert value to number`);
+
+  // Special case to allow reading "empty" value from qs
+  if (value === '') return Number.NaN;
+
+  if (isNaN(Number(value)))
+    throw new Error(`QS value "${value}" cannot be represented as a 'number'.`);
+  return Number(value);
+}
+
+function convertToBigInt(value: any): BigInt | undefined {
+  if (!value) return undefined;
+  if (typeof value !== 'string')
+    throw new Error(`Unable to convert value to bigint`);
+
+  if (!value.match(/^\d+$/))
+    throw new Error(`QS value "${value}" cannot be represented as a 'bigint'.`);
+  return BigInt(value);
+}
+
+function convertToBoolean(value: any): boolean | undefined {
+  if (!value) return undefined;
+  if (typeof value !== 'string')
+    throw new Error(`Unable to convert value to boolean`);
+
+  if (['1', 'true', 't'].includes(value.toLocaleLowerCase()))
+    return true;
+  if (['0', 'false', 'f'].includes(value.toLocaleLowerCase()))
+    return false;
+  throw new Error(`QS value "${value}" cannot be represented as a 'boolean'.`);
+}
+
+export function convertQsValue(value: any, toType: typeofWithArrays) {
   if (!VALID_TYPES.includes(toType))
     throw new Error(`Unable to convert string value to '${toType}'`);
 
   if (typeof value === 'undefined') return undefined;
   if (value === null) return undefined;
 
-  if (typeof value === toType)
+  if (typeof value === toType || toType === 'any')
     return value;
 
   if (toType === 'bigint') {
-    if (!value) return undefined;
-    if (typeof value !== 'string')
-      throw new Error(`Unable to convert value to bigint`);
-
-    if (!value.match(/^\d+$/))
-      throw new Error(`QS value "${value}" cannot be represented as a 'bigint'.`);
-    return BigInt(value);
+    return convertToBigInt(value);
   }
 
   if (toType === 'bigint[]') {
     if (!value) return undefined;
-    throw new Error('Not Yet Implemented');
+
+    if (Array.isArray(value))
+      return value.map(convertToBigInt).filter(isset);
+
+    if (typeof value !== 'string')
+      throw new Error(`Unable to convert value to number array`);
+    let valueArr = value.split(',');
+    return valueArr.map(convertToBigInt).filter(isset);
   }
 
   if (toType === 'number') {
-    if (!value) return undefined;
-    if (typeof value !== 'string')
-      throw new Error(`Unable to convert value to number`);
-
-    if (isNaN(Number(value)))
-      throw new Error(`QS value "${value}" cannot be represented as a 'number'.`);
-    return Number(value);
+    return convertToNumber(value);
   }
 
   if (toType === 'number[]') {
     if (!value) return undefined;
-    throw new Error('Not Yet Implemented');
+
+    if (Array.isArray(value))
+      return value.map(convertToNumber).filter(isset);
+
+    if (typeof value !== 'string')
+      throw new Error(`Unable to convert value to number array`);
+    let valueArr = value.split(',');
+    return valueArr.map(convertToNumber).filter(isset);
   }
 
   if (toType === 'boolean') {
-    if (!value) return undefined;
-    if (typeof value !== 'string')
-      throw new Error(`Unable to convert value to boolean`);
-
-    if (['1', 'true', 't'].includes(value.toLocaleLowerCase()))
-      return true;
-    if (['0', 'false', 'f'].includes(value.toLocaleLowerCase()))
-      return false;
-    throw new Error(`QS value "${value}" cannot be represented as a 'boolean'.`);
+    return convertToBoolean(value);
   }
 
   if (toType === 'boolean[]') {
     if (!value) return undefined;
-    throw new Error('Not Yet Implemented');
+
+    if (Array.isArray(value))
+      return value.map(convertToBoolean).filter(isset);
+
+    if (typeof value !== 'string')
+      throw new Error(`Unable to convert value to boolean array`);
+    let valueArr = value.split(',');
+    return valueArr.map(convertToBoolean).filter(isset);
   }
 
   if (toType === 'string[]') {
     if (!value) return undefined;
+    if (Array.isArray(value))
+      return value;
     if (typeof value !== 'string')
       throw new Error(`Unable to convert value to string array`);
     return value.split(',');
@@ -89,11 +131,7 @@ function convertQsValue(value: any, toType: typeofWithArrays) {
 }
 
 function getQueryStringState<State>(queryString: string, initialState: State, options?: QueryStateOptions): State {
-  let qsObject = qs.parse(queryString, {
-    ignoreQueryPrefix: true,
-    comma: true,
-    allowDots: true,
-  });
+  let qsObject = QueryString.parse(queryString);
 
   let newState = cloneDeep(initialState);
   let stateKeys = Object.keys(initialState);
@@ -103,6 +141,7 @@ function getQueryStringState<State>(queryString: string, initialState: State, op
     dataTypes = {};
     for (let key of stateKeys) {
       let initialType = typeof initialState[key as keyof State];
+      // with change to QS encoding (no external library), is this still the case?
       if (isValidQSType(initialType)) {
         dataTypes[key] = initialType;
       } else {
@@ -126,16 +165,18 @@ function getQueryStringState<State>(queryString: string, initialState: State, op
 }
 
 function getQueryString<State>(origQueryString: string, newState: State, initialState: State, prefix?: string): string {
-  let qsObject = qs.parse(origQueryString, {
-    ignoreQueryPrefix: true,
-    comma: true,
-    allowDots: true,
-  });
-
-  // set values from clonedState to qsObject
-  // check if any value from initialState equals newValue, if so remove it
+  let qsObject = QueryString.parse(origQueryString);
 
   let stateKeys = Object.keys(initialState);
+  let newStateKeys = Object.keys(newState);
+  // set values from clonedState to qsObject
+  for (let key of newStateKeys) {
+    if (stateKeys.includes(key)) continue;
+    let qsKey = prefix ? `${prefix}.${key}` : key;
+    set(qsObject, qsKey, newState[key as keyof State]);
+  }
+
+  // check if any value from initialState equals newValue, if so remove it
   for (let key of stateKeys) {
     let qsKey = prefix ? `${prefix}.${key}` : key;
     if (isEqual(newState[key as keyof State], initialState[key as keyof State])) {
@@ -146,13 +187,10 @@ function getQueryString<State>(origQueryString: string, newState: State, initial
   }
 
   // clean it from empty values - don't need them in object
-  qsObject = cleanDeep(qsObject);
+  qsObject = cleanDeep(qsObject, { emptyStrings: false });
 
   // create the new query string
-  let newQs = qs.stringify(qsObject, {
-    arrayFormat: 'comma',
-    allowDots: true,
-  });
+  let newQs = QueryString.stringify(qsObject);
 
   return newQs;
 }
@@ -283,4 +321,8 @@ export function batchedQSUpdate(fn: Function) {
 
   batchUpdateLoc = null;
   batchedHistoryObj = null;
+}
+
+export type {
+  PropertyTypes as QueryStringPropTypes
 }

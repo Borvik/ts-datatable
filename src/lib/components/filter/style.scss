@@ -1,0 +1,11 @@
+@import './editor/style.scss';
+@import './bar/style.scss';
+
+.filter-dialog {
+  min-width: 500px;
+
+  @media screen and (max-width: 510px) {
+    min-width: auto;
+    width: 99vw;
+  }
+}
