@@ -18,7 +18,6 @@ export const QuickFilterGroup: React.FC<Props> = ({ topLevel, value, path }) => 
 
   const prefix = '(', suffix = ')';
   const currentPath = path ?? [];
-  // const currentPathAsString = currentPath.join(',');
 
   let groupContents: any[] = [];
   for (let idx = 0; idx < value.filters.length; idx++) {

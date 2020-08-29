@@ -232,26 +232,6 @@ export interface QueryFilterItem {
   operator: AllFilterOperators;
 }
 
-// export interface QueryFilterAndGroup {
-//   and: (QueryFilterAndGroup | QueryFilterOrGroup | QueryFilterItem)[];
-// }
-
-// export interface QueryFilterOrGroup {
-//   or: (QueryFilterAndGroup | QueryFilterOrGroup | QueryFilterItem)[];
-// }
-
-// export type QueryFilterGroup = QueryFilterAndGroup | QueryFilterOrGroup;
-
-// export function isFilterAndGroup(value?: QueryFilterGroup | null): value is QueryFilterAndGroup {
-//   if (!value) return false;
-//   return Array.isArray((value as any).and);
-// }
-
-// export function isFilterOrGroup(value?: QueryFilterGroup | null): value is QueryFilterOrGroup {
-//   if (!value) return false;
-//   return Array.isArray((value as any).and);
-// }
-
 export type FilterCollection = (QueryFilterGroup | QueryFilterItem)[];
 
 export interface QueryFilterGroup {

@@ -141,21 +141,10 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
     '--ts-dt-fixed-bg': props.fixedColBg ?? 'white'
   };
 
-  // const [wrapTop, setWrapTop] = useState({width: 99999, wrap: false});
   const topEl = useRef<HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   let newWrapTop = {...wrapTop};
-  //   // if top width < value set
-  //   newWrapTop.width = topEl.current?.offsetWidth ?? 99999;
-  //   if (newWrapTop.width < 800) {
-  //     if (!wrapTop) newWrapTop.wrap = true;
-  //   } else {
-  //     if (wrapTop) newWrapTop.wrap = false;
-  //   }
-  //   if (newWrapTop.width !== wrapTop.width || newWrapTop.wrap !== wrapTop.wrap)
-  //     setWrapTop(newWrapTop);
-  // }, [wrapTop, setWrapTop]);
+  // The resize here is to check if the top area is to small and should wrap
+  // page/action buttons vs. search/filter bar
   useEffect(() => {
     function topResize() {
       let width = topEl.current?.offsetWidth ?? 99999;
@@ -218,14 +207,6 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
               />}
             </div>
           </div>
-          {/* <div className='ts-datatable-search-actions'>
-            
-            
-          </div>
-          <div className='ts-datatable-top-page-filters'>
-            
-            
-          </div> */}
           <div {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
             <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
               <TableHeader />

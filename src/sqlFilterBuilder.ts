@@ -108,8 +108,3 @@ export function buildSQL(filter?: QueryFilterGroup, fieldCounter: number = 0): S
     fieldCounter,
   };
 }
-
-/**
-  'any': 'Is any of',
-  'none': 'Is none of',
- */

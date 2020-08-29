@@ -127,36 +127,16 @@
           border-bottom: 1px solid;
         }
 
-        // input {
-        //   position: relative;
-        //   top: -10px;
-        // }
-
         input:focus {
           outline: none;
           border-bottom-color: #64B5F6;
         }
-
-        // input {
-        //   opacity: .25;
-        //   position: absolute;
-        //   top: -5px;
-        //   left: 0;
-        //   height: auto;
-        //   // line-height: .6em;
-        // //   top: 0; left: 0;
-        //   width: 100%;
-        //   font: inherit;
-        //   margin: 0;
-        //   padding: inherit;
-        // }
 
         &::after {
           position: absolute;
           content: attr(data-value) ' ';
           visibility: hidden;
           white-space: nowrap;
-          // padding: 0 .5em;
         }
       }
     }

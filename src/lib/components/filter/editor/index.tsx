@@ -3,7 +3,6 @@ import { QueryFilterGroup } from '../../table/types';
 import { FilterGroupEditor } from './group';
 import update, { Spec } from 'immutability-helper';
 
-// type FilterAction = 'set' | 'update' | 'remove' | 'add';
 interface Props {
   value: QueryFilterGroup;
   onChange: React.Dispatch<React.SetStateAction<QueryFilterGroup>>;
@@ -19,7 +18,6 @@ export const FilterEditor: React.FC<Props> = (props: Props, ref) => {
       onChange(val => update(val, $spec));
       return;
     }
-    // update(value, { filters: { [0]: _____  } })
     
     for (let i = path.length - 1; i >= 0; i--) {
       let idx = path[i];
