@@ -10,16 +10,17 @@ interface Props {
   column: DataColumn<any>
   filter: QueryFilterItem
   path: number[]
+  parentCollectionCount: number
 }
 
-export const QuickFilterItem: React.FC<Props> = ({ filter, column, path }) => {
+export const QuickFilterItem: React.FC<Props> = ({ filter, column, path, parentCollectionCount }) => {
   const { filterSettings } = useContext(ColumnContext);
   const { removeAtPath } = useContext(QuickBarContext);
 
   return <span className='quick-filter-field-container'>
-    <button onClick={() => removeAtPath(path)} type='button' className='quick-filter-item-remove-btn filter-btn'>
+    {parentCollectionCount > 1 && <button onClick={() => removeAtPath(path)} type='button' className='quick-filter-item-remove-btn filter-btn'>
       <FontAwesomeIcon icon={faTimesCircle} />
-    </button>
+    </button>}
     <span className='quick-filter-field'>
       <span className='quick-filter-field-name'>{column?.filter?.label ?? column?.header ?? <i>No column</i>}</span>
       <span className='quick-filter-field-operator'>

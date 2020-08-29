@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { QueryFilterGroup } from '../../table/types';
 import { FilterGroupEditor } from './group';
 import update, { Spec } from 'immutability-helper';

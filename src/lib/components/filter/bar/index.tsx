@@ -10,7 +10,6 @@ import { batchedQSUpdate } from '../../../utils/useQueryState';
 import { QueryFilterGroup } from '../../table/types';
 import update from 'immutability-helper';
 import get from 'lodash/get';
-import unset from 'lodash/unset';
 
 // Test url: http://localhost:3000/?filter=(id:1),(id:1;op:nul),(or:(id:3,4;op:bet),(id:5,6,7;op:any)),(and:(id:9))
 

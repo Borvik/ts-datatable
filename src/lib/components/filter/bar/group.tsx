@@ -28,7 +28,7 @@ export const QuickFilterGroup: React.FC<Props> = ({ topLevel, value, path }) => 
     else {
       let column = actualColumns.find(c => c.filter?.filterKey === (filter as QueryFilterItem).column);
       if (column) {
-        groupContents.push(<QuickFilterItem path={newPath} key={newPath.join(',')} column={column} filter={filter} />);
+        groupContents.push(<QuickFilterItem path={newPath} key={newPath.join(',')} column={column} filter={filter} parentCollectionCount={value.filters.length} />);
       }
     }
   }
