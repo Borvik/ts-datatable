@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useEffect, useMemo, useContext } 
 import ReactDOM from 'react-dom';
 import { DialogProvider, DialogContext } from './provider';
 import dialogPolyfill from 'dialog-polyfill';
+import { firstFocusable } from '../../utils/firstFocusable';
 
 const modalRoot = (typeof document !== 'undefined')
   ? document.getElementsByTagName('body').item(0)
@@ -12,16 +13,6 @@ interface DialogProps {
   dialogRef?: React.MutableRefObject<HTMLDialogElement | null>;
   style?: React.CSSProperties;
   className?: string;
-}
-
-const focusableItems = ['button', '[href]', 'input', 'select', 'textarea', '[tabindex]'].map(f => `${f}:not([tabindex="-1"]):not([data-noautofocus])`).join(', ');
-function firstFocusable(el: Element): HTMLElement | null {
-  let autofocus = el.querySelector('[autofocus], .autofocus');
-  if (autofocus) return autofocus as HTMLElement;
-
-  let focusable = el.querySelector(focusableItems);
-  if (!focusable) return null;
-  return focusable as HTMLElement;
 }
 
 /**
@@ -130,7 +121,7 @@ export const DialogHeader: React.FC<HeaderProps> = ({ showClose = true, children
       {children}
     </div>
     {showClose && <div>
-      <button type='button' className='close' onClick={() => {
+      <button type='button' className='close' data-noautofocus onClick={() => {
         dialogEl?.current?.close();
       }}>×</button>
     </div>}

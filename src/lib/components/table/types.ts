@@ -170,6 +170,7 @@ export interface CustomEditorProps {
   value: any;
   allValues: any;
   setValue: (newValue: any) => void;
+  onLoseFocus: () => void;
 }
 
 export const StringOperators = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'bet', 'nbet', 'con', 'ncon', 'beg', 'end', 'nul', 'nnul', 'any', 'none'] as const;

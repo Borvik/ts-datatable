@@ -73,6 +73,19 @@ export class MenuProvider extends Component<MenuProviderProps> {
     });
   };
 
+  onKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      console.log('Display Menu via keypress');
+      eventManager.emit(DISPLAY_MENU(this.props.id), e.nativeEvent, {
+        ref:
+          this.childrenRefs.length === 1
+            ? this.childrenRefs[0]
+            : this.childrenRefs,
+        ...this.props.data
+      });
+    }
+  }
+
   setChildRef = (ref: HTMLElement) =>
     ref === null || this.childrenRefs.push(ref);
 
@@ -110,6 +123,9 @@ export class MenuProvider extends Component<MenuProviderProps> {
       className,
       style,
       id,
+      tabIndex: 0,
+      onKeyDown: this.onKey,
+      'data-noautofocus': true,
     };
 
     if (typeof render === 'function') {

@@ -45,6 +45,16 @@ export const InputEditor: React.FC<EditorProps> = ({ filter, type, setState, pat
     setValue({setState, path, index, valuePath, value, filter});
   }
 
+  function onBlur(_e: React.FocusEvent<HTMLInputElement>) {
+    setEditing(false);
+  }
+
+  function onKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      setEditing(true);
+    }
+  }
+
   if (!editing) {
     let value: React.ReactNode = getValue(filter.value, valuePath);
 
@@ -52,13 +62,13 @@ export const InputEditor: React.FC<EditorProps> = ({ filter, type, setState, pat
       value = <span className='no-value'>&lt;enter a value&gt;</span>
     else if (isEmpty(value))
       value = <span className='no-value'>&lt;empty&gt;</span>;
-    return <span className='filter-editor-value' onClick={() => setEditing(true)}>{value}</span>
+    return <span className='filter-editor-value' tabIndex={0} onKeyDown={onKey} onClick={() => setEditing(true)}>{value}</span>
   }
 
   let value = getValue(filter.value, valuePath) ?? '';
   if (typeof value === 'number' && Number.isNaN(value))
     value = '';
   return <span className='input-sizer' data-value={value}>
-    <input style={{ width: inputWidth ?? undefined }} ref={inputRef} type={type} value={value} onChange={onChange} />
+    <input style={{ width: inputWidth ?? undefined }} ref={inputRef} type={type} value={value} onBlur={onBlur} onChange={onChange} />
   </span>;
 }

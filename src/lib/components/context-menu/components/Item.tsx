@@ -65,6 +65,17 @@ export class Item extends Component<ItemProps> {
         });
   };
 
+  handleEnter = (e: React.KeyboardEvent) => {
+    if (e.key !== 'Enter') return;
+    
+    this.isDisabled
+      ? e.stopPropagation()
+      : this.props.onClick({
+          event: this.props.nativeEvent as TriggerEvent,
+          props: { ...this.props.propsFromTrigger, ...this.props.data }
+        });
+  }
+
   render() {
     const { className, style, children } = this.props;
 
@@ -77,7 +88,9 @@ export class Item extends Component<ItemProps> {
         className={cssClasses}
         style={style}
         onClick={this.handleClick}
+        onKeyDown={this.handleEnter}
         role="presentation"
+        tabIndex={0}
       >
         <div className={styles.itemContent}>{children}</div>
       </div>

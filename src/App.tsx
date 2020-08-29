@@ -3,6 +3,7 @@ import { DataTable, CustomEditorProps } from './lib';
 import initSqlJs from 'sql.js';
 import './App.css';
 import { cloneDeep } from 'lodash';
+import { buildSQL } from './sqlFilterBuilder';
 
 type ThenArg<T> = T extends Promise<infer U> ? U : T;
 type SQL = ThenArg<ReturnType<typeof initSqlJs>>;
@@ -40,7 +41,7 @@ function query(sql: string, params?: any) {
     result.push(dbRes);
   }
   stmt.free();
-  
+
   console.log('Result:', result);
   console.groupEnd();
   return result;
@@ -112,6 +113,7 @@ function App() {
     <div className={`App`}>
       <header className="App-header">
         <button type='button' onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Toggle Theme</button>
+        <span> Note: Because Type/Weakness are actually stored as a comma separated list - the filter is there as an example only and doesn't work as expected.</span>
       </header>
       <div>
         <DataTable<Pokemon>
@@ -127,6 +129,9 @@ function App() {
           // Async data loading (recommended way)
           data={async ({ pagination, search, sorts, filters }) => {
             console.log('Running with filters:', filters);
+
+            let filterSql = buildSQL(filters);
+            console.log('Filter Sql:', filterSql);
             
             // This promise, timeout, and filter is all to
             // simulate an API call (sqlite calls synchrounous).
@@ -137,6 +142,11 @@ function App() {
                 if (search) {
                   params[':search'] = `%${search}%`;
                   whereClauses.push(`(num LIKE :search OR name LIKE :search OR type LIKE :search)`);
+                }
+
+                if (filterSql.sql) {
+                  Object.assign(params, filterSql.params);
+                  whereClauses.push(filterSql.sql);
                 }
   
                 let offset = (pagination.page - 1) * pagination.perPage;
@@ -377,11 +387,11 @@ class CustomTypeSelectEditor extends React.Component<CustomEditorProps, TypeEdit
     this.setState({ options: types });
   }
   render() {
-    const { inputRef, value, allValues, setValue } = this.props;
+    const { inputRef, value, allValues, setValue, onLoseFocus } = this.props;
     const { options } = this.state;
     
     let hideable = Array.isArray(allValues);
-    return <select ref={(el) => inputRef.current = el} value={value ?? ''} onChange={(e) => setValue(e.target.value)}>
+    return <select ref={(el) => inputRef.current = el} value={value ?? ''} onBlur={onLoseFocus} onChange={(e) => setValue(e.target.value)}>
       <option></option>
       {options.map(t => {
         if (hideable && value !== t.name && allValues.includes(t.name))

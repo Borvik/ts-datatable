@@ -92,7 +92,13 @@ const MultiValueEditor: React.FC<Props> = ({ column, filter, setState, ...rest }
   }
 
   let values: any[] = filter.value ?? [];
-  let valueKeyBase = JSON.stringify(values)
+  let { value: noValues, ...filterWithoutValues} = filter;
+  let valueKeyBase = JSON.stringify({
+    ...filterWithoutValues,
+    path: rest.path,
+    idx: rest.index,
+  });
+  
   return <>({values.map((_value, index, arr) => (
     <span className='multi-value-editor' key={valueKeyBase + '_' + index}>
       <SingleValueEditor column={column} setState={setState} valuePath={index} filter={filter} {...rest} />

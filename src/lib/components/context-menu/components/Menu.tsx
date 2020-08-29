@@ -9,6 +9,7 @@ import { HIDE_ALL, DISPLAY_MENU } from '../utils/actions';
 import { styles } from '../utils/styles';
 import { eventManager } from '../utils/eventManager';
 import { TriggerEvent, StyleProps, MenuId } from '../types';
+import { firstFocusable } from '../../../utils/firstFocusable';
 
 const KEY = {
   ENTER: 13,
@@ -96,6 +97,14 @@ export class Menu extends Component<MenuProps, MenuState> {
 
   componentDidUpdate(_: Readonly<MenuProps>, prevState: Readonly<MenuState>) {
     if (this.state.visible !== prevState.visible) {
+      if (this.state.visible && this.menuRef) {
+        let firstFocusableEl = firstFocusable(this.menuRef);
+        firstFocusableEl?.focus();
+      } else if (!this.state.visible) {
+        let menuProviderEl = document.getElementById(this.props.id);
+        menuProviderEl?.focus();
+      }
+
       if (this.state.visible && this.props.onShown) {
         this.props.onShown();
       } else if (!this.state.visible && this.props.onHidden) {
@@ -145,6 +154,7 @@ export class Menu extends Component<MenuProps, MenuState> {
 
   handleKeyboard = (e: KeyboardEvent) => {
     if (e.keyCode === KEY.ENTER || e.keyCode === KEY.ESC) {
+      e.stopPropagation();
       this.unBindWindowEvent();
       this.setState({ visible: false });
     }

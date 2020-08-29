@@ -123,7 +123,7 @@ export const FilterGroupEditor: React.FC<Props> = ({ value, path, setState }) =>
           </>}
         </Menu>
       </>}
-      {canAddCondition && <button type='button' className='filter-group-add-btn filter-btn' data-noautofocus onClick={() => addCondition()}>
+      {canAddCondition && <button type='button' className='filter-group-add-btn filter-btn' onClick={() => addCondition()}>
         <FontAwesomeIcon icon={faPlusCircle} />
       </button>}
     </div>
