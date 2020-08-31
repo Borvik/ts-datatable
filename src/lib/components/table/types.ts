@@ -76,6 +76,7 @@ interface ResolvableColumnTypes {
 
 interface BaseColumnProps<T> {
   key: string;
+  isPrimaryKey?: boolean;
   render?: (value: any, row: T, column: DataColumn<T>) => ReactRenderable;
   accessor?: string | number;
   getValue?: (row: T, column: DataColumn<T>) => any;

@@ -1,9 +1,9 @@
 import React, { useContext, useRef } from 'react';
 import { TableBodyProps } from './types';
 import { ColumnContext } from './contexts';
-import get from 'lodash/get';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import { getRowValue, getRowKey } from '../../utils/getRowKey';
 
 export const TableBody: React.FC<TableBodyProps> = (props) => {
   const { actualColumns: columns } = useContext(ColumnContext);
@@ -13,18 +13,14 @@ export const TableBody: React.FC<TableBodyProps> = (props) => {
     <>
       <tbody ref={tbodyRef} className={`${!props.data.length && props.loading ? 'ts-loading' : ''}`}>
         {props.data.map((row, rowIdx) => {
-          let rowKey = typeof props.getRowKey === 'function'
-            ? props.getRowKey(row)
-            : rowIdx;
+          let rowKey = getRowKey(row, rowIdx, columns, props.getRowKey);
 
           return (
             <tr key={rowKey}>
               {columns.map((col, colIdx) => {
                 if (!col.isVisible) return null;
 
-                let value = typeof col.accessor !== 'undefined'
-                  ? get(row, col.accessor)
-                  : col.getValue!(row, col);
+                let value = getRowValue(row, col);
 
                 let rendered = typeof col.render !== 'undefined'
                   ? col.render(value, row, col)

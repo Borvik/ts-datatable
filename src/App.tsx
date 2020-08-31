@@ -211,6 +211,7 @@ function App() {
                 type: 'number',
                 parseAsType: 'number',
               },
+              isPrimaryKey: true,
             },
             {
               header: 'Num',
@@ -218,7 +219,7 @@ function App() {
               defaultSortDir: 'desc',
               filter: {
                 type: 'string',
-              }
+              },
             },
             {
               header: 'Image',

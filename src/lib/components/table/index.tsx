@@ -16,6 +16,8 @@ import { ColumnPickerButton } from '../column-picker';
 import { FilterButton, FilterBar } from '../filter';
 import { convertFromQS, convertToQS } from '../../utils/transformFilter';
 
+const primaryKeyWarned: {[x:string]: boolean} = {};
+
 export const DataTable = function<T>({paginate = 'both', hideSearchForm = false, ...props}: PropsWithChildren<DataTableProperties<T>>) {
   /**
    * First let's get the user-defined column visibility
@@ -49,11 +51,28 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
   const [columnData] = useDeepDerivedState(() => {
     // First Clean the columns - transforms "resolve | type" column properties
     let visibleColumns = transformColumns(props.id, props.columns, columnVisibility);
+    let headerRows = getHeaderRows(visibleColumns),
+        actualColumns = getFlattenedColumns(visibleColumns);
 
+    let primaryKeyCount: number = 0;
+    
+    if (!props.getRowKey) {
+      for (let c of actualColumns) {
+        if (c.isPrimaryKey) {
+          primaryKeyCount++;
+          // Only warn once per table
+          if (primaryKeyCount > 1 && !primaryKeyWarned[props.id]) {
+            console.warn(`Primary Key defined twice - using first primary key`);
+            primaryKeyWarned[props.id] = true;
+          }
+        }
+      }
+    }
+    
     // Now format the columns for easier use, and return as derived state
     return {
-      headerRows: getHeaderRows(visibleColumns),
-      actualColumns: getFlattenedColumns(visibleColumns),
+      headerRows,
+      actualColumns,
     }
   }, [ props.id, columnVisibility, props.columns ]);
 

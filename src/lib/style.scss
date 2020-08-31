@@ -3,11 +3,12 @@
 @import './components/filter/style.scss';
 @import './components/context-menu/scss/main.scss';
 
-.ts-datatable { //
+.ts-datatable {
   display: flex;
   flex-direction: column;
   max-height: 100%;
-  margin-top: .25em;
+  box-sizing: border-box;
+  padding-top: .25em;
 
   .ts-datatable-wrapper {
     position: relative;

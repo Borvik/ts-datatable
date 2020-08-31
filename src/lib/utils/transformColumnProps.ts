@@ -42,6 +42,7 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       className: column.className,
       name: column.name ?? (typeof column.accessor === 'string' ? column.accessor : undefined),
       filter,
+      isPrimaryKey: column.isPrimaryKey,
 
       header: resolve(column.header, ''),
       fixed: resolve(column.fixed, false),
