@@ -273,6 +273,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
               <TableHeader />
               <TableBody
                 getRowKey={props.getRowKey}
+                canEditRow={props.canEditRow}
                 data={stateDataList.data}
                 loading={dataLoading}
                 LoadingComponent={props.components?.Loading}

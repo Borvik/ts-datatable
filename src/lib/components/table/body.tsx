@@ -15,6 +15,9 @@ export const TableBody: React.FC<TableBodyProps> = (props) => {
       <tbody ref={tbodyRef} className={`${!props.data.length && props.loading ? 'ts-loading' : ''}`}>
         {props.data.map((row, rowIdx) => {
           let rowKey = getRowKey(row, rowIdx, columns, props.getRowKey);
+          let canEditRow = isEditing;
+          if (canEditRow && typeof props.canEditRow === 'function')
+            canEditRow = props.canEditRow(row);
 
           return (
             <tr key={rowKey}>
@@ -26,8 +29,8 @@ export const TableBody: React.FC<TableBodyProps> = (props) => {
                 let rendered: any = null;
 
                 if (isEditing && col.editor) {
-                  let canEdit: boolean = true;
-                  if (typeof col.canEdit === 'function')
+                  let canEdit: boolean = canEditRow;
+                  if (canEditRow && typeof col.canEdit === 'function')
                     canEdit = col.canEdit(row, col);
 
                   if (canEdit)

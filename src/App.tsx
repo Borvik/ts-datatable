@@ -221,6 +221,7 @@ function App() {
               }));
             }
           }}
+          canEditRow={(data) => data.id !== 7}
           columns={[
             {
               header: 'ID',

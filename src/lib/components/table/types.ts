@@ -40,6 +40,7 @@ export interface DataTableProperties<T> {
   hideSearchForm?: boolean;
 
   getRowKey?: (row: T) => string | number;
+  canEditRow?: (row: T) => boolean;
   onShowColumnPicker?: OnShowColumnPicker;
   onSaveQuickEdit?: OnSaveQuickEdit<T>;
   quickEditPosition?: 'top' | 'bottom' | 'both';
@@ -122,6 +123,7 @@ export type OnSaveQuickEdit<T> = (formData: QuickEditFormData<T>) => Promise<voi
 export interface TableBodyProps {
   data: any[];
   getRowKey?: (row: any) => string | number;
+  canEditRow?: (row: any) => boolean;
   loading: boolean;
   LoadingComponent?: ReactRenderable;
 }
