@@ -450,6 +450,8 @@ class CustomTypeColumnEditor extends React.Component<CustomEditorProps<Pokemon>,
   }
 
   render() {
+    // don't warn on unused row/column
+    // eslint-disable-next-line
     const { value, setValue, row, column } = this.props;
     const { options } = this.state;
     
