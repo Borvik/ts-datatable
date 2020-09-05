@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useContext } from 'react';
 import { PaginateProps, PaginateButtonProps, PaginateLimitSelectProps, PageChange } from './types';
 import uniqueId from 'lodash/uniqueId';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -6,6 +6,7 @@ import { faCaretLeft } from '@fortawesome/free-solid-svg-icons/faCaretLeft';
 import { faCaretRight } from '@fortawesome/free-solid-svg-icons/faCaretRight';
 import { faWindowMinimize } from '@fortawesome/free-solid-svg-icons/faWindowMinimize';
 import { useDerivedState } from '../../utils/useDerivedState';
+import { ColumnContext } from '../table/contexts';
 
 /**
  * Guidelines
@@ -20,6 +21,7 @@ export const PageNav: React.FC<PaginateProps> = ({buttonPosition = 'split', perP
   const [id] = useState(uniqueId('pageSelect_'));
   const [editing, setEditing] = useState(false);
   const [pageNum, setPageNum] = useDerivedState(() => props.page, [props.page, editing]);
+  const { isEditing } = useContext(ColumnContext);
 
   let totalPages: number = 0;
   if (typeof props.total !== 'undefined') {
@@ -43,7 +45,7 @@ export const PageNav: React.FC<PaginateProps> = ({buttonPosition = 'split', perP
         totalPages={totalPages}
       />
       <span className="ts-paginate-label">Page <>
-        {!editing && <span className='ts-paginate-current-page' onClick={() => setEditing(true)}>{props.page}</span>}
+        {!editing && <span className='ts-paginate-current-page' onClick={isEditing ? undefined : () => setEditing(true)}>{props.page}</span>}
         {editing && <>
           <input
             className='ts-paginate-goto-page'
@@ -113,6 +115,7 @@ const PaginateButtons: React.FC<PaginateButtonProps> = ({
   page,
   changePage,
 }) => {
+  const { isEditing } = useContext(ColumnContext);
   const displayBefore = useMemo(() => (
     ((
       position === 'before' &&
@@ -144,7 +147,7 @@ const PaginateButtons: React.FC<PaginateButtonProps> = ({
   if (!total) return null;
   return <div className='ts-pagination-btn-group'>
     {displayBefore && <>
-      {!!showFirstLast && <button type='button' className={buttonClass} disabled={page <= 1} onClick={() => changePage({ page: 1 })}>
+      {!!showFirstLast && <button type='button' className={buttonClass} disabled={page <= 1 || isEditing} onClick={() => changePage({ page: 1 })}>
         <span className='fa-layers fa-fw'>
           <FontAwesomeIcon icon={faCaretLeft} fixedWidth />
           <FontAwesomeIcon icon={faWindowMinimize} fixedWidth transform={{
@@ -154,15 +157,15 @@ const PaginateButtons: React.FC<PaginateButtonProps> = ({
           }} />
         </span>
       </button>}
-      <button type='button' className={buttonClass} disabled={page <= 1} onClick={() => changePage({ page: page - 1 })}>
+      <button type='button' className={buttonClass} disabled={page <= 1 || isEditing} onClick={() => changePage({ page: page - 1 })}>
         <FontAwesomeIcon icon={faCaretLeft} fixedWidth />
       </button>
     </>}
     {displayAfter && <>
-      <button type='button' className={buttonClass} disabled={page >= totalPages} onClick={() => changePage({ page: page + 1 })}>
+      <button type='button' className={buttonClass} disabled={page >= totalPages || isEditing} onClick={() => changePage({ page: page + 1 })}>
         <FontAwesomeIcon icon={faCaretRight} fixedWidth />
       </button>
-      {!!showFirstLast && <button type='button' className={buttonClass} disabled={page >= totalPages} onClick={() => changePage({ page: totalPages })}>
+      {!!showFirstLast && <button type='button' className={buttonClass} disabled={page >= totalPages || isEditing} onClick={() => changePage({ page: totalPages })}>
         <span className='fa-layers fa-fw'>
           <FontAwesomeIcon icon={faCaretRight} fixedWidth />
           <FontAwesomeIcon icon={faWindowMinimize} fixedWidth transform={{
@@ -177,6 +180,7 @@ const PaginateButtons: React.FC<PaginateButtonProps> = ({
 };
 
 const PerPageLimitSelect: React.FC<PaginateLimitSelectProps> = ({ page, total, totalPages, perPage, perPageOptions, changePage }) => {
+  const { isEditing } = useContext(ColumnContext);
   const [pageLimit, setPageLimit] = useDerivedState(() => perPage, [ perPage ]);
   const pageOptions = useMemo(() => {
     if (perPageOptions === 'any') return [];
@@ -225,6 +229,7 @@ const PerPageLimitSelect: React.FC<PaginateLimitSelectProps> = ({ page, total, t
       <input
         type='number'
         min={1}
+        disabled={isEditing}
         value={Number.isNaN(pageLimit) ? '' : pageLimit}
         onChange={(e) => { setPageLimit(e.target.valueAsNumber); }}
         onKeyUp={(e) => {
@@ -240,7 +245,7 @@ const PerPageLimitSelect: React.FC<PaginateLimitSelectProps> = ({ page, total, t
       />
     </>}
     {perPageOptions !== 'any' && <>
-      {pageOptions.length > 1 && <select value={perPage} onChange={(e) => changePerPage(parseInt(e.target.value))}>
+      {pageOptions.length > 1 && <select disabled={isEditing} value={perPage} onChange={(e) => changePerPage(parseInt(e.target.value))}>
         {pageOptions.map(page => (
           <option key={page} value={page}>{page}</option>
         ))}

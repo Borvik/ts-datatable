@@ -1,5 +1,5 @@
-import React, { PropsWithChildren, useState, useEffect, useRef } from 'react';
-import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup } from './types';
+import React, { PropsWithChildren, useState, useEffect, useRef, useCallback } from 'react';
+import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { useQueryState, batchedQSUpdate } from '../../utils/useQueryState';
 import { transformColumns, getHeaderRows, getFlattenedColumns } from '../../utils/transformColumnProps';
@@ -15,8 +15,11 @@ import { notEmpty } from '../../utils/comparators';
 import { ColumnPickerButton } from '../column-picker';
 import { FilterButton, FilterBar } from '../filter';
 import { convertFromQS, convertToQS } from '../../utils/transformFilter';
+import { TableEditorButton } from './editors/editButton';
 
-export const DataTable = function<T>({paginate = 'both', hideSearchForm = false, ...props}: PropsWithChildren<DataTableProperties<T>>) {
+const primaryKeyWarned: {[x:string]: boolean} = {};
+
+export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, ...props}: PropsWithChildren<DataTableProperties<T>>) {
   /**
    * First let's get the user-defined column visibility
    * 
@@ -49,13 +52,37 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
   const [columnData] = useDeepDerivedState(() => {
     // First Clean the columns - transforms "resolve | type" column properties
     let visibleColumns = transformColumns(props.id, props.columns, columnVisibility);
+    let headerRows = getHeaderRows(visibleColumns),
+        actualColumns = getFlattenedColumns(visibleColumns);
 
+    let primaryKeyCount: number = 0, hasEditor: boolean = false;
+    
+    if (!props.getRowKey) {
+      for (let c of actualColumns) {
+        if (c.isPrimaryKey) {
+          primaryKeyCount++;
+          // Only warn once per table
+          if (primaryKeyCount > 1 && !primaryKeyWarned[props.id]) {
+            console.warn(`Primary Key defined twice - using first primary key`);
+            primaryKeyWarned[props.id] = true;
+          }
+        }
+        if (c.editor) hasEditor = true;
+      }
+    }
+    
     // Now format the columns for easier use, and return as derived state
     return {
-      headerRows: getHeaderRows(visibleColumns),
-      actualColumns: getFlattenedColumns(visibleColumns),
+      headerRows,
+      actualColumns,
+      hasEditor,
+      primaryKeyCount,
     }
   }, [ props.id, columnVisibility, props.columns ]);
+
+  const canEdit = typeof props.onSaveQuickEdit === 'function' && columnData.hasEditor && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
+
+  const [editFormData, setFormData] = useState<EditFormData>({});
 
   const [pagination, setPagination] = useQueryState({page: 1, perPage: 10}, {
     ...props.qs
@@ -101,6 +128,10 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
     }
   );
 
+  const [isEditing, setEditing] = useState(false);
+  const [isSavingQuickEdit, setSaving] = useState(false);
+  const [editCount, setEditCount] = useState(0);
+
   const [stateDataList, setDataList] = useState<DataFnResult<T[]>>({ data: [], total: 0 });
   const [dataLoading, setLoading] = useState(true);
   
@@ -132,7 +163,7 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
     }
     setLoading(true);
     getData();
-  }, [ pagination, searchQuery.query, filter, columnSort ]);
+  }, [ pagination, searchQuery.query, filter, columnSort, editCount ]);
 
   const Paginate = props.components?.Paginate ?? PageNav;
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
@@ -161,6 +192,25 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
     }
   }, []);
 
+  let propOnSave = props.onSaveQuickEdit;
+  const onSaveQuickEdit = useCallback(async (data: QuickEditFormData<T>) => {
+    try {
+      if (!!propOnSave && Object.keys(data).length) {
+        setSaving(true)
+        await propOnSave(data);
+        setFormData({});
+        setEditCount(c => c + 1);
+      }
+      setEditing(false);
+    }
+    catch {
+      // avoid unhandled exception
+    }
+    finally {
+      setSaving(false);
+    }
+  }, [propOnSave]);
+
   /**
    * Finally we setup the contexts that will house all the data
    * and pass it to all the subcomponents for eventual display.
@@ -173,11 +223,17 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
         multiColumnSorts: props.multiColumnSorts ?? false,
         filter,
         filterSettings: props.filterSettings,
+        isEditing,
+        isSavingQuickEdit,
+        editData: editFormData,
+        setFormData: setFormData,
         setFilter,
         setColumnVisibility,
         setColumnSort,
         onShowColumnPicker: props.onShowColumnPicker,
         setPagination,
+        getRowKey: props.getRowKey,
+        onSaveQuickEdit,
       }}>
         <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
           <div ref={topEl} className={`ts-datatable-top`}>
@@ -195,6 +251,11 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
             </div>
             <div className='ts-datatable-page-actions'>
               <div className="ts-datatable-actions">
+                {(quickEditPosition === 'top' || quickEditPosition === 'both') &&
+                  <TableEditorButton
+                    setEditing={setEditing}
+                    canEdit={canEdit}
+                  />}
                 <FilterButton />
                 <ColumnPickerButton />
               </div>
@@ -212,6 +273,7 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
               <TableHeader />
               <TableBody
                 getRowKey={props.getRowKey}
+                canEditRow={props.canEditRow}
                 data={stateDataList.data}
                 loading={dataLoading}
                 LoadingComponent={props.components?.Loading}
@@ -227,6 +289,13 @@ export const DataTable = function<T>({paginate = 'both', hideSearchForm = false,
                 total={stateDataList.total}
               />
             </div>}
+          <div className="ts-datatable-bottom-actions">
+            {(quickEditPosition === 'bottom' || quickEditPosition === 'both') && 
+              <TableEditorButton
+                setEditing={setEditing}
+                canEdit={canEdit}
+              />}
+          </div>
         </div>
       </ColumnContext.Provider>
     </React.Fragment>

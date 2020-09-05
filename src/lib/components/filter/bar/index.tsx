@@ -8,7 +8,7 @@ import { QuickFilterGroup } from './group';
 import { QuickBarContext } from './context';
 import { batchedQSUpdate } from '../../../utils/useQueryState';
 import { QueryFilterGroup } from '../../table/types';
-import update from 'immutability-helper';
+import { update } from '../../../utils/immutable';
 import get from 'lodash/get';
 
 // Test url: http://localhost:3000/?filter=(id:1),(id:1;op:nul),(or:(id:3,4;op:bet),(id:5,6,7;op:any)),(and:(id:9))

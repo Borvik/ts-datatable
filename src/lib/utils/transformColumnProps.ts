@@ -42,6 +42,9 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       className: column.className,
       name: column.name ?? (typeof column.accessor === 'string' ? column.accessor : undefined),
       filter,
+      isPrimaryKey: column.isPrimaryKey,
+      editor: column.editor,
+      canEdit: column.canEdit,
 
       header: resolve(column.header, ''),
       fixed: resolve(column.fixed, false),
@@ -74,6 +77,8 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
         // add all the children to this level (so non-visible leaf-columns can still appear in selector)
         columns = columns.concat(transformedColumn.columns);
       } else {
+        for (let col of transformedColumn.columns)
+          col.parent = transformedColumn;
         columns.push(transformedColumn);
       }
     } else {
@@ -163,6 +168,9 @@ export function getFlattenedColumns<T>(visibleColumns: DataColumn<T>[], flattene
 }
 
 export function getHeaderRows<T>(visibleColumns: DataColumn<T>[]): DataColumn<T>[][] {
+  /**
+   * scan columns for adjacent same parents - counting adjacent non-matches/empty
+   */
   let maxDepth: number = 1;
   for (let col of visibleColumns) {
     if (maxDepth < col.rowDepth)

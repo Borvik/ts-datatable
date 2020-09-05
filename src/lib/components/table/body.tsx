@@ -1,34 +1,47 @@
 import React, { useContext, useRef } from 'react';
 import { TableBodyProps } from './types';
 import { ColumnContext } from './contexts';
-import get from 'lodash/get';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import { getRowValue, getRowKey } from '../../utils/getRowKey';
+import { CellEditor } from './editors';
 
 export const TableBody: React.FC<TableBodyProps> = (props) => {
-  const { actualColumns: columns } = useContext(ColumnContext);
+  const { actualColumns: columns, isEditing } = useContext(ColumnContext);
   const tbodyRef = useRef<HTMLTableSectionElement>(null);
 
   return (
     <>
       <tbody ref={tbodyRef} className={`${!props.data.length && props.loading ? 'ts-loading' : ''}`}>
         {props.data.map((row, rowIdx) => {
-          let rowKey = typeof props.getRowKey === 'function'
-            ? props.getRowKey(row)
-            : rowIdx;
+          let rowKey = getRowKey(row, rowIdx, columns, props.getRowKey);
+          let canEditRow = isEditing;
+          if (canEditRow && typeof props.canEditRow === 'function')
+            canEditRow = props.canEditRow(row);
 
           return (
             <tr key={rowKey}>
               {columns.map((col, colIdx) => {
                 if (!col.isVisible) return null;
 
-                let value = typeof col.accessor !== 'undefined'
-                  ? get(row, col.accessor)
-                  : col.getValue!(row, col);
+                let value = getRowValue(row, col);
 
-                let rendered = typeof col.render !== 'undefined'
-                  ? col.render(value, row, col)
-                  : value;
+                let rendered: any = null;
+
+                if (isEditing && col.editor) {
+                  let canEdit: boolean = canEditRow;
+                  if (canEditRow && typeof col.canEdit === 'function')
+                    canEdit = col.canEdit(row, col);
+
+                  if (canEdit)
+                    rendered = <CellEditor column={col} value={value} row={row} />
+                }
+
+                if (rendered === null) {
+                  rendered = typeof col.render !== 'undefined'
+                    ? col.render(value, row, col)
+                    : value;
+                }
 
                 return <td key={colIdx} className={`${col.className ?? ''} ${col.fixed ? `fixed fixed-${col.fixed}` : ''}`.trim()}>{rendered}</td>;
               })}

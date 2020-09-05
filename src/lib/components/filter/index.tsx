@@ -9,7 +9,7 @@ export { FilterBar } from './bar';
 
 export const FilterButton: React.FC = (props) => {
   const { dialog, showDialog } = useDialog(<FilterDialog />);
-  const { actualColumns } = useContext(ColumnContext);
+  const { actualColumns, isEditing } = useContext(ColumnContext);
 
   async function onButtonClick(e: React.MouseEvent<HTMLButtonElement>) {
     try {
@@ -31,7 +31,7 @@ export const FilterButton: React.FC = (props) => {
   if (!canFilter) return <></>;
   return <>
     {dialog}
-    <button type='button' onClick={onButtonClick}>
+    <button type='button' disabled={isEditing} onClick={onButtonClick}>
       <FontAwesomeIcon icon={faFilter} />
     </button>
   </>;
