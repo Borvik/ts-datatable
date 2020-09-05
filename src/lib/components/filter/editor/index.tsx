@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { QueryFilterGroup } from '../../table/types';
 import { FilterGroupEditor } from './group';
-import update, { Spec } from 'immutability-helper';
+import { Spec, update } from '../../../utils/immutable';
 
 interface Props {
   value: QueryFilterGroup;

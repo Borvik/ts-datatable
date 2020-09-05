@@ -41,6 +41,8 @@ export interface DataTableProperties<T> {
 
   getRowKey?: (row: T) => string | number;
   onShowColumnPicker?: OnShowColumnPicker;
+  onSaveQuickEdit?: OnSaveQuickEdit<T>;
+  quickEditPosition?: 'top' | 'bottom' | 'both';
 
   tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
@@ -83,6 +85,8 @@ interface BaseColumnProps<T> {
   className?: string;
   name?: string; // used for qs filter/sorts
   filter?: ColumnFilter; // defines the filter capabilities
+  editor?: ColumnEditor<T>;
+  canEdit?: (row: T, column: DataColumn<T>) => boolean;
 }
 
 /** Provides definition for columns as they are to be passed in */
@@ -93,6 +97,7 @@ export interface DataColumnProp<T> extends ResolveProps<ResolvableColumnTypes>, 
 /** Provides definition for columns internally, as well as passed to interaction functions */
 export interface DataColumn<T> extends ResolvableColumnTypes, BaseColumnProps<T> {
   columns?: DataColumn<T>[];
+  parent?: DataColumn<T>;
 
   isVisible: boolean;
   rowDepth: number;
@@ -110,6 +115,9 @@ export interface ColumnVisibilityStorage {
 }
 type SetColumnVisibilityCallback = (columnVisibility: ColumnVisibilityStorage) => void;
 export type OnShowColumnPicker = (columns: DataColumn<any>[], setColumnVisibility: SetColumnVisibilityCallback, btnElement: HTMLButtonElement) => void | Promise<void>;
+
+export type QuickEditFormData<T> = Record<PropertyKey, Partial<T>>;
+export type OnSaveQuickEdit<T> = (formData: QuickEditFormData<T>) => Promise<void>
 
 export interface TableBodyProps {
   data: any[];
@@ -131,6 +139,12 @@ export interface QSColumnSorts {
   sort: string[];
 }
 
+/**
+ * 888888 88 88     888888 888888 88""Yb 
+ * 88__   88 88       88   88__   88__dP 
+ * 88""   88 88  .o   88   88""   88"Yb  
+ * 88     88 88ood8   88   888888 88  Yb 
+ */
 
 interface BaseColumnFilter {
   parseAsType?: QueryStringFilterTypes
@@ -162,10 +176,10 @@ export interface CustomColumnFilter extends BaseColumnFilter {
   defaultOperator?: AllFilterOperators;
   defaultValue?: any;
   toDisplay: (value: any) => ReactRenderable;
-  Editor: React.ReactType<CustomEditorProps>;
+  Editor: React.ReactType<CustomFilterEditorProps>;
 }
 
-export interface CustomEditorProps {
+export interface CustomFilterEditorProps {
   inputRef: React.MutableRefObject<HTMLElement | null>;
   focusRef: React.MutableRefObject<HTMLElement | null>;
   value: any;
@@ -249,3 +263,33 @@ export function isFilterItem(value?: QueryFilterGroup | QueryFilterItem | null):
   if (!value) return false;
   return (typeof (value as any).column === 'string');
 }
+
+
+/**
+ * 888888 8888b.  88 888888  dP"Yb  88""Yb .dP"Y8 
+ * 88__    8I  Yb 88   88   dP   Yb 88__dP `Ybo." 
+ * 88""    8I  dY 88   88   Yb   dP 88"Yb  o.`Y8b 
+ * 888888 8888Y"  88   88    YbodP  88  Yb 8bodP' 
+ */
+
+export type EditFormData = Record<PropertyKey, unknown>;
+
+interface BasicColumnEditor {
+  type: 'text' | 'email' | 'number' | 'checkbox'
+}
+
+export interface CustomColumnEditor<T> {
+  type: 'custom'
+  Editor: React.ReactType<CustomEditorProps<T>>
+}
+
+export interface CustomEditorProps<T> {
+  value: any;
+  row: T;
+  column: DataColumn<T>;
+  setValue: (newValue: any) => void;
+}
+
+type ColumnEditor<T> = BasicColumnEditor | CustomColumnEditor<T>;
+
+export type InputType = 'text' | 'email' | 'date' | 'datetime-local' | 'month' | 'number' | 'range' | 'search' | 'tel' | 'url' | 'week' | 'password' | 'datetime' | 'time' | 'color';

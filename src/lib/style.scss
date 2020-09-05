@@ -2,6 +2,7 @@
 @import './components/column-picker/style.scss';
 @import './components/filter/style.scss';
 @import './components/context-menu/scss/main.scss';
+@import './components/table/editors/style.scss';
 
 .ts-datatable {
   display: flex;
@@ -48,6 +49,8 @@
       .ts-datatable-actions {
         margin-bottom: .2em;
         margin-top: auto;
+        display: flex;
+        align-items: center;
       }
     }
   }
@@ -119,6 +122,35 @@
   .ts-loading {
     display: block;
     height: 2em;
+  }
+
+  .ts-datatable-bottom-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: .15em;
+  }
+
+  .quick-edit-btn-group {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid;
+    padding: .15em .25em;
+    border-radius: 4px;
+
+    &:not(.editing) {
+      border-color: transparent;
+      padding-right: 0;
+      border-right: 0;
+    }
+    
+    &.editing + * {
+      margin-left: .5em;
+    }
+
+    label {
+      font-weight: normal;
+      margin-right: .5em;
+    }
   }
 }
 

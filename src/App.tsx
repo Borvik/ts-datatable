@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { DataTable, CustomEditorProps } from './lib';
+import { DataTable, CustomFilterEditorProps, CustomEditorProps } from './lib';
 import initSqlJs from 'sql.js';
 import './App.css';
 import { cloneDeep } from 'lodash';
@@ -23,6 +23,8 @@ function sqliteParams(obj: any): any {
   let result: any = {};
   let keys = Object.keys(obj);
   for (let k of keys) {
+    if (typeof obj[k] === 'boolean')
+      obj[k] = obj[k] ? 1 : 0;
     result[':' + k] = obj[k];
   }
   return result;
@@ -38,11 +40,15 @@ function query(sql: string, params?: any) {
   let result: any[] = [];
   while (stmt.step()) {
     let dbRes = stmt.getAsObject();
+    if (typeof dbRes.collected !== 'undefined')
+      (dbRes as any).collected = !!dbRes.collected;
     result.push(dbRes);
   }
   stmt.free();
 
+  let rowsModified = DB.getRowsModified();
   console.log('Result:', result);
+  console.log('Rows Modified:', rowsModified);
   console.groupEnd();
   return result;
 }
@@ -76,12 +82,13 @@ function App() {
           weaknesses TEXT,
           prev_evolution TEXT,
           next_evolution TEXT,
-          evolves_to INTEGER
+          evolves_to INTEGER,
+          collected INTEGER not null default 0
         );`);
         DB.run(`CREATE TABLE pokemon_types (name);`)
 
         let uniqueTypes = new Set<string>();
-        let insertStmt = `INSERT INTO pokemon VALUES (:id,:num,:name,:img,:type,:height,:weight,:candy,:candy_count,:egg,:spawn_chance,:avg_spawns,:spawn_time,:weaknesses,:prev_evolution,:next_evolution,:evolves_to)`;
+        let insertStmt = `INSERT INTO pokemon VALUES (:id,:num,:name,:img,:type,:height,:weight,:candy,:candy_count,:egg,:spawn_chance,:avg_spawns,:spawn_time,:weaknesses,:prev_evolution,:next_evolution,:evolves_to,:collected)`;
         for (let creature of pokemon) {
           uniqueTypes = new Set<string>([...uniqueTypes, ...creature.type]);
 
@@ -94,6 +101,7 @@ function App() {
             obj.evolves_to = Number(obj.next_evolution[0].num);
             obj.next_evolution = obj.next_evolution.map((v: any) => v.name).join(' => ');
           }
+          obj.collected = false;
           
           DB.run(insertStmt, sqliteParams(obj));
         }
@@ -201,6 +209,18 @@ function App() {
           defaultSort={[
             {column: 'id', direction: 'asc'}
           ]}
+          quickEditPosition='top'
+          onSaveQuickEdit={async (data) => {
+            // loop through and save or craft single update
+            for (let primaryKey of Object.keys(data)) {
+              let updateSqls = Object.keys(data[primaryKey]).map(field => `${field} = :${field}`);
+              let sql = `UPDATE pokemon SET ${updateSqls.join(', ')} WHERE id = :id;`;
+              query(sql, sqliteParams({
+                ...data[primaryKey],
+                id: primaryKey,
+              }));
+            }
+          }}
           columns={[
             {
               header: 'ID',
@@ -233,6 +253,8 @@ function App() {
             {
               header: 'Name',
               accessor: 'name',
+              editor: { type: 'text' },
+              canEdit: (row) => row.id !== 3,
               filter: {
                 type: 'string',
               },
@@ -249,7 +271,11 @@ function App() {
               filter: {
                 type: 'custom',
                 toDisplay: (value: any) => value,
-                Editor: CustomTypeSelectEditor
+                Editor: CustomTypeSelectEditor,
+              },
+              editor: {
+                type: 'custom',
+                Editor: CustomTypeColumnEditor,
               }
             },
             {
@@ -338,8 +364,17 @@ function App() {
               header: 'Spawn Time',
               accessor: 'spawn_time',
               className: 'no-wrap',
-              fixed: 'right'
             },
+            {
+              header: 'Collected',
+              accessor: 'collected',
+              className: 'no-wrap',
+              fixed: 'right',
+              render: (value: any) => value ? 'Yes' : 'No',
+              editor: {
+                type: 'checkbox',
+              }
+            }
           ]}
         />
       </div>
@@ -367,6 +402,7 @@ interface Pokemon {
   weaknesses: string[];
   prev_evolution?: Evolution[];
   next_evolution?: Evolution[];
+  collected: boolean
 }
 
 interface Evolution {
@@ -378,7 +414,7 @@ interface TypeEditorState {
   options: DBPokemonType[];
 }
 
-class CustomTypeSelectEditor extends React.Component<CustomEditorProps, TypeEditorState> {
+class CustomTypeSelectEditor extends React.Component<CustomFilterEditorProps, TypeEditorState> {
   state = {
     options: [] as DBPokemonType[]
   }
@@ -399,6 +435,27 @@ class CustomTypeSelectEditor extends React.Component<CustomEditorProps, TypeEdit
           return null;
         return <option key={t.name} value={t.name}>{t.name}</option>
       }).filter(e => !!e)}
+    </select>
+  }
+}
+
+class CustomTypeColumnEditor extends React.Component<CustomEditorProps<Pokemon>, TypeEditorState> {
+  state = {
+    options: [] as DBPokemonType[]
+  }
+
+  componentDidMount() {
+    let types: DBPokemonType[] = query('SELECT * FROM pokemon_types;');
+    this.setState({ options: types });
+  }
+
+  render() {
+    const { value, setValue, row, column } = this.props;
+    const { options } = this.state;
+    
+    return <select value={value} onChange={(e) => setValue(e.target.value)}>
+      <option></option>
+      {options.map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
     </select>
   }
 }

@@ -4,9 +4,10 @@ import { ColumnContext } from './contexts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons/faCircleNotch';
 import { getRowValue, getRowKey } from '../../utils/getRowKey';
+import { CellEditor } from './editors';
 
 export const TableBody: React.FC<TableBodyProps> = (props) => {
-  const { actualColumns: columns } = useContext(ColumnContext);
+  const { actualColumns: columns, isEditing } = useContext(ColumnContext);
   const tbodyRef = useRef<HTMLTableSectionElement>(null);
 
   return (
@@ -22,9 +23,22 @@ export const TableBody: React.FC<TableBodyProps> = (props) => {
 
                 let value = getRowValue(row, col);
 
-                let rendered = typeof col.render !== 'undefined'
-                  ? col.render(value, row, col)
-                  : value;
+                let rendered: any = null;
+
+                if (isEditing && col.editor) {
+                  let canEdit: boolean = true;
+                  if (typeof col.canEdit === 'function')
+                    canEdit = col.canEdit(row, col);
+
+                  if (canEdit)
+                    rendered = <CellEditor column={col} value={value} row={row} />
+                }
+
+                if (rendered === null) {
+                  rendered = typeof col.render !== 'undefined'
+                    ? col.render(value, row, col)
+                    : value;
+                }
 
                 return <td key={colIdx} className={`${col.className ?? ''} ${col.fixed ? `fixed fixed-${col.fixed}` : ''}`.trim()}>{rendered}</td>;
               })}

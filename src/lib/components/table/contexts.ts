@@ -6,6 +6,8 @@ import {
   ColumnSort,
   OnShowColumnPicker,
   QueryFilterGroup,
+  EditFormData,
+  QuickEditFormData,
 } from './types';
 import { FilterSettings } from '../filter/types';
 
@@ -16,11 +18,17 @@ interface ColumnContextInterface<T> {
   filter: QueryFilterGroup,
   filterSettings?: FilterSettings,
   multiColumnSorts: boolean;
+  isEditing: boolean;
+  isSavingQuickEdit: boolean;
+  editData: EditFormData;
+  setFormData: React.Dispatch<React.SetStateAction<EditFormData>>;
   setColumnVisibility: (newState: (ColumnVisibilityStorage | ((state: ColumnVisibilityStorage) => ColumnVisibilityStorage))) => void;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
   onShowColumnPicker?: OnShowColumnPicker;
   setFilter: (newState: QueryFilterGroup | ((state: QueryFilterGroup) => QueryFilterGroup)) => void;
-  setPagination: (newState: Partial<{ page: number; perPage: number}> | ((state: { page: number; perPage: number}) => Partial<{page: number; perPage: number}>)) => void
+  setPagination: (newState: Partial<{ page: number; perPage: number}> | ((state: { page: number; perPage: number}) => Partial<{page: number; perPage: number}>)) => void;
+  getRowKey?: (row: T) => string | number
+  onSaveQuickEdit: (data: QuickEditFormData<T>) => Promise<void>
 }
 
 export const ColumnContext = createContext<ColumnContextInterface<any>>({
@@ -29,8 +37,13 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   columnSorts: [],
   filter: {groupOperator: 'and', filters: []},
   multiColumnSorts: false,
+  isEditing: false,
+  isSavingQuickEdit: false,
+  editData: {},
+  setFormData: () => {},
   setColumnVisibility: () => {},
   setColumnSort: () => {},
   setFilter: () => {},
   setPagination: () => {},
+  onSaveQuickEdit: async () => {},
 });
