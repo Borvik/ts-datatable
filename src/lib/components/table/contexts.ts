@@ -31,6 +31,9 @@ interface ColumnContextInterface<T> {
   onSaveQuickEdit: (data: QuickEditFormData<T>) => Promise<void>
   DetailRow?: React.ReactType<{parentRow: T}>
   canRowShowDetail?: (row: T) => boolean
+  columnOrder: string[]
+  setColumnOrder: (newState: string[] | ((state: string[]) => string[])) => void
+  canReorderColumns: boolean
 }
 
 export const ColumnContext = createContext<ColumnContextInterface<any>>({
@@ -48,4 +51,7 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   setFilter: () => {},
   setPagination: () => {},
   onSaveQuickEdit: async () => {},
+  columnOrder: [],
+  setColumnOrder: () => {},
+  canReorderColumns: false,
 });

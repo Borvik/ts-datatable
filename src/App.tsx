@@ -134,6 +134,7 @@ function App() {
           // data={pokemon} // Pass Data in directly
           // totalCount={5} // Total count to enable pagination
           multiColumnSorts={true}
+          canReorderColumns={true}
           // Async data loading (recommended way)
           data={async ({ pagination, search, sorts, filters }) => {
             console.log('Running with filters:', filters);
@@ -282,11 +283,25 @@ function App() {
               }
             },
             {
+              /*
+                |           Size           |
+                |      Dims       |        |
+                | Height | Length | Weight |
+              */
               header: 'Size',
               columns: [
                 {
-                  header: 'Height',
-                  accessor: 'height'
+                  header: 'Dims',
+                  columns: [
+                    {
+                      header: 'Height',
+                      accessor: 'height'
+                    },
+                    {
+                      header: 'Length',
+                      accessor: 'length', // doesn't exist
+                    }
+                  ]
                 },
                 {
                   header: 'Weight',

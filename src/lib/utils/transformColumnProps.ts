@@ -59,19 +59,13 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
         : undefined,
 
       isVisible,
-      rowDepth: 1,
+      sortIndex: 0,
       rowSpan: 1,
       colSpan: 1,
-      offset: 0,
     };
 
     if (transformedColumn.columns?.length) {
-      transformedColumn.rowDepth += transformedColumn.columns[0].rowDepth;
       let visibleChildren = transformedColumn.columns.filter(c => c.isVisible).length;
-      transformedColumn.colSpan = transformedColumn.columns.reduce((v, col) => {
-        if (!col.isVisible) return v;
-        return v + col.colSpan;
-      }, 0);
 
       if (visibleChildren <= 1) {
         // add all the children to this level (so non-visible leaf-columns can still appear in selector)
@@ -116,46 +110,6 @@ function getColumnIsVisible<T>(key: string, column: Pick<DataColumn<T>, 'enabled
 }
 
 
-// export function getVisibleColumns<T>(cleanColumns: DataColumn<T>[], columnVisibility: ColumnVisibilityStorage): DataColumn<T>[] {
-//   let columns: DataColumn<T>[] = [];
-//   //getColumnIsVisible(key, {enabled, visibleByDefault}, storedVisibility)
-//   for (let index = 0; index < cleanColumns.length; index++) {
-//     const column = cleanColumns[index];
-//     const {
-//       columns: children,
-//       isVisible: removedIsVisible,
-//       ...props
-//     } = column;
-
-//     let isVisible = getColumnIsVisible(column, columnVisibility);
-//     let newColumn: DataColumn<T> = {
-//       ...props,
-//       isVisible,
-//       columns: !!children
-//         ? getVisibleColumns(children, columnVisibility)
-//         : undefined
-//     };
-
-//     if (newColumn.columns?.length) {
-//       let visibleChildren = newColumn.columns.filter(c => c.isVisible).length;
-//       newColumn.colSpan = newColumn.columns.reduce((v, col) => {
-//         if (!col.isVisible) return v;
-//         return v + col.colSpan;
-//       }, 0);
-
-//       if (visibleChildren <= 1) {
-//         // add all the children to this level (so non-visible leaf-columns can still appear in selector)
-//         columns = columns.concat(newColumn.columns);
-//       } else {
-//         columns.push(newColumn);
-//       }
-//     } else {
-//       columns.push(newColumn);
-//     }
-//   }
-//   return columns;
-// }
-
 export function getFlattenedColumns<T>(visibleColumns: DataColumn<T>[], flattened: DataColumn<T>[] = []): DataColumn<T>[] {
   for (let c of visibleColumns) {
     if (c.columns?.length) {
@@ -167,37 +121,73 @@ export function getFlattenedColumns<T>(visibleColumns: DataColumn<T>[], flattene
   return flattened;
 }
 
-export function getHeaderRows<T>(visibleColumns: DataColumn<T>[]): DataColumn<T>[][] {
-  /**
-   * scan columns for adjacent same parents - counting adjacent non-matches/empty
-   */
-  let maxDepth: number = 1;
-  for (let col of visibleColumns) {
-    if (maxDepth < col.rowDepth)
-      maxDepth = col.rowDepth;
+export function generateHeaderRows<T>(columns: DataColumn<T>[], columnOrder: string[]): DataColumn<T>[][] {
+  const fixedColumns = columns.filter(c => !!c.fixed);
+  const fixedLeftColumns = fixedColumns.filter(c => c.fixed === 'left').map(c => c.key);
+  const fixedRightColumns = fixedColumns.filter(c => c.fixed === 'right').map(c => c.key);
+  const normalColumns = columns.filter(c => !fixedColumns.includes(c)).map(c => c.key);
+  const defaultOrder = [...fixedLeftColumns, ...normalColumns, ...fixedRightColumns];
+
+  for (let i = 0, l = defaultOrder.length; i < l; i++) {
+    let column = columns.find(c => c.key === defaultOrder[i]);
+    if (column) column.sortIndex = i;
   }
 
-  let rows = buildHeaderRows(visibleColumns);
-  for (let col of rows[0]) {
-    col.rowSpan = (maxDepth - col.rowDepth) + 1;
-  }
-
-  return rows;
-}
-
-function buildHeaderRows<T>(visibleColumns: DataColumn<T>[], rows: DataColumn<T>[][] = [], depth: number = 0): DataColumn<T>[][] {
-  // initialize this depth in the rows collection
-  while (rows.length <= depth)
-    rows.push([]);
-
-  for (let col of visibleColumns) {
-    if (col.columns?.length) {
-      buildHeaderRows(col.columns, rows, depth + 1);
+  if (columnOrder.length) {
+    const sortedOrder = [...fixedLeftColumns, ...columnOrder, ...fixedRightColumns];
+    for (let i = 0, l = sortedOrder.length; i < l; i++) {
+      let column = columns.find(c => c.key === sortedOrder[i]);
+      if (column) column.sortIndex = i;
     }
 
-    // add column to rows
-    rows[depth].push(col);
+    columns.sort((a, b) => a.sortIndex - b.sortIndex);
   }
+  return generateHeaderRow(columns);
+}
+
+function generateHeaderRow<T>(columns: DataColumn<T>[], rows: DataColumn<T>[][] = []): DataColumn<T>[][] {
+  let currentRow: DataColumn<T>[] = [];
+  let parentRow: DataColumn<T>[] = [];
+
+  let lastParent: DataColumn<T> | null | undefined = null;
+  let currentColumnSpan: number = 1;
+  for (let column of columns) {
+    if (!column.isVisible) continue;
+    currentRow.push(column);
+
+    if (!!lastParent && lastParent === column.parent) {
+      currentColumnSpan += column.colSpan;
+      (lastParent as DataColumn<T>).colSpan = currentColumnSpan;
+      if (!parentRow.includes(lastParent)) {
+        parentRow.push(lastParent);
+      }
+    } else {
+      currentColumnSpan = column.colSpan;
+    }
+    lastParent = column.parent;
+  }
+
+  if (parentRow.length) {
+    let actualParentRow: DataColumn<T>[] = [];
+    let actualCurrentRow: DataColumn<T>[] = [];
+
+    for (let column of columns) {
+      if (column.parent && parentRow.includes(column.parent)) {
+        if (!actualParentRow.includes(column.parent))
+          actualParentRow.push(column.parent);
+        actualCurrentRow.push(column);
+      } else {
+        column.rowSpan++;
+        actualParentRow.push(column);
+      }
+    }
+
+    generateHeaderRow(actualParentRow, rows);
+    rows.push(actualCurrentRow);
+  } else {
+    rows.push(currentRow);
+  }
+  
   return rows;
 }
 /*

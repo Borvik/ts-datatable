@@ -1,6 +1,6 @@
 .config-column {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
 
   .column-header {
     margin-right: 1.5em;
@@ -10,10 +10,18 @@
     margin-top: .15em;
   }
 
+  .column-drag-placeholder {
+    width: 1.25em;
+  }
+  .column-drag {
+    cursor: grab;
+  }
+
   button.visibility-toggle {
     border: none;
     background: transparent;
     cursor: pointer;
+    margin-left: auto;
 
     &:focus {
       outline: none;
