@@ -53,6 +53,10 @@ export interface DataTableProperties<T> {
 
   filterSettings?: FilterSettings;
 
+  canRowShowDetail?: (row: T) => boolean
+  DetailRow?: React.ReactType<{parentRow: T}>;
+  renderDetailRow?: (row: T) => ReactRenderable;
+
   components?: {
     Paginate?: React.ReactType<PaginateRequiredProps>;
     SearchForm?: React.ReactType<SearchRequiredProps>;

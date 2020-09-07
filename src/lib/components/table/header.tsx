@@ -4,7 +4,12 @@ import { HeaderSort } from './sortable';
 import { ColumnSort } from './types';
 
 export const TableHeader: React.FC = () => {
-  const { headerRows, columnSorts, multiColumnSorts, setColumnSort } = useContext(ColumnContext);
+  const {
+    headerRows,
+    columnSorts,
+    multiColumnSorts,
+    setColumnSort,
+  } = useContext(ColumnContext);
 
   if (headerRows.length < 1) return null;
 

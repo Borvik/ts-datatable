@@ -60,7 +60,7 @@
     align-items: flex-end;
   }
 
-    .ts-datatable-table {
+  .ts-datatable-table {
     border-collapse: collapse;
 
     th, td {
@@ -83,6 +83,27 @@
            * May or may not need a polyfill
            * https://github.com/matteobad/focus-within-polyfill
            */
+        }
+      }
+    }
+
+    .mdr-control {
+      padding-left: 1.25em;
+      padding-right: .25em;
+
+      > .mdr-button {
+        position: absolute;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        background: none;
+        border: none;
+        font-size: inherit;
+        top: calc(50% - .5em);
+
+        &.no-mdr-padding {
+          display: inline-block;
+          width: 1.25em;
         }
       }
     }

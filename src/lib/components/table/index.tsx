@@ -234,6 +234,9 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
         setPagination,
         getRowKey: props.getRowKey,
         onSaveQuickEdit,
+        DetailRow: props.DetailRow,
+        renderDetailRow: props.renderDetailRow,
+        canRowShowDetail: props.canRowShowDetail,
       }}>
         <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
           <div ref={topEl} className={`ts-datatable-top`}>
