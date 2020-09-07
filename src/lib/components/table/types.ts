@@ -56,6 +56,8 @@ export interface DataTableProperties<T> {
   canRowShowDetail?: (row: T) => boolean
   DetailRow?: React.ReactType<{parentRow: T}>;
 
+  canReorderColumns?: boolean
+
   components?: {
     Paginate?: React.ReactType<PaginateRequiredProps>;
     SearchForm?: React.ReactType<SearchRequiredProps>;
@@ -104,10 +106,11 @@ export interface DataColumn<T> extends ResolvableColumnTypes, BaseColumnProps<T>
   parent?: DataColumn<T>;
 
   isVisible: boolean;
-  rowDepth: number;
+  // rowDepth: number;
   rowSpan: number;
   colSpan: number;
-  offset: number;
+  sortIndex: number;
+  // offset: number;
 }
 
 /**

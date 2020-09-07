@@ -2,7 +2,7 @@ import React, { PropsWithChildren, useState, useEffect, useRef, useCallback } fr
 import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { useQueryState, batchedQSUpdate } from '../../utils/useQueryState';
-import { transformColumns, getHeaderRows, getFlattenedColumns } from '../../utils/transformColumnProps';
+import { transformColumns, getFlattenedColumns, generateHeaderRows } from '../../utils/transformColumnProps';
 import { useLocalState } from '../../utils/useLocalState';
 import { ColumnContext } from './contexts';
 import { TableHeader } from './header';
@@ -37,6 +37,8 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     `table.${props.id}.columns`, {}, [ props.id ]
   );
 
+  const [columnOrder, setColumnOrder] = useLocalState<string[]>(`table.${props.id}.columnOrder`, [], [ props.id ]);
+
   /**
    * Using a deep comparison get the memoized column data.
    * 
@@ -52,8 +54,8 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
   const [columnData] = useDeepDerivedState(() => {
     // First Clean the columns - transforms "resolve | type" column properties
     let visibleColumns = transformColumns(props.id, props.columns, columnVisibility);
-    let headerRows = getHeaderRows(visibleColumns),
-        actualColumns = getFlattenedColumns(visibleColumns);
+    let actualColumns = getFlattenedColumns(visibleColumns);
+    let headerRows = generateHeaderRows(actualColumns, props.canReorderColumns ? columnOrder : []);
 
     let primaryKeyCount: number = 0, hasEditor: boolean = false;
     
@@ -78,7 +80,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       hasEditor,
       primaryKeyCount,
     }
-  }, [ props.id, columnVisibility, props.columns ]);
+  }, [ props.id, columnVisibility, props.columns, columnOrder, props.canReorderColumns ]);
 
   const canEdit = typeof props.onSaveQuickEdit === 'function' && columnData.hasEditor && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
 
@@ -236,6 +238,9 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
         onSaveQuickEdit,
         DetailRow: props.DetailRow,
         canRowShowDetail: props.canRowShowDetail,
+        columnOrder,
+        setColumnOrder,
+        canReorderColumns: props.canReorderColumns ?? false,
       }}>
         <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
           <div ref={topEl} className={`ts-datatable-top`}>
