@@ -60,19 +60,12 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
 
       isVisible,
       sortIndex: 0,
-      // rowDepth: 1,
       rowSpan: 1,
       colSpan: 1,
-      // offset: 0,
     };
 
     if (transformedColumn.columns?.length) {
-      // transformedColumn.rowDepth += transformedColumn.columns[0].rowDepth;
       let visibleChildren = transformedColumn.columns.filter(c => c.isVisible).length;
-      // transformedColumn.colSpan = transformedColumn.columns.reduce((v, col) => {
-      //   if (!col.isVisible) return v;
-      //   return v + col.colSpan;
-      // }, 0);
 
       if (visibleChildren <= 1) {
         // add all the children to this level (so non-visible leaf-columns can still appear in selector)
@@ -116,46 +109,6 @@ function getColumnIsVisible<T>(key: string, column: Pick<DataColumn<T>, 'enabled
   return isVisible;
 }
 
-
-// export function getVisibleColumns<T>(cleanColumns: DataColumn<T>[], columnVisibility: ColumnVisibilityStorage): DataColumn<T>[] {
-//   let columns: DataColumn<T>[] = [];
-//   //getColumnIsVisible(key, {enabled, visibleByDefault}, storedVisibility)
-//   for (let index = 0; index < cleanColumns.length; index++) {
-//     const column = cleanColumns[index];
-//     const {
-//       columns: children,
-//       isVisible: removedIsVisible,
-//       ...props
-//     } = column;
-
-//     let isVisible = getColumnIsVisible(column, columnVisibility);
-//     let newColumn: DataColumn<T> = {
-//       ...props,
-//       isVisible,
-//       columns: !!children
-//         ? getVisibleColumns(children, columnVisibility)
-//         : undefined
-//     };
-
-//     if (newColumn.columns?.length) {
-//       let visibleChildren = newColumn.columns.filter(c => c.isVisible).length;
-//       newColumn.colSpan = newColumn.columns.reduce((v, col) => {
-//         if (!col.isVisible) return v;
-//         return v + col.colSpan;
-//       }, 0);
-
-//       if (visibleChildren <= 1) {
-//         // add all the children to this level (so non-visible leaf-columns can still appear in selector)
-//         columns = columns.concat(newColumn.columns);
-//       } else {
-//         columns.push(newColumn);
-//       }
-//     } else {
-//       columns.push(newColumn);
-//     }
-//   }
-//   return columns;
-// }
 
 export function getFlattenedColumns<T>(visibleColumns: DataColumn<T>[], flattened: DataColumn<T>[] = []): DataColumn<T>[] {
   for (let c of visibleColumns) {

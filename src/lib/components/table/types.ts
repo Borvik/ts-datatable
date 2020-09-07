@@ -106,11 +106,9 @@ export interface DataColumn<T> extends ResolvableColumnTypes, BaseColumnProps<T>
   parent?: DataColumn<T>;
 
   isVisible: boolean;
-  // rowDepth: number;
   rowSpan: number;
   colSpan: number;
   sortIndex: number;
-  // offset: number;
 }
 
 /**
