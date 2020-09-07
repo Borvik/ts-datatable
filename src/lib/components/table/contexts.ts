@@ -10,7 +10,6 @@ import {
   QuickEditFormData,
 } from './types';
 import { FilterSettings } from '../filter/types';
-import { ReactRenderable } from '../../types';
 
 interface ColumnContextInterface<T> {
   actualColumns: DataColumn<T>[]; // the flat list of columns (lowest level)
@@ -31,7 +30,6 @@ interface ColumnContextInterface<T> {
   getRowKey?: (row: T) => string | number
   onSaveQuickEdit: (data: QuickEditFormData<T>) => Promise<void>
   DetailRow?: React.ReactType<{parentRow: T}>
-  renderDetailRow?: (row: T) => ReactRenderable
   canRowShowDetail?: (row: T) => boolean
 }
 

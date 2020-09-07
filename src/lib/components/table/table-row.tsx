@@ -13,27 +13,20 @@ interface TableRowProps {
 
 export const TableRow: React.FC<TableRowProps> = ({ row, ...props }) => {
   const [ isExpanded, setExpanded ] = useState(false);
-  const { actualColumns: columns, isEditing, DetailRow, renderDetailRow, canRowShowDetail } = useContext(ColumnContext);
+  const { actualColumns: columns, isEditing, DetailRow, canRowShowDetail } = useContext(ColumnContext);
 
   let canEditRow = isEditing;
   if (canEditRow && typeof props.canEditRow === 'function')
     canEditRow = props.canEditRow(row);
 
   let columnCount = 0;
-  let hasDetailRenderer = (!!DetailRow || !!renderDetailRow);
+  let hasDetailRenderer = (!!DetailRow);
   let detailRowAvailable = hasDetailRenderer;
   if (detailRowAvailable && typeof canRowShowDetail === 'function')
     detailRowAvailable = canRowShowDetail(row);
 
-  let detailRow: any = null;
-  if (isExpanded && hasDetailRenderer) {
-    if (typeof renderDetailRow === 'function')
-      detailRow = renderDetailRow(row);
-    else if (typeof DetailRow !== 'undefined')
-      detailRow = <DetailRow parentRow={row} />
-  }
-
   let detailBtnRendered: boolean = false;
+  const DetailRowRenderer = DetailRow ?? FakeDetailRow;
   return <>
     <tr>
       {columns.map((col, colIdx) => {
@@ -82,8 +75,12 @@ export const TableRow: React.FC<TableRowProps> = ({ row, ...props }) => {
         </td>;
       })}
     </tr>
-    {isExpanded && <tr>
-      <td colSpan={columnCount}>{detailRow}</td>
+    {isExpanded && !!DetailRow && <tr>
+      <td colSpan={columnCount}><DetailRowRenderer parentRow={row} /></td>
     </tr>}
   </>;
+}
+
+const FakeDetailRow: React.FC<{parentRow: any}> = () => {
+  return <></>;
 }

@@ -55,7 +55,6 @@ export interface DataTableProperties<T> {
 
   canRowShowDetail?: (row: T) => boolean
   DetailRow?: React.ReactType<{parentRow: T}>;
-  renderDetailRow?: (row: T) => ReactRenderable;
 
   components?: {
     Paginate?: React.ReactType<PaginateRequiredProps>;
