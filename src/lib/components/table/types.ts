@@ -16,13 +16,15 @@ export interface DataFnResult<T> {
   total: number;
 }
 
-type DataResultUnion<T> = T | DataFnResult<T>;
-export type DataFn<T> = (props: {
+interface DataProps {
   pagination: PageChange;
   search?: string;
   filters?: QueryFilterGroup;
   sorts: ColumnSort[];
-}) => DataResultUnion<T> | Promise<DataResultUnion<T>>;
+}
+
+type DataResultUnion<T> = T | DataFnResult<T>;
+export type DataFn<T> = (props: DataProps) => DataResultUnion<T> | Promise<DataResultUnion<T>>;
 
 export interface DataTableProperties<T> {
   id: string;
@@ -41,6 +43,7 @@ export interface DataTableProperties<T> {
 
   getRowKey?: (row: T) => string | number;
   canEditRow?: (row: T) => boolean;
+  onQueryChange?: (props: DataProps) => void;
   onShowColumnPicker?: OnShowColumnPicker;
   onSaveQuickEdit?: OnSaveQuickEdit<T>;
   quickEditPosition?: 'top' | 'bottom' | 'both';
@@ -54,13 +57,13 @@ export interface DataTableProperties<T> {
   filterSettings?: FilterSettings;
 
   canRowShowDetail?: (row: T) => boolean
-  DetailRow?: React.ReactType<{parentRow: T}>;
+  DetailRow?: React.ElementType<{parentRow: T}>;
 
   canReorderColumns?: boolean
 
   components?: {
-    Paginate?: React.ReactType<PaginateRequiredProps>;
-    SearchForm?: React.ReactType<SearchRequiredProps>;
+    Paginate?: React.ElementType<PaginateRequiredProps>;
+    SearchForm?: React.ElementType<SearchRequiredProps>;
     Loading?: ReactRenderable;
   }
 }
@@ -182,7 +185,7 @@ export interface CustomColumnFilter extends BaseColumnFilter {
   defaultOperator?: AllFilterOperators;
   defaultValue?: any;
   toDisplay: (value: any) => ReactRenderable;
-  Editor: React.ReactType<CustomFilterEditorProps>;
+  Editor: React.ElementType<CustomFilterEditorProps>;
 }
 
 export interface CustomFilterEditorProps {
@@ -286,7 +289,7 @@ interface BasicColumnEditor {
 
 export interface CustomColumnEditor<T> {
   type: 'custom'
-  Editor: React.ReactType<CustomEditorProps<T>>
+  Editor: React.ElementType<CustomEditorProps<T>>
 }
 
 export interface CustomEditorProps<T> {

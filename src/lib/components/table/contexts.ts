@@ -29,7 +29,7 @@ interface ColumnContextInterface<T> {
   setPagination: (newState: Partial<{ page: number; perPage: number}> | ((state: { page: number; perPage: number}) => Partial<{page: number; perPage: number}>)) => void;
   getRowKey?: (row: T) => string | number
   onSaveQuickEdit: (data: QuickEditFormData<T>) => Promise<void>
-  DetailRow?: React.ReactType<{parentRow: T}>
+  DetailRow?: React.ElementType<{parentRow: T}>
   canRowShowDetail?: (row: T) => boolean
   columnOrder: string[]
   setColumnOrder: (newState: string[] | ((state: string[]) => string[])) => void

@@ -139,6 +139,15 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
   
   useDeepEffect(() => {
     async function getData() {
+      if (typeof props.onQueryChange === 'function') {
+        props.onQueryChange({
+          pagination,
+          search: hideSearchForm ? '' : searchQuery.query,
+          sorts: columnSort.sort,
+          filters: filter.filters.length ? filter : undefined,
+        });
+      }
+
       if (typeof props.data === 'function') {
         let returnedData = await props.data({
           pagination,
@@ -153,7 +162,6 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
           setDataList(returnedData);
         }
       } else {
-        setPagination({ perPage: props.data.length });
         setDataList({
           data: props.data,
           total: typeof props.totalCount === 'undefined'
