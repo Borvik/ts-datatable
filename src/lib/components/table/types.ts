@@ -31,6 +31,7 @@ export interface DataTableProperties<T> {
   columns: Partial<DataColumnProp<T>>[];
   data: DataFn<T[]> | T[];
   totalCount?: number;
+  isLoading?: boolean;
 
   multiColumnSorts?: boolean;
   defaultSort?: ColumnSort[];

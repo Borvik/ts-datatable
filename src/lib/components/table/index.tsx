@@ -225,96 +225,94 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
    * Finally we setup the contexts that will house all the data
    * and pass it to all the subcomponents for eventual display.
    */
-  return (
-    <React.Fragment key={props.id}>
-      <ColumnContext.Provider value={{
-        ...columnData,
-        columnSorts: columnSort.sort,
-        multiColumnSorts: props.multiColumnSorts ?? false,
-        filter,
-        filterSettings: props.filterSettings,
-        isEditing,
-        isSavingQuickEdit,
-        editData: editFormData,
-        setFormData: setFormData,
-        setFilter,
-        setColumnVisibility,
-        setColumnSort,
-        onShowColumnPicker: props.onShowColumnPicker,
-        setPagination,
-        getRowKey: props.getRowKey,
-        onSaveQuickEdit,
-        DetailRow: props.DetailRow,
-        canRowShowDetail: props.canRowShowDetail,
-        columnOrder,
-        setColumnOrder,
-        canReorderColumns: props.canReorderColumns ?? false,
-      }}>
-        <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
-          <div ref={topEl} className={`ts-datatable-top`}>
-            <div className='ts-datatable-search-filters'>
-              {!hideSearchForm && <SearchForm
-                searchQuery={searchQuery.query}
-                onSearch={(query) => {
-                  batchedQSUpdate(() => {
-                    setSearchQuery({ query });
-                    setPagination({ page: 1 });
-                  });
-                }}
-              />}
-              <FilterBar />
-            </div>
-            <div className='ts-datatable-page-actions'>
-              <div className="ts-datatable-actions">
-                {(quickEditPosition === 'top' || quickEditPosition === 'both') &&
-                  <TableEditorButton
-                    setEditing={setEditing}
-                    canEdit={canEdit}
-                  />}
-                <FilterButton />
-                <ColumnPickerButton />
-              </div>
-              {(paginate === 'top' || paginate === 'both') &&
-                <Paginate
-                  {...props.paginateOptions}
-                  {...pagination}
-                  changePage={(page) => setPagination(page)}
-                  total={stateDataList.total}
-              />}
-            </div>
+  return (<>
+    <ColumnContext.Provider value={{
+      ...columnData,
+      columnSorts: columnSort.sort,
+      multiColumnSorts: props.multiColumnSorts ?? false,
+      filter,
+      filterSettings: props.filterSettings,
+      isEditing,
+      isSavingQuickEdit,
+      editData: editFormData,
+      setFormData: setFormData,
+      setFilter,
+      setColumnVisibility,
+      setColumnSort,
+      onShowColumnPicker: props.onShowColumnPicker,
+      setPagination,
+      getRowKey: props.getRowKey,
+      onSaveQuickEdit,
+      DetailRow: props.DetailRow,
+      canRowShowDetail: props.canRowShowDetail,
+      columnOrder,
+      setColumnOrder,
+      canReorderColumns: props.canReorderColumns ?? false,
+    }}>
+      <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
+        <div ref={topEl} className={`ts-datatable-top`}>
+          <div className='ts-datatable-search-filters'>
+            {!hideSearchForm && <SearchForm
+              searchQuery={searchQuery.query}
+              onSearch={(query) => {
+                batchedQSUpdate(() => {
+                  setSearchQuery({ query });
+                  setPagination({ page: 1 });
+                });
+              }}
+            />}
+            <FilterBar />
           </div>
-          <div {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
-            <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
-              <TableHeader />
-              <TableBody
-                getRowKey={props.getRowKey}
-                canEditRow={props.canEditRow}
-                data={stateDataList.data}
-                loading={dataLoading}
-                LoadingComponent={props.components?.Loading}
-              />
-            </table>
-          </div>
-          {(paginate === 'bottom' || paginate === 'both') &&
-            <div className='ts-datatable-bottom-page'>
+          <div className='ts-datatable-page-actions'>
+            <div className="ts-datatable-actions">
+              {(quickEditPosition === 'top' || quickEditPosition === 'both') &&
+                <TableEditorButton
+                  setEditing={setEditing}
+                  canEdit={canEdit}
+                />}
+              <FilterButton />
+              <ColumnPickerButton />
+            </div>
+            {(paginate === 'top' || paginate === 'both') &&
               <Paginate
                 {...props.paginateOptions}
                 {...pagination}
                 changePage={(page) => setPagination(page)}
-                total={stateDataList.total}
-              />
-            </div>}
-          <div className="ts-datatable-bottom-actions">
-            {(quickEditPosition === 'bottom' || quickEditPosition === 'both') && 
-              <TableEditorButton
-                setEditing={setEditing}
-                canEdit={canEdit}
-              />}
+                total={typeof props.data === 'function' ? stateDataList.total : props.totalCount}
+            />}
           </div>
         </div>
-      </ColumnContext.Provider>
-    </React.Fragment>
-  );
+        <div {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
+          <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
+            <TableHeader />
+            <TableBody
+              getRowKey={props.getRowKey}
+              canEditRow={props.canEditRow}
+              data={typeof props.data === 'function' ? stateDataList.data : props.data}
+              loading={typeof props.data === 'function' ? dataLoading : (props.isLoading ?? false)}
+              LoadingComponent={props.components?.Loading}
+            />
+          </table>
+        </div>
+        {(paginate === 'bottom' || paginate === 'both') &&
+          <div className='ts-datatable-bottom-page'>
+            <Paginate
+              {...props.paginateOptions}
+              {...pagination}
+              changePage={(page) => setPagination(page)}
+              total={typeof props.data === 'function' ? stateDataList.total : props.totalCount}
+            />
+          </div>}
+        <div className="ts-datatable-bottom-actions">
+          {(quickEditPosition === 'bottom' || quickEditPosition === 'both') && 
+            <TableEditorButton
+              setEditing={setEditing}
+              canEdit={canEdit}
+            />}
+        </div>
+      </div>
+    </ColumnContext.Provider>
+  </>);
 };
 
 
