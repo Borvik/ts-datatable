@@ -16,7 +16,7 @@ export interface DataFnResult<T> {
   total: number;
 }
 
-interface DataProps {
+export interface DataProps {
   pagination: PageChange;
   search?: string;
   filters?: QueryFilterGroup;

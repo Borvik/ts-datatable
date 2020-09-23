@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { DataTable, CustomFilterEditorProps, CustomEditorProps } from './lib';
+import { DataTable, CustomFilterEditorProps, CustomEditorProps, DataProps } from './lib';
 import initSqlJs from 'sql.js';
 import './App.css';
 import { cloneDeep } from 'lodash';
@@ -56,6 +56,8 @@ function query(sql: string, params?: any) {
 function App() {
   const [theme, setTheme] = React.useState('dark');
   const [, setDB] = React.useState<SQLDatabase | null>(null);
+  const [staticData, setStaticData] = React.useState<{list: Pokemon[], total: number, loading: boolean}>({list: [], total: 0, loading: true});
+
   useEffect(() => {
     addBodyClass(theme);
     return () => removeBodyClass(theme);
@@ -117,6 +119,60 @@ function App() {
 
   if (!DB) return <></>;
 
+  async function onQueryChange({ pagination, search, sorts, filters }: DataProps) {
+    console.log('Running static list with filters:', filters);
+    let filterSql = buildSQL(filters);
+
+    setStaticData({list: staticData.list, total: staticData.total, loading: true});
+    await new Promise((resolve) => {
+      setTimeout(() => {
+        let params: any = {};
+        let whereClauses: string[] = [];
+        if (search) {
+          params[':search'] = `%${search}%`;
+          whereClauses.push(`(num LIKE :search OR name LIKE :search OR type LIKE :search)`);
+        }
+
+        if (filterSql.sql) {
+          Object.assign(params, filterSql.params);
+          whereClauses.push(filterSql.sql);
+        }
+
+        let offset = (pagination.page - 1) * pagination.perPage;
+        let len = pagination.perPage;
+
+        let whereQuery = whereClauses.length
+          ? 'WHERE ' + whereClauses.join(' AND ')
+          : '';
+
+        let orderBy = sorts.length
+          ? 'ORDER BY ' + sorts.map(s => `${s.column} ${s.direction}`).join(', ')
+          : '';
+
+        let countResult = query(`
+          SELECT COUNT(*) as total
+          FROM pokemon
+          ${whereQuery}
+        `, params);
+
+        let fullResult = query(`
+          SELECT *
+          FROM pokemon
+          ${whereQuery}
+          ${orderBy}
+          LIMIT ${len} OFFSET ${offset}
+        `, params);
+
+        setStaticData({
+          list: fullResult,
+          total: countResult[0].total,
+          loading: false,
+        });
+        resolve();
+      }, 750)
+    })
+  }
+
   return (
     <div className={`App`}>
       <header className="App-header">
@@ -131,76 +187,78 @@ function App() {
             allowNested: true,
             limitOneColumnUse: true,
           }}
-          // data={pokemon} // Pass Data in directly
-          // totalCount={5} // Total count to enable pagination
+          onQueryChange={(props) => onQueryChange(props)} // Notifies of filter/pagination/search/sort changes
+          data={staticData.list} // Pass Data in directly
+          totalCount={staticData.total} // Total count to enable pagination
+          isLoading={staticData.loading} // Allows external to show loading indicator
           multiColumnSorts={true}
           canReorderColumns={true}
-          // Async data loading (recommended way)
-          data={async ({ pagination, search, sorts, filters }) => {
-            console.log('Running with filters:', filters);
+          // Async data loading
+          // data={async ({ pagination, search, sorts, filters }) => {
+          //   console.log('Running with filters:', filters);
 
-            let filterSql = buildSQL(filters);
-            console.log('Filter Sql:', filterSql);
+          //   let filterSql = buildSQL(filters);
+          //   console.log('Filter Sql:', filterSql);
             
-            // This promise, timeout, and filter is all to
-            // simulate an API call (sqlite calls synchrounous).
-            return await new Promise(resolve => {
-              setTimeout(() => {
-                let params: any = {};
-                let whereClauses: string[] = [];
-                if (search) {
-                  params[':search'] = `%${search}%`;
-                  whereClauses.push(`(num LIKE :search OR name LIKE :search OR type LIKE :search)`);
-                }
+          //   // This promise, timeout, and filter is all to
+          //   // simulate an API call (sqlite calls synchrounous).
+          //   return await new Promise(resolve => {
+          //     setTimeout(() => {
+          //       let params: any = {};
+          //       let whereClauses: string[] = [];
+          //       if (search) {
+          //         params[':search'] = `%${search}%`;
+          //         whereClauses.push(`(num LIKE :search OR name LIKE :search OR type LIKE :search)`);
+          //       }
 
-                if (filterSql.sql) {
-                  Object.assign(params, filterSql.params);
-                  whereClauses.push(filterSql.sql);
-                }
+          //       if (filterSql.sql) {
+          //         Object.assign(params, filterSql.params);
+          //         whereClauses.push(filterSql.sql);
+          //       }
   
-                let offset = (pagination.page - 1) * pagination.perPage;
-                let len = pagination.perPage;
+          //       let offset = (pagination.page - 1) * pagination.perPage;
+          //       let len = pagination.perPage;
   
-                let whereQuery = whereClauses.length
-                  ? 'WHERE ' + whereClauses.join(' AND ')
-                  : '';
+          //       let whereQuery = whereClauses.length
+          //         ? 'WHERE ' + whereClauses.join(' AND ')
+          //         : '';
   
-                let orderBy = sorts.length
-                  ? 'ORDER BY ' + sorts.map(s => `${s.column} ${s.direction}`).join(', ')
-                  : '';
+          //       let orderBy = sorts.length
+          //         ? 'ORDER BY ' + sorts.map(s => `${s.column} ${s.direction}`).join(', ')
+          //         : '';
   
-                let countResult = query(`
-                  SELECT COUNT(*) as total
-                  FROM pokemon
-                  ${whereQuery}
-                `, params);
+          //       let countResult = query(`
+          //         SELECT COUNT(*) as total
+          //         FROM pokemon
+          //         ${whereQuery}
+          //       `, params);
   
-                let fullResult = query(`
-                  SELECT *
-                  FROM pokemon
-                  ${whereQuery}
-                  ${orderBy}
-                  LIMIT ${len} OFFSET ${offset}
-                `, params);
+          //       let fullResult = query(`
+          //         SELECT *
+          //         FROM pokemon
+          //         ${whereQuery}
+          //         ${orderBy}
+          //         LIMIT ${len} OFFSET ${offset}
+          //       `, params);
 
-                resolve({
-                  total: countResult[0].total,
-                  data: fullResult,
-                });
-              }, 750);
-            });
+          //       resolve({
+          //         total: countResult[0].total,
+          //         data: fullResult,
+          //       });
+          //     }, 750);
+          //   });
 
-            // Function doesn't _need_ to be async, could
-            // be synchronous, though wouldn't really be an api call
+          //   // Function doesn't _need_ to be async, could
+          //   // be synchronous, though wouldn't really be an api call
 
-            // let offset = (pagination.page - 1) * pagination.limit;
-            // let len = (pagination.page * pagination.limit);
+          //   // let offset = (pagination.page - 1) * pagination.limit;
+          //   // let len = (pagination.page * pagination.limit);
                 
-            // return {
-            //   total: pokemon.length,
-            //   data: pokemon.slice(offset, len),
-            // };
-          }}
+          //   // return {
+          //   //   total: pokemon.length,
+          //   //   data: pokemon.slice(offset, len),
+          //   // };
+          // }}
           fixedColBg='var(--dt-fixed-bg, white)'
           paginateOptions={{
             buttonPosition: 'split',
