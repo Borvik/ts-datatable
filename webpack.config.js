@@ -19,7 +19,11 @@ module.exports = {
   externals: [nodeExternals({
     whitelist: [
       /^\@fortawesome/,
-      'lodash',
+      /^lodash/,
+      'clean-deep',
+      'dialog-polyfill',
+      'react-sortable-hoc',
+      'immutability-helper',
       'qs',
     ]
   })],
