@@ -3,7 +3,11 @@ import { ColumnContext } from './contexts';
 import { HeaderSort } from './sortable';
 import { ColumnSort } from './types';
 
-export const TableHeader: React.FC = () => {
+interface HeadProps {
+  headRef: React.RefObject<HTMLTableSectionElement>
+}
+
+export const TableHeader: React.FC<HeadProps> = (props) => {
   const {
     headerRows,
     columnSorts,
@@ -14,7 +18,7 @@ export const TableHeader: React.FC = () => {
   if (headerRows.length < 1) return null;
 
   return (
-    <thead>
+    <thead ref={props.headRef}>
       {headerRows.map((row, rowIdx) => (
         <tr key={rowIdx} className='ts-datatable-header-row'>
           {row.map((col, colIdx) => {

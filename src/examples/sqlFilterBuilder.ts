@@ -1,4 +1,4 @@
-import { QueryFilterGroup, QueryFilterItem, isFilterGroup } from "./lib/components/table/types";
+import { QueryFilterGroup, QueryFilterItem, isFilterGroup } from "../lib/components/table/types";
 
 interface SqlResult {
   sql: string

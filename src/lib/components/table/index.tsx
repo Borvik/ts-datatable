@@ -86,7 +86,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
 
   const [editFormData, setFormData] = useState<EditFormData>({});
 
-  const [pagination, setPagination] = useQueryState({page: 1, perPage: 10}, {
+  const [pagination, setPagination] = useQueryState({page: 1, perPage: props.paginateOptions?.defaultPerPage ?? 10}, {
     ...props.qs
   });
 
@@ -139,6 +139,15 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
   
   useDeepEffect(() => {
     async function getData() {
+      if (typeof props.onQueryChange === 'function') {
+        props.onQueryChange({
+          pagination,
+          search: hideSearchForm ? '' : searchQuery.query,
+          sorts: columnSort.sort,
+          filters: filter.filters.length ? filter : undefined,
+        });
+      }
+
       if (typeof props.data === 'function') {
         let returnedData = await props.data({
           pagination,
@@ -153,7 +162,6 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
           setDataList(returnedData);
         }
       } else {
-        setPagination({ perPage: props.data.length });
         setDataList({
           data: props.data,
           total: typeof props.totalCount === 'undefined'
@@ -175,6 +183,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
   };
 
   const topEl = useRef<HTMLDivElement>(null);
+  const theadEl = useRef<HTMLTableSectionElement>(null);
 
   // The resize here is to check if the top area is to small and should wrap
   // page/action buttons vs. search/filter bar
@@ -193,6 +202,38 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       window.removeEventListener('resize', topResize);
     }
   }, []);
+
+  // On page change - ensure scrolled to top (if enabled)
+  let scrollToTopEnabled = !(props.paginateOptions?.disableScrollToTop);
+  useEffect(() => {
+    if (!scrollToTopEnabled) return;
+    
+    /**
+     * Need both of these depending on the UI styling.
+     * 
+     * The two scenarios depend on page styling and up to developer:
+     *   1. Bottom actions and scrollbar always visible (ideal)
+     *   2. Whole page scrolls
+     * 
+     * For scenario 1 - scrolling to topEl (search/action buttons)
+     * doesn't really work as they are also always visible so we need
+     * to scroll to show thead (which also breaks down for fixed headers,
+     * but that isn't supported yet).
+     * 
+     * For scenario 2 - scrolling to thead, while it would work, probably
+     * isn't ideal, as it's nice to get the top page nav and action buttons
+     * available.
+     * 
+     * We can't detect these scenarios - so we do both.
+     * thead first, then a topEl and the topEl one might not scroll
+     * 
+     * If we did it the other way - then it _might_ scroll back down
+     * and hide part of topEl.
+     */
+    theadEl.current?.scrollIntoView();
+    topEl.current?.scrollIntoView();
+  }, [ pagination, scrollToTopEnabled ]);
+
 
   let propOnSave = props.onSaveQuickEdit;
   const onSaveQuickEdit = useCallback(async (data: QuickEditFormData<T>) => {
@@ -217,96 +258,94 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
    * Finally we setup the contexts that will house all the data
    * and pass it to all the subcomponents for eventual display.
    */
-  return (
-    <React.Fragment key={props.id}>
-      <ColumnContext.Provider value={{
-        ...columnData,
-        columnSorts: columnSort.sort,
-        multiColumnSorts: props.multiColumnSorts ?? false,
-        filter,
-        filterSettings: props.filterSettings,
-        isEditing,
-        isSavingQuickEdit,
-        editData: editFormData,
-        setFormData: setFormData,
-        setFilter,
-        setColumnVisibility,
-        setColumnSort,
-        onShowColumnPicker: props.onShowColumnPicker,
-        setPagination,
-        getRowKey: props.getRowKey,
-        onSaveQuickEdit,
-        DetailRow: props.DetailRow,
-        canRowShowDetail: props.canRowShowDetail,
-        columnOrder,
-        setColumnOrder,
-        canReorderColumns: props.canReorderColumns ?? false,
-      }}>
-        <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
-          <div ref={topEl} className={`ts-datatable-top`}>
-            <div className='ts-datatable-search-filters'>
-              {!hideSearchForm && <SearchForm
-                searchQuery={searchQuery.query}
-                onSearch={(query) => {
-                  batchedQSUpdate(() => {
-                    setSearchQuery({ query });
-                    setPagination({ page: 1 });
-                  });
-                }}
-              />}
-              <FilterBar />
-            </div>
-            <div className='ts-datatable-page-actions'>
-              <div className="ts-datatable-actions">
-                {(quickEditPosition === 'top' || quickEditPosition === 'both') &&
-                  <TableEditorButton
-                    setEditing={setEditing}
-                    canEdit={canEdit}
-                  />}
-                <FilterButton />
-                <ColumnPickerButton />
-              </div>
-              {(paginate === 'top' || paginate === 'both') &&
-                <Paginate
-                  {...props.paginateOptions}
-                  {...pagination}
-                  changePage={(page) => setPagination(page)}
-                  total={stateDataList.total}
-              />}
-            </div>
+  return (<>
+    <ColumnContext.Provider value={{
+      ...columnData,
+      columnSorts: columnSort.sort,
+      multiColumnSorts: props.multiColumnSorts ?? false,
+      filter,
+      filterSettings: props.filterSettings,
+      isEditing,
+      isSavingQuickEdit,
+      editData: editFormData,
+      setFormData: setFormData,
+      setFilter,
+      setColumnVisibility,
+      setColumnSort,
+      onShowColumnPicker: props.onShowColumnPicker,
+      setPagination,
+      getRowKey: props.getRowKey,
+      onSaveQuickEdit,
+      DetailRow: props.DetailRow,
+      canRowShowDetail: props.canRowShowDetail,
+      columnOrder,
+      setColumnOrder,
+      canReorderColumns: props.canReorderColumns ?? false,
+    }}>
+      <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
+        <div ref={topEl} className={`ts-datatable-top`}>
+          <div className='ts-datatable-search-filters'>
+            {!hideSearchForm && <SearchForm
+              searchQuery={searchQuery.query}
+              onSearch={(query) => {
+                batchedQSUpdate(() => {
+                  setSearchQuery({ query });
+                  setPagination({ page: 1 });
+                });
+              }}
+            />}
+            <FilterBar />
           </div>
-          <div {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
-            <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
-              <TableHeader />
-              <TableBody
-                getRowKey={props.getRowKey}
-                canEditRow={props.canEditRow}
-                data={stateDataList.data}
-                loading={dataLoading}
-                LoadingComponent={props.components?.Loading}
-              />
-            </table>
-          </div>
-          {(paginate === 'bottom' || paginate === 'both') &&
-            <div className='ts-datatable-bottom-page'>
+          <div className='ts-datatable-page-actions'>
+            <div className="ts-datatable-actions">
+              {(quickEditPosition === 'top' || quickEditPosition === 'both') &&
+                <TableEditorButton
+                  setEditing={setEditing}
+                  canEdit={canEdit}
+                />}
+              <FilterButton />
+              <ColumnPickerButton />
+            </div>
+            {(paginate === 'top' || paginate === 'both') &&
               <Paginate
                 {...props.paginateOptions}
                 {...pagination}
                 changePage={(page) => setPagination(page)}
-                total={stateDataList.total}
-              />
-            </div>}
-          <div className="ts-datatable-bottom-actions">
-            {(quickEditPosition === 'bottom' || quickEditPosition === 'both') && 
-              <TableEditorButton
-                setEditing={setEditing}
-                canEdit={canEdit}
-              />}
+                total={typeof props.data === 'function' ? stateDataList.total : props.totalCount}
+            />}
           </div>
         </div>
-      </ColumnContext.Provider>
-    </React.Fragment>
-  );
+        <div {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
+          <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
+            <TableHeader headRef={theadEl} />
+            <TableBody
+              getRowKey={props.getRowKey}
+              canEditRow={props.canEditRow}
+              data={typeof props.data === 'function' ? stateDataList.data : props.data}
+              loading={typeof props.data === 'function' ? dataLoading : (props.isLoading ?? false)}
+              LoadingComponent={props.components?.Loading}
+            />
+          </table>
+        </div>
+        {(paginate === 'bottom' || paginate === 'both') &&
+          <div className='ts-datatable-bottom-page'>
+            <Paginate
+              {...props.paginateOptions}
+              {...pagination}
+              changePage={(page) => setPagination(page)}
+              total={typeof props.data === 'function' ? stateDataList.total : props.totalCount}
+            />
+          </div>}
+        <div className="ts-datatable-bottom-actions">
+          {(quickEditPosition === 'bottom' || quickEditPosition === 'both') && 
+            <TableEditorButton
+              setEditing={setEditing}
+              canEdit={canEdit}
+            />}
+        </div>
+      </div>
+    </ColumnContext.Provider>
+  </>);
 };
 
 

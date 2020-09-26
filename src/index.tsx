@@ -1,8 +1,10 @@
+/* File for example/dev runner */
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
-import App from './App';
+import App from './examples/App';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
