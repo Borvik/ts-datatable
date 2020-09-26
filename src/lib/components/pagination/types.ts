@@ -7,6 +7,11 @@ export interface PageChange {
 
 export interface PaginateOptions {
   /**
+   * Default number of rows per page
+   */
+  defaultPerPage?: number;
+
+  /**
    * When true, shows the total number of records
    */
   totalVisible?: boolean;

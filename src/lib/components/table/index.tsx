@@ -86,7 +86,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
 
   const [editFormData, setFormData] = useState<EditFormData>({});
 
-  const [pagination, setPagination] = useQueryState({page: 1, perPage: 10}, {
+  const [pagination, setPagination] = useQueryState({page: 1, perPage: props.paginateOptions?.defaultPerPage ?? 10}, {
     ...props.qs
   });
 

@@ -23,6 +23,7 @@ export function FullFeaturedExample() {
       buttonPosition: 'split',
       showFirstLast: true,
       perPageOptions: 'any',
+      defaultPerPage: 50,
     }}
     quickEditPosition='top'
     onSaveQuickEdit={async (data) => {
