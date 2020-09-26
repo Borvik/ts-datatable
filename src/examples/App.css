@@ -4,6 +4,11 @@
   flex-direction: column;
 }
 
+.App-header {
+  display: flex;
+  align-items: center;
+}
+
 .App > div {
   min-height: 0;
   flex: 1 1 auto;
