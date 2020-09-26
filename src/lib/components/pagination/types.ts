@@ -42,6 +42,11 @@ export interface PaginateOptions {
 
   perPageOptions?: 'default' | 'any' | number[];
   perPageLoc?: false | ButtonPosition;
+
+  /**
+   * Disables scroll to top on page change feature
+   */
+  disableScrollToTop?: boolean
 }
 
 export interface PaginateRequiredProps {

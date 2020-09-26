@@ -183,6 +183,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
   };
 
   const topEl = useRef<HTMLDivElement>(null);
+  const theadEl = useRef<HTMLTableSectionElement>(null);
 
   // The resize here is to check if the top area is to small and should wrap
   // page/action buttons vs. search/filter bar
@@ -201,6 +202,38 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       window.removeEventListener('resize', topResize);
     }
   }, []);
+
+  // On page change - ensure scrolled to top (if enabled)
+  let scrollToTopEnabled = !(props.paginateOptions?.disableScrollToTop);
+  useEffect(() => {
+    if (!scrollToTopEnabled) return;
+    
+    /**
+     * Need both of these depending on the UI styling.
+     * 
+     * The two scenarios depend on page styling and up to developer:
+     *   1. Bottom actions and scrollbar always visible (ideal)
+     *   2. Whole page scrolls
+     * 
+     * For scenario 1 - scrolling to topEl (search/action buttons)
+     * doesn't really work as they are also always visible so we need
+     * to scroll to show thead (which also breaks down for fixed headers,
+     * but that isn't supported yet).
+     * 
+     * For scenario 2 - scrolling to thead, while it would work, probably
+     * isn't ideal, as it's nice to get the top page nav and action buttons
+     * available.
+     * 
+     * We can't detect these scenarios - so we do both.
+     * thead first, then a topEl and the topEl one might not scroll
+     * 
+     * If we did it the other way - then it _might_ scroll back down
+     * and hide part of topEl.
+     */
+    theadEl.current?.scrollIntoView();
+    topEl.current?.scrollIntoView();
+  }, [ pagination, scrollToTopEnabled ]);
+
 
   let propOnSave = props.onSaveQuickEdit;
   const onSaveQuickEdit = useCallback(async (data: QuickEditFormData<T>) => {
@@ -284,7 +317,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
         </div>
         <div {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
           <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
-            <TableHeader />
+            <TableHeader headRef={theadEl} />
             <TableBody
               getRowKey={props.getRowKey}
               canEditRow={props.canEditRow}
