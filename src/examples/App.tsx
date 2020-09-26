@@ -3,14 +3,14 @@ import './App.css';
 import { initializeDB, SQLDatabase } from './db';
 
 import { AsyncDataExample } from './async-data';
-import { ExternalDataExample } from './external-data';
+import { ManualDataExample } from './manual-data';
 import { FullFeaturedExample } from './full';
 
 interface ExampleChooser { [x: string]: React.ElementType<any> }
 
 const Examples: ExampleChooser = {
   AsyncData: AsyncDataExample,
-  ExternalData: ExternalDataExample,
+  ManualData: ManualDataExample,
   Full: FullFeaturedExample,
 }
 
@@ -24,7 +24,7 @@ const removeBodyClass = (className: string) => document.body.classList.remove(cl
 function App() {
   const [theme, setTheme] = React.useState('dark');
   const [theDb, setDB] = React.useState<SQLDatabase | null>(null);
-  const [selectedExample, setExample] = React.useState('ExternalData');
+  const [selectedExample, setExample] = React.useState('ManualData');
 
   useEffect(() => {
     addBodyClass(theme);

@@ -3,7 +3,7 @@ import { DataTable } from '../../lib';
 import { CommonColumns } from '../columns';
 import { DataState, onQueryChange, Pokemon } from '../db';
 
-export function ExternalDataExample() {
+export function ManualDataExample() {
   const [staticData, setStaticData] = React.useState<DataState>({list: [], total: 0, loading: true});
   
   return <DataTable<Pokemon>
