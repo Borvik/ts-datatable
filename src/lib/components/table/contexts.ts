@@ -8,6 +8,8 @@ import {
   QueryFilterGroup,
   EditFormData,
   QuickEditFormData,
+  CustomClasses,
+  CustomLabels,
 } from './types';
 import { FilterSettings } from '../filter/types';
 
@@ -34,6 +36,8 @@ interface ColumnContextInterface<T> {
   columnOrder: string[]
   setColumnOrder: (newState: string[] | ((state: string[]) => string[])) => void
   canReorderColumns: boolean
+  classNames?: CustomClasses
+  labels?: CustomLabels
 }
 
 export const ColumnContext = createContext<ColumnContextInterface<any>>({

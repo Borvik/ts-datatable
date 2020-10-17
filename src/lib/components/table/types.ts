@@ -67,6 +67,9 @@ export interface DataTableProperties<T> {
     SearchForm?: React.ElementType<SearchRequiredProps>;
     Loading?: ReactRenderable;
   }
+
+  classNames?: CustomClasses
+  labels?: CustomLabels
 }
 // //  React.DetailedHTMLProps<React.TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>
 // interface TableContainerProps extends Omit<HTMLProps<HTMLDivElement>, 'id'> {
@@ -75,6 +78,37 @@ export interface DataTableProperties<T> {
 // x.
 
 export type FixedType = boolean | 'left' | 'right';
+
+export interface CustomClasses {
+  dialogButton?: string
+  dialogCloseButton?: string
+  dialogApplyButton?: string
+  actionButton?: string
+  actionButtonEdit?: string
+  actionButtonSave?: string
+  actionButtonDiscard?: string
+  actionButtonFilter?: string
+  actionButtonSettings?: string
+}
+
+export interface CustomLabels {
+  search?: string
+  perPage?: string
+  page?: string
+  pageOf?: string
+  first?: string
+  previous?: string
+  next?: string
+  last?: string
+  close?: string
+  apply?: string
+  columns?: string
+  settings?: string
+  quickEdit?: string
+  saveChanges?: string
+  discardChanges?: string
+  filter?: string
+}
 
 interface ResolvableColumnTypes {
   header: ReactRenderable;

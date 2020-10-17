@@ -48,7 +48,7 @@ const SortableColumns = SortableContainer((({ children }) => {
 
 export const ColumnPickerDialog: React.FC = () => {
   const dialogEl = useRef<HTMLDialogElement | null>(null);
-  const { actualColumns, setColumnVisibility, columnOrder, setColumnOrder } = useContext(ColumnContext);
+  const { actualColumns, setColumnVisibility, columnOrder, setColumnOrder, classNames, labels } = useContext(ColumnContext);
   const [visible, setVisible] = useDeepDerivedState<ColumnVisibilityStorage>((prev) => {
     let newVisible: ColumnVisibilityStorage = {};
     for (let col of actualColumns) {
@@ -74,6 +74,15 @@ export const ColumnPickerDialog: React.FC = () => {
     return cols;
   }, [dialogOrder]);
 
+  let btnCloseClass: string | undefined;
+  let btnApplyClass: string | undefined;
+  if (classNames?.dialogButton || classNames?.dialogCloseButton) {
+    btnCloseClass = `${classNames?.dialogButton ?? ''} ${classNames?.dialogCloseButton ?? ''}`.trim();
+  }
+  if (classNames?.dialogButton || classNames?.dialogApplyButton) {
+    btnApplyClass = `${classNames?.dialogButton ?? ''} ${classNames?.dialogApplyButton ?? ''}`.trim();
+  }
+
   return <Dialog dialogRef={dialogEl} onSubmit={async (close) => {
     ReactDOM.unstable_batchedUpdates(() => {
       setColumnVisibility(visible);
@@ -82,7 +91,7 @@ export const ColumnPickerDialog: React.FC = () => {
     close();
   }}>
     <DialogHeader>
-      Columns
+      {labels?.columns ?? 'Columns'}
     </DialogHeader>
     <DialogBody>
       {!!fixedLeftColumns.length && <div className='config-column-list'>
@@ -133,10 +142,10 @@ export const ColumnPickerDialog: React.FC = () => {
       </div>}
     </DialogBody>
     <DialogFooter>
-      <button type='button' onClick={() => {
+      <button type='button' className={btnCloseClass} onClick={() => {
         dialogEl.current?.close();
-      }}>Close</button>
-      <button type='submit'>Apply</button>
+      }}>{labels?.close ?? 'Close'}</button>
+      <button type='submit' className={btnApplyClass}>{labels?.apply ?? 'Apply'}</button>
     </DialogFooter>
   </Dialog>
 }

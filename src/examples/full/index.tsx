@@ -25,6 +25,35 @@ export function FullFeaturedExample() {
       perPageOptions: 'any',
       defaultPerPage: 50,
     }}
+    classNames={{
+      dialogButton: 'btn',
+      dialogApplyButton: 'btn-apply',
+      dialogCloseButton: 'btn-close',
+      actionButton: 'btn',
+      actionButtonDiscard: 'btn-discard',
+      actionButtonEdit: 'btn-edit',
+      actionButtonFilter: 'btn-filter',
+      actionButtonSave: 'btn-save',
+      actionButtonSettings: 'btn-settings',
+    }}
+    labels={{
+      search: 'Search',
+      perPage: 'Per Page',
+      page: 'Page',
+      pageOf: 'of',
+      first: 'First',
+      previous: 'Previous',
+      next: 'Next',
+      last: 'Last',
+      close: 'Close',
+      apply: 'Apply',
+      columns: 'Columns',
+      settings: 'Settings',
+      quickEdit: 'Quick Edit',
+      saveChanges: 'Save Changes',
+      discardChanges: 'Discard Changes',
+      filter: 'Filter',
+    }}
     quickEditPosition='top'
     onSaveQuickEdit={async (data) => {
       // loop through and save or craft single update

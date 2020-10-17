@@ -6,8 +6,17 @@ import { FilterEditor } from './editor';
 
 export const FilterDialog: React.FC = (props) => {
   const dialogEl = useRef<HTMLDialogElement | null>(null);
-  const { filter, setFilter, setPagination } = useContext(ColumnContext);
+  const { filter, setFilter, setPagination, classNames, labels } = useContext(ColumnContext);
   const [filterState, setFilterState] = useState(filter);
+
+  let btnCloseClass: string | undefined;
+  let btnApplyClass: string | undefined;
+  if (classNames?.dialogButton || classNames?.dialogCloseButton) {
+    btnCloseClass = `${classNames?.dialogButton ?? ''} ${classNames?.dialogCloseButton ?? ''}`.trim();
+  }
+  if (classNames?.dialogButton || classNames?.dialogApplyButton) {
+    btnApplyClass = `${classNames?.dialogButton ?? ''} ${classNames?.dialogApplyButton ?? ''}`.trim();
+  }
 
   return <Dialog className='filter-dialog' dialogRef={dialogEl} onSubmit={async (close) => {
     batchedQSUpdate(() => {
@@ -17,14 +26,14 @@ export const FilterDialog: React.FC = (props) => {
     close();
   }}>
     <DialogHeader>
-      Filter
+      {labels?.filter ?? 'Filter'}
     </DialogHeader>
     <DialogBody>
       <FilterEditor value={filterState} onChange={setFilterState} />
     </DialogBody>
     <DialogFooter>
-      <button type='button' onClick={() => { dialogEl.current?.close(); }}>Close</button>
-      <button type='submit'>Apply</button>
+      <button type='button' className={btnCloseClass} onClick={() => { dialogEl.current?.close(); }}>{labels?.close ?? 'Close'}</button>
+      <button type='submit' className={btnApplyClass}>{labels?.apply ?? 'Apply'}</button>
     </DialogFooter>
   </Dialog>;
 }

@@ -11,12 +11,24 @@ interface ButtonProps {
 }
 
 export const TableEditorButton: React.FC<ButtonProps> = ({ setEditing, canEdit }) => {
-  const { isEditing, setFormData, onSaveQuickEdit, editData, isSavingQuickEdit } = useContext(ColumnContext);
+  const {
+    isEditing,
+    setFormData,
+    onSaveQuickEdit,
+    editData,
+    isSavingQuickEdit,
+    classNames,
+    labels,
+  } = useContext(ColumnContext);
 
   if (!isEditing) {
     if (canEdit) {
+      let btnEditClass: string | undefined;
+      if (classNames?.actionButton || classNames?.actionButtonEdit)
+        btnEditClass = `${classNames?.actionButton ?? ''} ${classNames?.actionButtonEdit ?? ''}`.trim();
+      
       return <div className='quick-edit-btn-group'>
-        <button type='button' onClick={() => setEditing(true)} title='Quick Edit'>
+        <button type='button' className={btnEditClass} onClick={() => setEditing(true)} title={labels?.quickEdit ?? 'Quick Edit'}>
           <FontAwesomeIcon icon={faPencilAlt} />
         </button>
       </div>;
@@ -24,14 +36,23 @@ export const TableEditorButton: React.FC<ButtonProps> = ({ setEditing, canEdit }
     return null;
   }
 
+  let btnDiscardClass: string | undefined;
+  let btnSaveClass: string | undefined;
+  if (classNames?.actionButton || classNames?.actionButtonDiscard) {
+    btnDiscardClass = `${classNames?.actionButton ?? ''} ${classNames?.actionButtonDiscard ?? ''}`.trim();
+  }
+  if (classNames?.actionButton || classNames?.actionButtonSave) {
+    btnSaveClass = `${classNames?.actionButton ?? ''} ${classNames?.actionButtonSave ?? ''}`.trim();
+  }
+
   return <div className='quick-edit-btn-group editing'>
-    <label>Quick Edit</label>
-    <button type='button' title='Save Changes' disabled={isSavingQuickEdit} onClick={() => {
+    <label>{labels?.quickEdit ?? 'Quick Edit'}</label>
+    <button type='button' className={btnSaveClass} title={labels?.saveChanges ?? 'Save Changes'} disabled={isSavingQuickEdit} onClick={() => {
       onSaveQuickEdit(editData as any)
     }}>
       <FontAwesomeIcon icon={faSave} />
     </button>
-    <button type='button' title='Discard Changes' disabled={isSavingQuickEdit} onClick={() => {
+    <button type='button' className={btnDiscardClass} title={labels?.discardChanges ?? 'Discard Changes'} disabled={isSavingQuickEdit} onClick={() => {
       setFormData({});
       setEditing(false)
     }}>

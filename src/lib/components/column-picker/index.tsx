@@ -7,7 +7,7 @@ import { ColumnPickerDialog } from './dialog';
 
 export const ColumnPickerButton: React.FC = (props) => {
   const { dialog, showDialog } = useDialog(<ColumnPickerDialog />);
-  const { actualColumns, setColumnVisibility, onShowColumnPicker } = useContext(ColumnContext);
+  const { actualColumns, setColumnVisibility, onShowColumnPicker, classNames, labels } = useContext(ColumnContext);
 
   async function onButtonClick(e: React.MouseEvent<HTMLButtonElement>) {
     try {
@@ -22,9 +22,14 @@ export const ColumnPickerButton: React.FC = (props) => {
     }
   }
 
+  let btnSettingsClass: string | undefined;
+  if (classNames?.actionButton || classNames?.actionButtonSettings) {
+    btnSettingsClass = `${classNames?.actionButton ?? ''} ${classNames?.actionButtonSettings ?? ''}`.trim();
+  }
+
   return <>
     {dialog}
-    <button type='button' onClick={onButtonClick}>
+    <button type='button' title={labels?.settings ?? 'Settings'} className={btnSettingsClass} onClick={onButtonClick}>
       <FontAwesomeIcon icon={faCog} />
     </button>
   </>;

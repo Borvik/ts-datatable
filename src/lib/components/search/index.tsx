@@ -6,7 +6,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
 import { ColumnContext } from '../table/contexts';
 
 export const SearchForm: React.FC<SearchProps> = (props) => {
-  const { isEditing } = useContext(ColumnContext);
+  const { isEditing, labels } = useContext(ColumnContext);
   const [searchQuery, setSearchQuery] = useDerivedState(() => props.searchQuery, [props.searchQuery]);
 
   return (
@@ -19,11 +19,11 @@ export const SearchForm: React.FC<SearchProps> = (props) => {
       <input
         type='search'
         value={searchQuery}
-        placeholder='Search'
+        placeholder={labels?.search ?? 'Search'}
         disabled={isEditing}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      <button type='submit' title='Search' disabled={isEditing}>
+      <button type='submit' title={labels?.search ?? 'Search'} disabled={isEditing}>
         <FontAwesomeIcon icon={faSearch} />
       </button>
     </form>
