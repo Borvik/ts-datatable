@@ -10,3 +10,6 @@ export type {
   DataProps,
   DataColumnProp,
 } from './components/table/types';
+export type {
+  TableActionButtonsProps
+} from './components/table/actions';

@@ -10,6 +10,10 @@ import {
   QuickEditFormData,
   CustomClasses,
   CustomLabels,
+  CustomComponents,
+  SetFilterCb,
+  SetPaginationCb,
+  OnShowFilterEditor,
 } from './types';
 import { FilterSettings } from '../filter/types';
 
@@ -27,8 +31,9 @@ interface ColumnContextInterface<T> {
   setColumnVisibility: (newState: (ColumnVisibilityStorage | ((state: ColumnVisibilityStorage) => ColumnVisibilityStorage))) => void;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
   onShowColumnPicker?: OnShowColumnPicker;
-  setFilter: (newState: QueryFilterGroup | ((state: QueryFilterGroup) => QueryFilterGroup)) => void;
-  setPagination: (newState: Partial<{ page: number; perPage: number}> | ((state: { page: number; perPage: number}) => Partial<{page: number; perPage: number}>)) => void;
+  onShowFilterEditor?: OnShowFilterEditor;
+  setFilter: SetFilterCb;
+  setPagination: SetPaginationCb;
   getRowKey?: (row: T) => string | number
   onSaveQuickEdit: (data: QuickEditFormData<T>) => Promise<void>
   DetailRow?: React.ElementType<{parentRow: T}>
@@ -38,6 +43,7 @@ interface ColumnContextInterface<T> {
   canReorderColumns: boolean
   classNames?: CustomClasses
   labels?: CustomLabels
+  components?: CustomComponents
 }
 
 export const ColumnContext = createContext<ColumnContextInterface<any>>({

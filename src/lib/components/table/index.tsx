@@ -16,6 +16,7 @@ import { ColumnPickerButton } from '../column-picker';
 import { FilterButton, FilterBar } from '../filter';
 import { convertFromQS, convertToQS } from '../../utils/transformFilter';
 import { TableEditorButton } from './editors/editButton';
+import { TableActionButtons } from './actions';
 
 const primaryKeyWarned: {[x:string]: boolean} = {};
 
@@ -177,6 +178,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
 
   const Paginate = props.components?.Paginate ?? PageNav;
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
+  const ActionButtons = props.components?.ActionButtons ?? TableActionButtons;
 
   let wrapperStyle: any = {
     '--ts-dt-fixed-bg': props.fixedColBg ?? 'white'
@@ -273,6 +275,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       setColumnVisibility,
       setColumnSort,
       onShowColumnPicker: props.onShowColumnPicker,
+      onShowFilterEditor: props.onShowFilterEditor,
       setPagination,
       getRowKey: props.getRowKey,
       onSaveQuickEdit,
@@ -283,6 +286,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       canReorderColumns: props.canReorderColumns ?? false,
       classNames: props.classNames,
       labels: props.labels,
+      components: props.components,
     }}>
       <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
         <div ref={topEl} className={`ts-datatable-top`}>
@@ -300,13 +304,18 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
           </div>
           <div className='ts-datatable-page-actions'>
             <div className="ts-datatable-actions">
-              {(quickEditPosition === 'top' || quickEditPosition === 'both') &&
-                <TableEditorButton
-                  setEditing={setEditing}
-                  canEdit={canEdit}
-                />}
-              <FilterButton />
-              <ColumnPickerButton />
+              <ActionButtons
+                position='top'
+                quickEditPosition={quickEditPosition}
+                buttons={{
+                  quickEdit: <TableEditorButton
+                    setEditing={setEditing}
+                    canEdit={canEdit}
+                  />,
+                  filter: <FilterButton />,
+                  columnPicker: <ColumnPickerButton />,
+                }}
+              />
             </div>
             {(paginate === 'top' || paginate === 'both') &&
               <Paginate
@@ -339,11 +348,18 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
             />
           </div>}
         <div className="ts-datatable-bottom-actions">
-          {(quickEditPosition === 'bottom' || quickEditPosition === 'both') && 
-            <TableEditorButton
-              setEditing={setEditing}
-              canEdit={canEdit}
-            />}
+          <ActionButtons
+            position='bottom'
+            quickEditPosition={quickEditPosition}
+            buttons={{
+              quickEdit: <TableEditorButton
+                setEditing={setEditing}
+                canEdit={canEdit}
+              />,
+              filter: <FilterButton />,
+              columnPicker: <ColumnPickerButton />,
+            }}
+          />
         </div>
       </div>
     </ColumnContext.Provider>

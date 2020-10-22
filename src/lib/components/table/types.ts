@@ -7,7 +7,9 @@ import {
 import { QueryStateOptions, QueryStringFilterTypes } from '../../utils/useQueryState';
 import { PaginateRequiredProps, PaginateOptions, PageChange } from '../pagination/types';
 import { SearchRequiredProps } from '../search/types';
-import { FilterSettings } from '../filter/types';
+import { CustomFilterButtonProps, FilterSettings } from '../filter/types';
+import { CustomColumnPickerButtonProps } from '../column-picker/types';
+import { TableActionButtonsProps } from './actions';
 
 // export type EditFn<T> = (row: T, changes: Partial<T>) => Promise<boolean>;
 
@@ -46,6 +48,7 @@ export interface DataTableProperties<T> {
   canEditRow?: (row: T) => boolean;
   onQueryChange?: (props: DataProps) => void;
   onShowColumnPicker?: OnShowColumnPicker;
+  onShowFilterEditor?: OnShowFilterEditor;
   onSaveQuickEdit?: OnSaveQuickEdit<T>;
   quickEditPosition?: 'top' | 'bottom' | 'both';
 
@@ -62,20 +65,22 @@ export interface DataTableProperties<T> {
 
   canReorderColumns?: boolean
 
-  components?: {
-    Paginate?: React.ElementType<PaginateRequiredProps>;
-    SearchForm?: React.ElementType<SearchRequiredProps>;
-    Loading?: ReactRenderable;
-  }
+  components?: CustomComponents
 
   classNames?: CustomClasses
   labels?: CustomLabels
 }
-// //  React.DetailedHTMLProps<React.TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>
-// interface TableContainerProps extends Omit<HTMLProps<HTMLDivElement>, 'id'> {
-// }
-// let x: TableHTMLAttributes;
-// x.
+
+export interface CustomComponents {
+  Paginate?: React.ElementType<PaginateRequiredProps>;
+  SearchForm?: React.ElementType<SearchRequiredProps>;
+  ActionButtons?: React.ElementType<TableActionButtonsProps>;
+  Loading?: ReactRenderable;
+  Buttons?: {
+    ColumnPicker?: React.ElementType<CustomColumnPickerButtonProps>
+    Filter?: React.ElementType<CustomFilterButtonProps>
+  }
+}
 
 export type FixedType = boolean | 'left' | 'right';
 
@@ -158,6 +163,11 @@ export interface ColumnVisibilityStorage {
 }
 type SetColumnVisibilityCallback = (columnVisibility: ColumnVisibilityStorage) => void;
 export type OnShowColumnPicker = (columns: DataColumn<any>[], setColumnVisibility: SetColumnVisibilityCallback, btnElement: HTMLButtonElement) => void | Promise<void>;
+
+export type OnShowFilterEditor = (filter: QueryFilterGroup, applyFilter: (filter: QueryFilterGroup) => void, btnElement: HTMLButtonElement) => void | Promise<void>;
+
+export type SetFilterCb = (newState: QueryFilterGroup | ((state: QueryFilterGroup) => QueryFilterGroup)) => void;
+export type SetPaginationCb = (newState: Partial<{ page: number; perPage: number}> | ((state: { page: number; perPage: number}) => Partial<{page: number; perPage: number}>)) => void;
 
 export type QuickEditFormData<T> = Record<PropertyKey, Partial<T>>;
 export type OnSaveQuickEdit<T> = (formData: QuickEditFormData<T>) => Promise<void>

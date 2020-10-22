@@ -1,3 +1,4 @@
+import { MouseEventHandler } from 'react';
 import { Spec } from '../../utils/immutable';
 import { QueryFilterGroup, OperatorMap, AllFilterOperators } from '../table/types';
 
@@ -14,3 +15,8 @@ export interface FilterSettings {
 }
 
 export type SetEditorStateFn = (path: number[], $spec: Spec<QueryFilterGroup>) => void;
+
+export interface CustomFilterButtonProps {
+  onClick: MouseEventHandler<HTMLButtonElement>
+  disabled: boolean
+}

@@ -15,13 +15,24 @@ import get from 'lodash/get';
 
 export const FilterBar: React.FC = (props) => {
   const { dialog, showDialog } = useDialog(<FilterDialog />);
-  const { filter, setFilter, setPagination } = useContext(ColumnContext);
+  const { filter, setFilter, setPagination, onShowFilterEditor } = useContext(ColumnContext);
 
   if (!filter.filters.length) return <></>;
 
+  function applyFilter(filterState: QueryFilterGroup) {
+    batchedQSUpdate(() => {
+      setFilter(filterState);
+      setPagination({ page: 1 });
+    });
+  }
+  
   async function onButtonClick(e: React.MouseEvent<HTMLButtonElement>) {
     try {
-      await showDialog();
+      if (onShowFilterEditor) {
+        await onShowFilterEditor(filter, applyFilter, e.currentTarget);
+      } else {
+        await showDialog();
+      }
     }
     catch (err) {
       console.error(err);

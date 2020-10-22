@@ -4,16 +4,39 @@ import { FilterDialog } from './dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons/faFilter';
 import { ColumnContext } from '../table/contexts';
+import { batchedQSUpdate } from '../../utils/useQueryState';
+import { QueryFilterGroup } from '../table/types';
 
 export { FilterBar } from './bar';
 
 export const FilterButton: React.FC = (props) => {
   const { dialog, showDialog } = useDialog(<FilterDialog />);
-  const { actualColumns, isEditing, classNames, labels } = useContext(ColumnContext);
+  const {
+    actualColumns,
+    isEditing,
+    classNames,
+    labels,
+    filter,
+    components,
+    setFilter,
+    setPagination,
+    onShowFilterEditor,
+  } = useContext(ColumnContext);
+
+  function applyFilter(filterState: QueryFilterGroup) {
+    batchedQSUpdate(() => {
+      setFilter(filterState);
+      setPagination({ page: 1 });
+    });
+  }
 
   async function onButtonClick(e: React.MouseEvent<HTMLButtonElement>) {
     try {
-      await showDialog();
+      if (onShowFilterEditor) {
+        await onShowFilterEditor(filter, applyFilter, e.currentTarget);
+      } else {
+        await showDialog();
+      }
     }
     catch (err) {
       console.error(err);
@@ -35,10 +58,13 @@ export const FilterButton: React.FC = (props) => {
     btnFilterClass = `${classNames?.actionButton ?? ''} ${classNames?.actionButtonFilter ?? ''}`.trim();
   }
 
+  const CustomButton = components?.Buttons?.Filter;
+
   return <>
     {dialog}
-    <button type='button' title={labels?.filter ?? 'Filter'} className={btnFilterClass} disabled={isEditing} onClick={onButtonClick}>
+    {!!CustomButton && <CustomButton disabled={isEditing} onClick={onButtonClick} />}
+    {!CustomButton && <button type='button' title={labels?.filter ?? 'Filter'} className={btnFilterClass} disabled={isEditing} onClick={onButtonClick}>
       <FontAwesomeIcon icon={faFilter} />
-    </button>
+    </button>}
   </>;
 }

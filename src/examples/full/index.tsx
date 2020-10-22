@@ -1,5 +1,5 @@
 import React from 'react';
-import { DataTable } from '../../lib';
+import { DataTable, TableActionButtonsProps } from '../../lib';
 import { CommonColumns } from '../columns';
 import { DataState, onQueryChange, Pokemon, query, sqliteParams } from '../db';
 
@@ -76,5 +76,56 @@ export function FullFeaturedExample() {
     data={staticData.list} // Pass Data in directly
     totalCount={staticData.total} // Total count to enable pagination
     isLoading={staticData.loading} // Allows external to show loading indicator
+
+    components={{
+      Buttons: {
+        ColumnPicker: CustomColPicker,
+        Filter: CustomFilterBtn,
+      },
+      ActionButtons: CustomActionButtons
+    }}
   />
+}
+
+type PartialRequire<T, K extends keyof T> = Required<Pick<T, K>> & Omit<T, K>
+type ButtonOnClick = PartialRequire<React.HTMLProps<HTMLButtonElement>, 'onClick'>;
+
+export class CustomColPicker extends React.Component<ButtonOnClick> {
+
+  render() {
+    const { onClick } = this.props;
+
+    return <button type='button' title='Custom Settings' onClick={onClick}>
+      Settings
+    </button>
+  }
+
+}
+
+
+type FilterProps = PartialRequire<React.HTMLProps<HTMLButtonElement>, 'onClick' | 'disabled'>;
+export class CustomFilterBtn extends React.Component<FilterProps> {
+
+  render() {
+    const { onClick, disabled } = this.props;
+
+    return <button type='button' title='Filter Test' disabled={disabled} onClick={onClick}>
+      Filter
+    </button>
+  }
+
+}
+
+export class CustomActionButtons extends React.Component<TableActionButtonsProps> {
+
+  render() {
+    const { buttons: { quickEdit, filter, columnPicker }} = this.props;
+
+    return <>
+      {columnPicker}
+      <button>test</button>
+      {filter}
+      {quickEdit}
+    </>
+  }
 }
