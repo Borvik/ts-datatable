@@ -2,7 +2,8 @@ import { ReactRenderable, ResolveProps } from '../../types';
 import {
   DetailedHTMLProps,
   TableHTMLAttributes,
-  HTMLProps
+  HTMLProps,
+  ReactElement
 } from 'react';
 import { QueryStateOptions, QueryStringFilterTypes } from '../../utils/useQueryState';
 import { PaginateRequiredProps, PaginateOptions, PageChange } from '../pagination/types';
@@ -26,7 +27,9 @@ export interface DataProps {
 }
 
 type DataResultUnion<T> = T | DataFnResult<T>;
-export type DataFn<T> = (props: DataProps) => DataResultUnion<T> | Promise<DataResultUnion<T>>;
+type DataFnResultUnion<T> = DataResultUnion<T> | ReactElement<any>;
+export type DataFnCb<T> = (data: DataResultUnion<T>) => void;
+export type DataFn<T> = (props: DataProps, cb: DataFnCb<T>) => DataFnResultUnion<T> | Promise<DataFnResultUnion<T>>;
 
 export interface DataTableProperties<T> {
   id: string;

@@ -2,6 +2,7 @@ const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const nodeExternals = require('webpack-node-externals');
+const postCssPresetEnv = require('postcss-preset-env');
 
 module.exports = {
   entry: {
@@ -62,7 +63,19 @@ module.exports = {
           {
             loader: "postcss-loader",
             options: {
-              map: true,
+              sourceMap: true,
+              syntax: 'postcss-scss',
+              plugins: [
+                require('autoprefixer'),
+                postCssPresetEnv({
+                  stage: 0,
+                  features: {
+                    'color-mod-function': true,
+                    'alpha-hex-colors': true
+                  }
+                }),
+              ],
+              browsers: ['> 0.25%', 'ie >= 11']
             }
           },
           {

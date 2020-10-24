@@ -137,7 +137,17 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
 
   const [stateDataList, setDataList] = useState<DataFnResult<T[]>>({ data: [], total: 0 });
   const [dataLoading, setLoading] = useState(true);
+  const [dataLoaderEl, setDataLoaderEl] = useState<React.ReactElement<any> | null>(null);
   
+  function doSetDataList(data: T[] | DataFnResult<T[]>) {
+    if (Array.isArray(data)) {
+      setDataList({ data: data, total: data.length });
+    } else {
+      setDataList(data);
+    }
+    setLoading(false);
+  }
+
   useDeepEffect(() => {
     async function getData() {
       if (typeof props.onQueryChange === 'function') {
@@ -155,22 +165,22 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
           search: hideSearchForm ? '' : searchQuery.query,
           sorts: columnSort.sort,
           filters: filter.filters.length ? filter : undefined,
-        });
+        }, doSetDataList);
 
-        if (Array.isArray(returnedData)) {
-          setDataList({ data: returnedData, total: returnedData.length });
-        } else {
-          setDataList(returnedData);
+        if (React.isValidElement(returnedData)) {
+          setDataLoaderEl(returnedData);
+        }
+        else {
+          doSetDataList(returnedData);
         }
       } else {
-        setDataList({
+        doSetDataList({
           data: props.data,
           total: typeof props.totalCount === 'undefined'
             ? props.data.length
             : props.totalCount
         });
       }
-      setLoading(false);
     }
     setLoading(true);
     getData();
@@ -261,6 +271,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
    * and pass it to all the subcomponents for eventual display.
    */
   return (<>
+    {dataLoaderEl}
     <ColumnContext.Provider value={{
       ...columnData,
       columnSorts: columnSort.sort,

@@ -1,6 +1,6 @@
 {
   "name": "@borvik/ts-datatable",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "MIT",
   "repository": "github:Borvik/ts-datatable",
   "bugs": {
@@ -11,6 +11,7 @@
   },
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "dependencies": {},
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
