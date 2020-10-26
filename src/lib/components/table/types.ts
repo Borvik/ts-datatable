@@ -47,6 +47,9 @@ export interface DataTableProperties<T> {
   paginateOptions?: PaginateOptions;
   hideSearchForm?: boolean;
 
+  canSelectRows?: boolean;
+  onSelectionChange?: (selectedRows: any[]) => void;
+
   getRowKey?: (row: T) => string | number;
   canEditRow?: (row: T) => boolean;
   onQueryChange?: (props: DataProps) => void;

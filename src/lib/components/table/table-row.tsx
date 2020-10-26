@@ -8,12 +8,19 @@ import { faChevronDown } from '@fortawesome/free-solid-svg-icons/faChevronDown';
 
 interface TableRowProps {
   row: any;
+  rowIndex: number;
   canEditRow?: (row: any) => boolean;
 }
 
 export const TableRow: React.FC<TableRowProps> = ({ row, ...props }) => {
   const [ isExpanded, setExpanded ] = useState(false);
-  const { actualColumns: columns, isEditing, DetailRow, canRowShowDetail } = useContext(ColumnContext);
+  const {
+    actualColumns: columns,
+    isEditing,
+    DetailRow,
+    canRowShowDetail,
+    canSelectRows,
+  } = useContext(ColumnContext);
 
   let canEditRow = isEditing;
   if (canEditRow && typeof props.canEditRow === 'function')
@@ -25,10 +32,19 @@ export const TableRow: React.FC<TableRowProps> = ({ row, ...props }) => {
   if (detailRowAvailable && typeof canRowShowDetail === 'function')
     detailRowAvailable = canRowShowDetail(row);
 
-  let detailBtnRendered: boolean = false;
   const DetailRowRenderer = DetailRow ?? FakeDetailRow;
   return <>
     <tr>
+      {hasDetailRenderer && <td key={`mdr`} className='fixed fixed-left mdr-control'>
+        {detailRowAvailable && <>
+          <button type='button' className='mdr-button' onClick={() => setExpanded(v => !v)}>
+            <FontAwesomeIcon fixedWidth icon={isExpanded ? faChevronDown : faChevronRight} />
+          </button>
+        </>}
+      </td>}
+      {canSelectRows && <td key={`sel`} className='fixed fixed-left mdr-control'>
+        c
+      </td>}
       {columns.map((col, colIdx) => {
         if (!col.isVisible) return null;
         columnCount++;
@@ -55,27 +71,17 @@ export const TableRow: React.FC<TableRowProps> = ({ row, ...props }) => {
         let classNames: string[] = [
           col.className ?? '',
           col.fixed ? `fixed fixed-${col.fixed}` : '',
-          hasDetailRenderer && !detailBtnRendered ? 'mdr-control' : '',
         ].filter(s => !!s);
 
-        return <td key={colIdx} className={classNames.join(' ').trim()}>
-          {detailRowAvailable && !detailBtnRendered && <>
-            <button type='button' className='mdr-button' onClick={() => setExpanded(v => !v)}>
-              <FontAwesomeIcon fixedWidth icon={isExpanded ? faChevronDown : faChevronRight} />
-            </button>
-            {detailBtnRendered = true}{/* shouldn't render as its a bool value */}
-          </>}
-          {!detailRowAvailable && hasDetailRenderer && !detailBtnRendered && <>
-            {/* Detail not available for row, but is for table */}
-            {/* Need spacing so it doesn't appear mis-aligned */}
-            <button type='button' className='mdr-button no-mdr-padding' />
-            {detailBtnRendered = true}{/* shouldn't render as its a bool value */}
-          </>}
-          {rendered}
-        </td>;
+        return <>
+          <td key={colIdx} className={classNames.join(' ').trim()}>
+            {rendered}
+          </td>
+        </>;
       })}
     </tr>
     {isExpanded && !!DetailRow && <tr>
+      <td className='fixed fixed-left mdr-control'></td>
       <td colSpan={columnCount}><DetailRowRenderer parentRow={row} /></td>
     </tr>}
   </>;

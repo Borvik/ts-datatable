@@ -17,6 +17,7 @@ export function FullFeaturedExample() {
     defaultSort={[
       {column: 'id', direction: 'asc'}
     ]}
+    canSelectRows={true}
     multiColumnSorts={true}
     canReorderColumns={true}
     paginateOptions={{

@@ -13,9 +13,13 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
     columnSorts,
     multiColumnSorts,
     setColumnSort,
+    DetailRow,
+    canSelectRows,
   } = useContext(ColumnContext);
 
   if (headerRows.length < 1) return null;
+
+  let hasDetailRenderer = (!!DetailRow);
 
   return (
     <thead ref={props.headRef}>
@@ -55,14 +59,21 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
               }
             }
 
-            return (
+            return (<>
+              {(colIdx === 0 && rowIdx === 0) && <>
+                {hasDetailRenderer && <th scope='col' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'>
+                </th>}
+                {canSelectRows && <th scope='col' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'>
+                  c
+                </th>}
+              </>}
               <th key={colIdx} className={`${col.className ?? ''} ${col.fixed ? `fixed fixed-${col.fixed}` : ''}`.trim()} colSpan={col.colSpan > 1 ? col.colSpan : undefined} rowSpan={col.rowSpan > 1 ? col.rowSpan : undefined} scope={colScope}>
                 <span className={`ts-datatable-header-cell ${isSortable ? 'sortable' : ''}`.trim()} onClick={isSortable ? onClick : undefined} onMouseDown={isSortable ? (e) => { if (e.shiftKey) { e.preventDefault() } } : undefined}>
                   <span className='ts-datatable-header-content'>{col.header}</span>
                   <HeaderSort column={col} sort={sort} />
                 </span>
               </th>
-            )
+            </>)
           })}
         </tr>
       ))}

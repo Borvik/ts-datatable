@@ -27,9 +27,13 @@ interface ColumnContextInterface<T> {
   isEditing: boolean;
   isSavingQuickEdit: boolean;
   editData: EditFormData;
+  canSelectRows: boolean;
+  selectedRows: Record<string | number, T>;
   setFormData: React.Dispatch<React.SetStateAction<EditFormData>>;
   setColumnVisibility: (newState: (ColumnVisibilityStorage | ((state: ColumnVisibilityStorage) => ColumnVisibilityStorage))) => void;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
+  setAllSelected: () => void;
+  setRowSelected: (row: T, rowIndex: number) => void;
   onShowColumnPicker?: OnShowColumnPicker;
   onShowFilterEditor?: OnShowFilterEditor;
   setFilter: SetFilterCb;
@@ -55,9 +59,13 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   isEditing: false,
   isSavingQuickEdit: false,
   editData: {},
+  canSelectRows: false,
+  selectedRows: {},
   setFormData: () => {},
   setColumnVisibility: () => {},
   setColumnSort: () => {},
+  setAllSelected: () => {},
+  setRowSelected: () => {},
   setFilter: () => {},
   setPagination: () => {},
   onSaveQuickEdit: async () => {},

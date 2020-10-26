@@ -73,8 +73,11 @@
         &.fixed-right {
           right: 0;
         }
-        &.fixed-left {
+        &.fixed-left:nth-child(1) {
           left: 0;
+        }
+        &.fixed-left:nth-child(2) {
+          left: 1.5em;
         }
 
         &:focus-within {
@@ -100,11 +103,6 @@
         border: none;
         font-size: inherit;
         top: calc(50% - .5em);
-
-        &.no-mdr-padding {
-          display: inline-block;
-          width: 1.25em;
-        }
       }
     }
   }

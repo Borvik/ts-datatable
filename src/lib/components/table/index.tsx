@@ -17,6 +17,8 @@ import { FilterButton, FilterBar } from '../filter';
 import { convertFromQS, convertToQS } from '../../utils/transformFilter';
 import { TableEditorButton } from './editors/editButton';
 import { TableActionButtons } from './actions';
+import { getRowKey } from '../../utils/getRowKey';
+import { update } from '../../utils/immutable';
 
 const primaryKeyWarned: {[x:string]: boolean} = {};
 
@@ -84,8 +86,10 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
   }, [ props.id, columnVisibility, props.columns, columnOrder, props.canReorderColumns ]);
 
   const canEdit = typeof props.onSaveQuickEdit === 'function' && columnData.hasEditor && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
+  const canSelectRows = !!props.canSelectRows && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
 
   const [editFormData, setFormData] = useState<EditFormData>({});
+  const [selectedRows, setSelectedRows] = useState<Record<string | number, T>>({});
 
   const [pagination, setPagination] = useQueryState({page: 1, perPage: props.paginateOptions?.defaultPerPage ?? 10}, {
     ...props.qs
@@ -266,6 +270,39 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     }
   }, [propOnSave]);
 
+  function doSetSelectedRows(selection: Record<string | number, T>) {
+    if (typeof props.onSelectionChange === 'function') {
+      // raise
+    }
+    setSelectedRows(selection);
+  }
+
+  function setAllSelected() {
+    let data = typeof props.data === 'function' ? stateDataList.data : props.data;
+    let newSelected: Record<string | number, T> = {};
+    data.map((row, idx) => {
+      let rowKey = getRowKey(row, idx, columnData.actualColumns, props.getRowKey);
+      newSelected[rowKey] = row;
+      return row;
+    });
+    doSetSelectedRows(newSelected);
+  }
+
+  function setRowSelected(row: any, rowIndex: number) {
+    let rowKey = getRowKey(row, rowIndex, columnData.actualColumns, props.getRowKey);
+    let exists = typeof selectedRows[rowKey] !== 'undefined';
+    
+    if (!exists) {
+      doSetSelectedRows(update(selectedRows, {
+        [rowKey]: { $set: row },
+      }));
+    } else {
+      doSetSelectedRows(update(selectedRows, {
+        $unset: [rowKey]
+      }));
+    }
+  }
+
   /**
    * Finally we setup the contexts that will house all the data
    * and pass it to all the subcomponents for eventual display.
@@ -281,10 +318,14 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       isEditing,
       isSavingQuickEdit,
       editData: editFormData,
+      canSelectRows,
+      selectedRows,
       setFormData: setFormData,
       setFilter,
       setColumnVisibility,
       setColumnSort,
+      setAllSelected,
+      setRowSelected,
       onShowColumnPicker: props.onShowColumnPicker,
       onShowFilterEditor: props.onShowFilterEditor,
       setPagination,
