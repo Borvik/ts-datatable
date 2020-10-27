@@ -64,6 +64,17 @@
     border-collapse: collapse;
 
     th, td {
+      &.row-selector {
+        padding-left: 0;
+        padding-right: 0;
+
+        > div {
+          width: var(--ts-selector-width, 25px);
+          display: inline-flex;
+          justify-content: center;
+        }
+      }
+
       &.fixed {
         position: sticky;
         background-clip: padding-box;
@@ -75,6 +86,18 @@
         }
         &.fixed-left {
           left: 0;
+
+          &.mdr-control + .fixed-left {
+            left: 1.5em;
+          }
+
+          &.row-selector + .fixed-left {
+            left: var(--ts-selector-width, 25px); // unknown
+          }
+
+          &.mdr-control + .row-selector + .fixed-left {
+            left: calc(1.5em + var(--ts-selector-width, 25px)); // unknown
+          }
         }
 
         &:focus-within {
@@ -100,11 +123,6 @@
         border: none;
         font-size: inherit;
         top: calc(50% - .5em);
-
-        &.no-mdr-padding {
-          display: inline-block;
-          width: 1.25em;
-        }
       }
     }
   }

@@ -18,6 +18,7 @@ export const TableBody: React.FC<TableBodyProps> = (props) => {
           
           return <TableRow
             key={rowKey}
+            rowIndex={rowIdx}
             row={row}
             canEditRow={props.canEditRow}
           />;

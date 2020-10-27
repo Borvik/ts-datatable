@@ -11,6 +11,7 @@ import { SearchRequiredProps } from '../search/types';
 import { CustomFilterButtonProps, FilterSettings } from '../filter/types';
 import { CustomColumnPickerButtonProps } from '../column-picker/types';
 import { TableActionButtonsProps } from './actions';
+import { RowSelectorCheckboxProps } from '../row-selector';
 
 // export type EditFn<T> = (row: T, changes: Partial<T>) => Promise<boolean>;
 
@@ -47,6 +48,10 @@ export interface DataTableProperties<T> {
   paginateOptions?: PaginateOptions;
   hideSearchForm?: boolean;
 
+  canSelectRows?: boolean;
+  canSelectRow?: (row: T) => boolean;
+  onSelectionChange?: (selectedIds: any[], selectedRows: T[]) => void;
+
   getRowKey?: (row: T) => string | number;
   canEditRow?: (row: T) => boolean;
   onQueryChange?: (props: DataProps) => void;
@@ -79,6 +84,7 @@ export interface CustomComponents {
   SearchForm?: React.ElementType<SearchRequiredProps>;
   ActionButtons?: React.ElementType<TableActionButtonsProps>;
   Loading?: ReactRenderable;
+  RowCheckbox?: React.ElementType<RowSelectorCheckboxProps>;
   Buttons?: {
     ColumnPicker?: React.ElementType<CustomColumnPickerButtonProps>
     Filter?: React.ElementType<CustomFilterButtonProps>

@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
+import { RowSelector } from '../row-selector';
 import { ColumnContext } from './contexts';
 import { HeaderSort } from './sortable';
 import { ColumnSort } from './types';
 
 interface HeadProps {
   headRef: React.RefObject<HTMLTableSectionElement>
+  data: any[]
 }
 
 export const TableHeader: React.FC<HeadProps> = (props) => {
@@ -13,9 +15,13 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
     columnSorts,
     multiColumnSorts,
     setColumnSort,
+    DetailRow,
+    canSelectRows,
   } = useContext(ColumnContext);
 
   if (headerRows.length < 1) return null;
+
+  let hasDetailRenderer = (!!DetailRow);
 
   return (
     <thead ref={props.headRef}>
@@ -55,14 +61,25 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
               }
             }
 
-            return (
+            return (<React.Fragment key={`row-key-${colIdx}`}>
+              {(colIdx === 0 && rowIdx === 0) && <>
+                {hasDetailRenderer && <th scope='col' key='mdr' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'>
+                </th>}
+                {canSelectRows && <th scope='col' key='sel' rowSpan={headerRows.length} className='fixed fixed-left row-selector'>
+                  <RowSelector
+                    row={null}
+                    rowIndex={-1}
+                    data={props.data}
+                  />
+                </th>}
+              </>}
               <th key={colIdx} className={`${col.className ?? ''} ${col.fixed ? `fixed fixed-${col.fixed}` : ''}`.trim()} colSpan={col.colSpan > 1 ? col.colSpan : undefined} rowSpan={col.rowSpan > 1 ? col.rowSpan : undefined} scope={colScope}>
                 <span className={`ts-datatable-header-cell ${isSortable ? 'sortable' : ''}`.trim()} onClick={isSortable ? onClick : undefined} onMouseDown={isSortable ? (e) => { if (e.shiftKey) { e.preventDefault() } } : undefined}>
                   <span className='ts-datatable-header-content'>{col.header}</span>
                   <HeaderSort column={col} sort={sort} />
                 </span>
               </th>
-            )
+            </React.Fragment>)
           })}
         </tr>
       ))}

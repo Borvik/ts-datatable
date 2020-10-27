@@ -1,5 +1,5 @@
 import React from 'react';
-import { DataTable, TableActionButtonsProps } from '../../lib';
+import { DataTable, RowSelectorCheckboxProps, TableActionButtonsProps } from '../../lib';
 import { CommonColumns } from '../columns';
 import { DataState, onQueryChange, Pokemon, query, sqliteParams } from '../db';
 
@@ -70,6 +70,13 @@ export function FullFeaturedExample() {
     DetailRow={({parentRow}) => <div>Detail row for {parentRow.name} goes here. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisis commodo purus eget vehicula. Duis sodales sem orci, et pulvinar neque lacinia ut. Fusce in massa vel lorem consequat maximus nec ac lectus. In in elementum nulla. Quisque odio purus, euismod sed ullamcorper commodo, ullamcorper in ligula. Fusce sollicitudin pretium diam a facilisis. In fermentum, lectus quis efficitur suscipit, justo elit fermentum velit, in aliquet massa nisi suscipit ligula. Etiam volutpat id nulla at eleifend. Nulla tristique tellus ipsum, in gravida mauris ornare et. Mauris aliquet blandit risus ac ornare.</div>}
     canRowShowDetail={(data) => data.id !== 4}
 
+    canSelectRows={true}
+    canSelectRow={(data) => data.id !== 3}
+    onSelectionChange={(ids, rows) => {
+      // Probably store the selected in a state somewhere for use in an API call
+      console.log('Selected:', ids, rows);
+    }}
+
     columns={CommonColumns}
 
     onQueryChange={(queryProps) => onQueryChange(queryProps, setStaticData)} // Notifies of filter/pagination/search/sort changes
@@ -82,7 +89,8 @@ export function FullFeaturedExample() {
         ColumnPicker: CustomColPicker,
         Filter: CustomFilterBtn,
       },
-      ActionButtons: CustomActionButtons
+      ActionButtons: CustomActionButtons,
+      RowCheckbox: CustomCheckbox,
     }}
   />
 }
@@ -127,5 +135,20 @@ export class CustomActionButtons extends React.Component<TableActionButtonsProps
       {filter}
       {quickEdit}
     </>
+  }
+}
+
+export class CustomCheckbox extends React.Component<RowSelectorCheckboxProps> {
+  
+  render() {
+    const { checked, indeterminate, onChange } = this.props;
+    return <input
+      type='checkbox'
+      ref={(el) => el && (el.indeterminate = indeterminate)}
+      checked={checked}
+      onChange={onChange}
+      // inspect checkbox to see that custom is working
+      data-test={'custom-working'}
+    />;
   }
 }

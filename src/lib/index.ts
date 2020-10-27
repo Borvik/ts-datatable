@@ -13,3 +13,6 @@ export type {
 export type {
   TableActionButtonsProps
 } from './components/table/actions';
+export type {
+  RowSelectorCheckboxProps
+} from './components/row-selector';
