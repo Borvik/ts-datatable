@@ -5,6 +5,7 @@ import { CellEditor } from './editors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons/faChevronDown';
+import { RowSelector } from '../row-selector';
 
 interface TableRowProps {
   row: any;
@@ -42,8 +43,8 @@ export const TableRow: React.FC<TableRowProps> = ({ row, ...props }) => {
           </button>
         </>}
       </td>}
-      {canSelectRows && <td key={`sel`} className='fixed fixed-left mdr-control'>
-        c
+      {canSelectRows && <td key={`sel`} className='fixed fixed-left row-selector'>
+        <RowSelector row={row} rowIndex={props.rowIndex} />
       </td>}
       {columns.map((col, colIdx) => {
         if (!col.isVisible) return null;
@@ -73,15 +74,14 @@ export const TableRow: React.FC<TableRowProps> = ({ row, ...props }) => {
           col.fixed ? `fixed fixed-${col.fixed}` : '',
         ].filter(s => !!s);
 
-        return <>
-          <td key={colIdx} className={classNames.join(' ').trim()}>
-            {rendered}
-          </td>
-        </>;
+        return <td key={colIdx} className={classNames.join(' ').trim()}>
+          {rendered}
+        </td>;
       })}
     </tr>
     {isExpanded && !!DetailRow && <tr>
-      <td className='fixed fixed-left mdr-control'></td>
+      {hasDetailRenderer && <td className='fixed fixed-left mdr-control'></td>}
+      {canSelectRows && <td className='fixed fixed-left row-selector'></td>}
       <td colSpan={columnCount}><DetailRowRenderer parentRow={row} /></td>
     </tr>}
   </>;

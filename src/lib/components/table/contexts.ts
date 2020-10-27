@@ -32,7 +32,7 @@ interface ColumnContextInterface<T> {
   setFormData: React.Dispatch<React.SetStateAction<EditFormData>>;
   setColumnVisibility: (newState: (ColumnVisibilityStorage | ((state: ColumnVisibilityStorage) => ColumnVisibilityStorage))) => void;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
-  setAllSelected: () => void;
+  setAllSelected: (selectAll: boolean) => void;
   setRowSelected: (row: T, rowIndex: number) => void;
   onShowColumnPicker?: OnShowColumnPicker;
   onShowFilterEditor?: OnShowFilterEditor;
@@ -45,6 +45,7 @@ interface ColumnContextInterface<T> {
   columnOrder: string[]
   setColumnOrder: (newState: string[] | ((state: string[]) => string[])) => void
   canReorderColumns: boolean
+  canSelectRow?: (row: T) => boolean;
   classNames?: CustomClasses
   labels?: CustomLabels
   components?: CustomComponents

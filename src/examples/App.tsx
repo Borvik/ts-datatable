@@ -24,7 +24,7 @@ const removeBodyClass = (className: string) => document.body.classList.remove(cl
 function App() {
   const [theme, setTheme] = React.useState('dark');
   const [theDb, setDB] = React.useState<SQLDatabase | null>(null);
-  const [selectedExample, setExample] = React.useState('Full');
+  const [selectedExample, setExample] = React.useState('ManualData');
 
   useEffect(() => {
     addBodyClass(theme);

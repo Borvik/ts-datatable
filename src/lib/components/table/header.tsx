@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
+import { RowSelector } from '../row-selector';
 import { ColumnContext } from './contexts';
 import { HeaderSort } from './sortable';
 import { ColumnSort } from './types';
 
 interface HeadProps {
   headRef: React.RefObject<HTMLTableSectionElement>
+  data: any[]
 }
 
 export const TableHeader: React.FC<HeadProps> = (props) => {
@@ -59,12 +61,16 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
               }
             }
 
-            return (<>
+            return (<React.Fragment key={`row-key-${colIdx}`}>
               {(colIdx === 0 && rowIdx === 0) && <>
-                {hasDetailRenderer && <th scope='col' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'>
+                {hasDetailRenderer && <th scope='col' key='mdr' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'>
                 </th>}
-                {canSelectRows && <th scope='col' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'>
-                  c
+                {canSelectRows && <th scope='col' key='sel' rowSpan={headerRows.length} className='fixed fixed-left row-selector'>
+                  <RowSelector
+                    row={null}
+                    rowIndex={-1}
+                    data={props.data}
+                  />
                 </th>}
               </>}
               <th key={colIdx} className={`${col.className ?? ''} ${col.fixed ? `fixed fixed-${col.fixed}` : ''}`.trim()} colSpan={col.colSpan > 1 ? col.colSpan : undefined} rowSpan={col.rowSpan > 1 ? col.rowSpan : undefined} scope={colScope}>
@@ -73,7 +79,7 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
                   <HeaderSort column={col} sort={sort} />
                 </span>
               </th>
-            </>)
+            </React.Fragment>)
           })}
         </tr>
       ))}

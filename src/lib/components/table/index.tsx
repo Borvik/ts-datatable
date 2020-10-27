@@ -187,6 +187,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       }
     }
     setLoading(true);
+    doSetSelectedRows({});
     getData();
   }, [ pagination, searchQuery.query, filter, columnSort, editCount ]);
 
@@ -273,18 +274,25 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
   function doSetSelectedRows(selection: Record<string | number, T>) {
     if (typeof props.onSelectionChange === 'function') {
       // raise
+      let keys = Object.keys(selection);
+      let values = Object.values(selection);
+      props.onSelectionChange(keys, values);
     }
     setSelectedRows(selection);
   }
 
-  function setAllSelected() {
+  function setAllSelected(selectAll: boolean) {
     let data = typeof props.data === 'function' ? stateDataList.data : props.data;
     let newSelected: Record<string | number, T> = {};
-    data.map((row, idx) => {
-      let rowKey = getRowKey(row, idx, columnData.actualColumns, props.getRowKey);
-      newSelected[rowKey] = row;
-      return row;
-    });
+    if (selectAll) {
+      data.map((row, idx) => {
+        if (typeof props.canSelectRow === 'function' && !props.canSelectRow(row))
+          return row;
+        let rowKey = getRowKey(row, idx, columnData.actualColumns, props.getRowKey);
+        newSelected[rowKey] = row;
+        return row;
+      });
+    }
     doSetSelectedRows(newSelected);
   }
 
@@ -339,6 +347,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       classNames: props.classNames,
       labels: props.labels,
       components: props.components,
+      canSelectRow: props.canSelectRow,
     }}>
       <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
         <div ref={topEl} className={`ts-datatable-top`}>
@@ -380,7 +389,10 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
         </div>
         <div {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
           <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
-            <TableHeader headRef={theadEl} />
+            <TableHeader
+              headRef={theadEl}
+              data={typeof props.data === 'function' ? stateDataList.data : props.data}
+            />
             <TableBody
               getRowKey={props.getRowKey}
               canEditRow={props.canEditRow}
