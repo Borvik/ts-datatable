@@ -41,6 +41,7 @@ export interface DataTableProperties<T> {
 
   multiColumnSorts?: boolean;
   defaultSort?: ColumnSort[];
+  defaultGroupBy?: ColumnSort[];
 
   qs?: QueryStateOptions;
 
@@ -200,6 +201,14 @@ export interface ColumnSorts {
 
 export interface QSColumnSorts {
   sort: string[];
+}
+
+export interface GroupBy {
+  group: ColumnSort[];
+}
+
+export interface QSGroupBy {
+  group: string[];
 }
 
 /**

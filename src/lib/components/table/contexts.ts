@@ -14,6 +14,7 @@ import {
   SetFilterCb,
   SetPaginationCb,
   OnShowFilterEditor,
+  GroupBy,
 } from './types';
 import { FilterSettings } from '../filter/types';
 
@@ -21,6 +22,7 @@ interface ColumnContextInterface<T> {
   actualColumns: DataColumn<T>[]; // the flat list of columns (lowest level)
   headerRows: DataColumn<T>[][];
   columnSorts: ColumnSort[];
+  groupBy: ColumnSort[]
   filter: QueryFilterGroup,
   filterSettings?: FilterSettings,
   multiColumnSorts: boolean;
@@ -32,6 +34,7 @@ interface ColumnContextInterface<T> {
   setFormData: React.Dispatch<React.SetStateAction<EditFormData>>;
   setColumnVisibility: (newState: (ColumnVisibilityStorage | ((state: ColumnVisibilityStorage) => ColumnVisibilityStorage))) => void;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
+  setGroupBy: (newState: GroupBy | ((state: GroupBy) => GroupBy)) => void;
   setAllSelected: (selectAll: boolean) => void;
   setRowSelected: (row: T, rowIndex: number) => void;
   onShowColumnPicker?: OnShowColumnPicker;
@@ -55,6 +58,7 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   actualColumns: [],
   headerRows: [],
   columnSorts: [],
+  groupBy: [],
   filter: {groupOperator: 'and', filters: []},
   multiColumnSorts: false,
   isEditing: false,
@@ -65,6 +69,7 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   setFormData: () => {},
   setColumnVisibility: () => {},
   setColumnSort: () => {},
+  setGroupBy: () => {},
   setAllSelected: () => {},
   setRowSelected: () => {},
   setFilter: () => {},

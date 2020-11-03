@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useState, useEffect, useRef, useCallback } from 'react';
-import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData } from './types';
+import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData, QSGroupBy, GroupBy, ColumnSort } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { useQueryState, batchedQSUpdate } from '../../utils/useQueryState';
 import { transformColumns, getFlattenedColumns, generateHeaderRows } from '../../utils/transformColumnProps';
@@ -135,6 +135,30 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     }
   );
 
+  const [groupBy, setGroupBy] = useParsedQs<GroupBy, QSGroupBy>(
+    { group: props.defaultGroupBy ?? [] },
+    (qsSort) => ({ // parse
+      group: qsSort.group.map(v => {
+        let parts = v.split(' ').filter(a => !!a);
+        if (parts.length !== 2) return null;
+        return {
+          column: parts[0],
+          direction: (parts[1].toLowerCase() === 'desc' ? 'desc' : 'asc') as 'asc' | 'desc'
+        }
+      })
+      .filter(notEmpty)
+    }),
+    (state) => ({ // encode
+      group: state.group.map(v => `${v.column} ${v.direction}`)
+    }),
+    {
+      ...props.qs,
+      properties: {
+        group: 'string[]'
+      }
+    }
+  );
+
   const [isEditing, setEditing] = useState(false);
   const [isSavingQuickEdit, setSaving] = useState(false);
   const [editCount, setEditCount] = useState(0);
@@ -154,11 +178,16 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
 
   useDeepEffect(() => {
     async function getData() {
+      let fullSort: ColumnSort[] = [
+        ...groupBy.group,
+        ...columnSort.sort,
+      ];
+
       if (typeof props.onQueryChange === 'function') {
         props.onQueryChange({
           pagination,
           search: hideSearchForm ? '' : searchQuery.query,
-          sorts: columnSort.sort,
+          sorts: fullSort,
           filters: filter.filters.length ? filter : undefined,
         });
       }
@@ -167,7 +196,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
         let returnedData = await props.data({
           pagination,
           search: hideSearchForm ? '' : searchQuery.query,
-          sorts: columnSort.sort,
+          sorts: fullSort,
           filters: filter.filters.length ? filter : undefined,
         }, doSetDataList);
 
@@ -189,7 +218,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     setLoading(true);
     doSetSelectedRows({});
     getData();
-  }, [ pagination, searchQuery.query, filter, columnSort, editCount ]);
+  }, [ pagination, searchQuery.query, filter, columnSort, groupBy, editCount ]);
 
   const Paginate = props.components?.Paginate ?? PageNav;
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
@@ -320,6 +349,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     <ColumnContext.Provider value={{
       ...columnData,
       columnSorts: columnSort.sort,
+      groupBy: groupBy.group,
       multiColumnSorts: props.multiColumnSorts ?? false,
       filter,
       filterSettings: props.filterSettings,
@@ -332,6 +362,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       setFilter,
       setColumnVisibility,
       setColumnSort,
+      setGroupBy,
       setAllSelected,
       setRowSelected,
       onShowColumnPicker: props.onShowColumnPicker,
