@@ -1,4 +1,4 @@
-import { DataColumnProp, DataColumn, ColumnVisibilityStorage } from '../components/table/types';
+import { DataColumnProp, DataColumn, ColumnVisibilityStorage, ColumnSort } from '../components/table/types';
 import { resolve } from '../types';
 import { cloneDeep } from 'lodash';
 
@@ -10,7 +10,7 @@ import { cloneDeep } from 'lodash';
  * @param propColumns The list of columns from the table props.
  * @param parentKey Internal use only for hierarchical data.
  */
-export function transformColumns<T>(tableId: string, propColumns: Partial<DataColumnProp<T>>[], columnVisibility: ColumnVisibilityStorage, parentKey: string = ''): DataColumn<T>[] {
+export function transformColumns<T>(tableId: string, propColumns: Partial<DataColumnProp<T>>[], columnVisibility: ColumnVisibilityStorage, groupBy: ColumnSort[], parentKey: string = ''): DataColumn<T>[] {
   let columns: DataColumn<T>[] = [];
 
   let index: number = 0,
@@ -55,14 +55,17 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       canToggleVisibility: resolve(column.canToggleVisibility, true),
 
       columns: !!column.columns
-        ? transformColumns(tableId, column.columns, columnVisibility, key)
+        ? transformColumns(tableId, column.columns, columnVisibility, groupBy, key)
         : undefined,
 
       isVisible,
       sortIndex: 0,
       rowSpan: 1,
       colSpan: 1,
+      isGrouped: false,
     };
+
+    transformedColumn.isGrouped = !!groupBy.find(g => g.column === transformedColumn.name);
 
     if (transformedColumn.columns?.length) {
       let visibleChildren = transformedColumn.columns.filter(c => c.isVisible).length;
@@ -152,7 +155,7 @@ function generateHeaderRow<T>(columns: DataColumn<T>[], rows: DataColumn<T>[][] 
   let lastParent: DataColumn<T> | null | undefined = null;
   let currentColumnSpan: number = 1;
   for (let column of columns) {
-    if (!column.isVisible) continue;
+    if (!column.isVisible || column.isGrouped) continue;
     currentRow.push(column);
 
     if (!!lastParent && lastParent === column.parent) {

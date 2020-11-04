@@ -30,6 +30,7 @@ interface ColumnContextInterface<T> {
   isSavingQuickEdit: boolean;
   editData: EditFormData;
   canSelectRows: boolean;
+  canGroupBy: boolean;
   selectedRows: Record<string | number, T>;
   setFormData: React.Dispatch<React.SetStateAction<EditFormData>>;
   setColumnVisibility: (newState: (ColumnVisibilityStorage | ((state: ColumnVisibilityStorage) => ColumnVisibilityStorage))) => void;
@@ -78,4 +79,5 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   columnOrder: [],
   setColumnOrder: () => {},
   canReorderColumns: false,
+  canGroupBy: false,
 });

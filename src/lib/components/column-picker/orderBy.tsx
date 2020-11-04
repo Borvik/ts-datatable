@@ -15,9 +15,10 @@ interface OrderByProps {
   setVisibleColumns: (newState: ColumnVisibilityStorage | ((state: ColumnVisibilityStorage) => ColumnVisibilityStorage)) => void
   isDropDisabled: boolean
   dragColumn: ColumnDragSource | null;
+  isDragDisabled: boolean
 }
 
-export const OrderByList: React.FC<OrderByProps> = ({ dragColumn, containerId, isDropDisabled, sortedColumns, visibleColumns, setVisibleColumns }) => {
+export const OrderByList: React.FC<OrderByProps> = ({ dragColumn, containerId, isDropDisabled, sortedColumns, visibleColumns, setVisibleColumns, isDragDisabled }) => {
 
   return (
     <Droppable
@@ -56,6 +57,7 @@ export const OrderByList: React.FC<OrderByProps> = ({ dragColumn, containerId, i
                 colIndex={index}
                 col={col}
                 isVisible={isVisible}
+                isDragDisabled={isDragDisabled}
                 toggleVisibility={() => setVisibleColumns(prev => ({ ...prev, [col.key]: !prev[col.key] }))}
               />
             })}
@@ -71,16 +73,17 @@ interface ColumnProps {
   colIndex: number
   col: DataColumn<any>
   isVisible: boolean
+  isDragDisabled: boolean
   toggleVisibility: () => void
 }
 
-const ColumnEl: React.FC<ColumnProps> = ({ col, colIndex, isVisible, toggleVisibility }) => {
+const ColumnEl: React.FC<ColumnProps> = ({ col, colIndex, isVisible, toggleVisibility, isDragDisabled }) => {
   const { canReorderColumns } = useContext(ColumnContext);
 
   return <Draggable
     draggableId={col.key}
     index={colIndex}
-    isDragDisabled={!canReorderColumns}
+    isDragDisabled={!canReorderColumns || isDragDisabled}
   >
     {(provided) => (
       <div
@@ -90,9 +93,10 @@ const ColumnEl: React.FC<ColumnProps> = ({ col, colIndex, isVisible, toggleVisib
         ref={provided.innerRef}
       >
         {canReorderColumns && <>
-          <div className='column-drag' {...provided.dragHandleProps}>
+          {isDragDisabled && <div className='column-drag-placeholder' />}
+          {!isDragDisabled && <div className='column-drag' {...provided.dragHandleProps}>
             <FontAwesomeIcon icon={faGripVertical} fixedWidth />
-          </div>
+          </div>}
         </>}
         <span className='column-header'>{col.header}</span>
         {!!col.canToggleVisibility && <>

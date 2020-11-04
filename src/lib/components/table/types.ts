@@ -73,6 +73,7 @@ export interface DataTableProperties<T> {
   DetailRow?: React.ElementType<{parentRow: T}>;
 
   canReorderColumns?: boolean
+  canGroupBy?: boolean
 
   components?: CustomComponents
 
@@ -162,6 +163,7 @@ export interface DataColumn<T> extends ResolvableColumnTypes, BaseColumnProps<T>
   rowSpan: number;
   colSpan: number;
   sortIndex: number;
+  isGrouped: boolean;
 }
 
 /**
@@ -209,6 +211,38 @@ export interface GroupBy {
 
 export interface QSGroupBy {
   group: string[];
+}
+
+export interface DataGroup {
+  column: string
+  value: any
+  children: DataGroup[] | DataRow[]
+}
+
+export interface DataRow {
+  key: string | number
+  rowIndex: number
+  row: any
+}
+
+export function isDataGroup(value?: DataGroup | DataRow | null): value is DataGroup {
+  if (!value) return false;
+  return (typeof (value as any).column === 'string');
+}
+
+export function isDataRow(value?: DataGroup | DataRow | null): value is DataRow {
+  if (!value) return false;
+  return (typeof (value as any).column === 'undefined');
+}
+
+export function isDataGroupArray(value?: DataGroup[] | DataRow[]): value is DataGroup[] {
+  if (!value?.length) return false;
+  return (typeof (value[0] as any).column === 'string');
+}
+
+export function isDataRowArray(value?: DataGroup[] | DataRow[]): value is DataRow[] {
+  if (!value?.length) return false;
+  return (typeof (value[0] as any).column === 'undefined');
 }
 
 /**

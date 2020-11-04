@@ -22,6 +22,7 @@ export const ColumnPickerDialog: React.FC = () => {
     classNames,
     labels,
     groupBy,
+    canGroupBy,
   } = useContext(ColumnContext);
   const [visible, setVisible] = useDeepDerivedState<ColumnVisibilityStorage>((prev) => {
     let newVisible: ColumnVisibilityStorage = {};
@@ -192,6 +193,7 @@ export const ColumnPickerDialog: React.FC = () => {
             setVisibleColumns={setVisible}
             dragColumn={sourceDroppable}
             isDropDisabled={true}
+            isDragDisabled={!canGroupBy}
           />
           <OrderByList
             containerId='order-by-main'
@@ -199,13 +201,14 @@ export const ColumnPickerDialog: React.FC = () => {
             visibleColumns={visible}
             setVisibleColumns={setVisible}
             dragColumn={sourceDroppable}
+            isDragDisabled={false}
             isDropDisabled={
               sourceDroppable !== null &&
               sourceDroppable.sourceList !== 'group-by' &&
               sourceDroppable.sourceList !== 'order-by-main'
             }
           />
-          {/* <OrderByList
+          {/* <OrderByList 
             containerId='order-by-main-copy'
             sortedColumns={sortedColumns}
             visibleColumns={visible}
@@ -218,14 +221,15 @@ export const ColumnPickerDialog: React.FC = () => {
             setVisibleColumns={setVisible}
             dragColumn={sourceDroppable}
             isDropDisabled={true}
+            isDragDisabled={!canGroupBy}
           />
         </div>
-        <GroupByList
+        {canGroupBy && <GroupByList
           groupedColumns={groupedColumns}
           groupedDirections={dialogGroup}
           dragColumn={sourceDroppable}
           toggleSort={toggleSort}
-        />
+        />}
       </DragDropContext>
     </DialogBody>
     <DialogFooter>

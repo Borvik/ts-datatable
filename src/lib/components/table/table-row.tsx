@@ -47,7 +47,7 @@ export const TableRow: React.FC<TableRowProps> = ({ row, ...props }) => {
         <RowSelector row={row} rowIndex={props.rowIndex} />
       </td>}
       {columns.map((col, colIdx) => {
-        if (!col.isVisible) return null;
+        if (!col.isVisible || col.isGrouped) return null;
         columnCount++;
 
         let value = getRowValue(row, col);
