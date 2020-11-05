@@ -1,11 +1,13 @@
 import React, { useContext, useRef } from 'react';
-import { DataColumn, DataGroup, DataRow, isDataRowArray, TableBodyProps } from './types';
+import { DataGroup, DataRow, isDataGroupArray, isDataRowArray, TableBodyProps } from './types';
 import { ColumnContext } from './contexts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons/faCircleNotch';
 import { TableRow } from './table-row';
 import { getRowKey } from '../../utils/getRowKey';
 import { useArrayDerivedState } from '../../utils/useDerivedState';
+import { getGroupKey, getGroupKeys, GroupKey } from '../../utils/getGroupKey';
+import { TableGroup } from './table-group';
 
 export const TableBody: React.FC<TableBodyProps> = ({ data, loading, canEditRow, LoadingComponent, ...props }) => {
   const { actualColumns: columns, groupBy } = useContext(ColumnContext);
@@ -20,17 +22,44 @@ export const TableBody: React.FC<TableBodyProps> = ({ data, loading, canEditRow,
       }));
     }
 
+    let nestedGroups: DataGroup[] = [];
     for (let i = 0; i < data.length; i++) {
       // get group values as a array
-      // groupBy: [{column: 'a', direction: 'asc'}, {column: 'b', direction: 'asc}]
-      // values: [2, 4]
+      let groupValues = getGroupKeys(data[i], groupBy, columns);
 
-      // build group hierarchy - incrementally
-      // store in 2 lists, 1 hierarchical, 1 flat
-      // each group should have a unique key to find in flat array
-      //   helps actullay build the hierarchical
-      // final group in chain gets a `DataRow` for this interation
+      let currentGroup: GroupKey[] = [],
+          currentGroupKey: string,
+          lastGroup: DataGroup | null = null;
+      while (groupValues.length) {
+        let grp = groupValues.shift()!;
+        currentGroup.push(grp);
+        currentGroupKey = getGroupKey(currentGroup);
+
+        let grpContainer: DataGroup[] = (lastGroup?.children as DataGroup[] | undefined) ?? nestedGroups;
+        
+        // eslint (no-loop-func)
+        // eslint-disable-next-line
+        let dgrp = grpContainer.find(g => g.key === currentGroupKey);
+        if (!dgrp) {
+          dgrp = {
+            key: currentGroupKey,
+            level: currentGroup.length,
+            column: grp.column,
+            value: grp.value,
+            children: [],
+          };
+          grpContainer.push(dgrp);
+        }
+        lastGroup = dgrp;
+      }
+
+      (lastGroup!.children as DataRow[]).push({
+        row: data[i],
+        rowIndex: i,
+        key: getRowKey(data[i], i, columns, props.getRowKey),
+      });
     }
+    return nestedGroups;
   }, [columns, groupBy, data]);
 
   return (
@@ -46,6 +75,13 @@ export const TableBody: React.FC<TableBodyProps> = ({ data, loading, canEditRow,
             canEditRow={canEditRow}
           />;
         })} */}
+        {isDataGroupArray(groupedData) && <>
+          {groupedData.map(grp => <TableGroup
+            key={grp.key}
+            group={grp}
+            canEditRow={canEditRow}
+          />)}
+        </>}
         {isDataRowArray(groupedData) && <>
           {groupedData.map(row => <TableRow
             key={row.key}

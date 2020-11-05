@@ -214,6 +214,8 @@ export interface QSGroupBy {
 }
 
 export interface DataGroup {
+  key: string
+  level: number
   column: string
   value: any
   children: DataGroup[] | DataRow[]
