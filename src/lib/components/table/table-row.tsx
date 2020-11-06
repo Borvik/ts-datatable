@@ -6,14 +6,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons/faChevronDown';
 import { RowSelector } from '../row-selector';
+import { DataGroup } from './types';
 
 interface TableRowProps {
   row: any;
   rowIndex: number;
   canEditRow?: (row: any) => boolean;
+  group?: DataGroup
 }
 
-export const TableRow: React.FC<TableRowProps> = ({ row, ...props }) => {
+export const TableRow: React.FC<TableRowProps> = ({ row, group, ...props }) => {
   const [ isExpanded, setExpanded ] = useState(false);
   const {
     actualColumns: columns,
@@ -34,8 +36,10 @@ export const TableRow: React.FC<TableRowProps> = ({ row, ...props }) => {
     detailRowAvailable = canRowShowDetail(row);
 
   const DetailRowRenderer = DetailRow ?? FakeDetailRow;
+
+  let rowStyle: any = {'--indent': group?.level ?? 0};
   return <>
-    <tr>
+    <tr style={rowStyle}>
       {hasDetailRenderer && <td key={`mdr`} className='fixed fixed-left mdr-control'>
         {detailRowAvailable && <>
           <button type='button' className='mdr-button' onClick={() => setExpanded(v => !v)}>
