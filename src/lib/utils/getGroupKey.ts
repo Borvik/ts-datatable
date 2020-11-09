@@ -6,16 +6,16 @@ export interface GroupKey {
   value: any
 }
 
-export function getGroupKeys(row: any, groupBy: ColumnSort[], columns: DataColumn<any>[]) {
+export function getGroupKeys(row: any, groupByOrder: ColumnSort[], columns: DataColumn<any>[]) {
   let groupKeys: GroupKey[] = [];
 
-  for (let i = 0; i < groupBy.length; i++) {
-    let col = columns.find(c => c.name === groupBy[i].column);
+  for (let i = 0; i < groupByOrder.length; i++) {
+    let col = columns.find(c => c.name === groupByOrder[i].column);
     if (!col) {
-      groupKeys.push({ column: groupBy[i].column, value: undefined });
+      groupKeys.push({ column: groupByOrder[i].column, value: undefined });
     } else {
       let value = getRowValue(row, col);
-      groupKeys.push({ column: groupBy[i].column, value });
+      groupKeys.push({ column: groupByOrder[i].column, value });
     }
   }
 

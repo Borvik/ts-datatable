@@ -14,7 +14,7 @@ import {
   SetFilterCb,
   SetPaginationCb,
   OnShowFilterEditor,
-  GroupBy,
+  GroupSort,
 } from './types';
 import { FilterSettings } from '../filter/types';
 
@@ -22,7 +22,8 @@ interface ColumnContextInterface<T> {
   actualColumns: DataColumn<T>[]; // the flat list of columns (lowest level)
   headerRows: DataColumn<T>[][];
   columnSorts: ColumnSort[];
-  groupBy: ColumnSort[]
+  groupBySort: ColumnSort[]
+  groupByOrder: ColumnSort[]
   filter: QueryFilterGroup,
   filterSettings?: FilterSettings,
   multiColumnSorts: boolean;
@@ -35,7 +36,7 @@ interface ColumnContextInterface<T> {
   setFormData: React.Dispatch<React.SetStateAction<EditFormData>>;
   setColumnVisibility: (newState: (ColumnVisibilityStorage | ((state: ColumnVisibilityStorage) => ColumnVisibilityStorage))) => void;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
-  setGroupBy: (newState: GroupBy | ((state: GroupBy) => GroupBy)) => void;
+  setGroupBy: (groups: GroupSort[]) => void;
   setAllSelected: (selectAll: boolean) => void;
   setRowSelected: (row: T, rowIndex: number) => void;
   onShowColumnPicker?: OnShowColumnPicker;
@@ -53,13 +54,15 @@ interface ColumnContextInterface<T> {
   classNames?: CustomClasses
   labels?: CustomLabels
   components?: CustomComponents
+  groupsExpandedByDefault: boolean
 }
 
 export const ColumnContext = createContext<ColumnContextInterface<any>>({
   actualColumns: [],
   headerRows: [],
   columnSorts: [],
-  groupBy: [],
+  groupBySort: [],
+  groupByOrder: [],
   filter: {groupOperator: 'and', filters: []},
   multiColumnSorts: false,
   isEditing: false,
@@ -80,4 +83,15 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   setColumnOrder: () => {},
   canReorderColumns: false,
   canGroupBy: false,
+  groupsExpandedByDefault: true,
+});
+
+interface GroupCollapseContextInterface {
+  setExpanded: (groupKey: string, expanded: boolean) => void
+  collapsedState: Record<string, boolean>
+}
+
+export const GroupCollapseContext = createContext<GroupCollapseContextInterface>({
+  setExpanded: () => {},
+  collapsedState: {}
 });

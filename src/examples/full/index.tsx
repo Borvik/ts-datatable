@@ -84,6 +84,7 @@ export function FullFeaturedExample() {
     data={staticData.list} // Pass Data in directly
     totalCount={staticData.total} // Total count to enable pagination
     isLoading={staticData.loading} // Allows external to show loading indicator
+    defaultGroupBy={[{column: 'candy', direction: 'asc'}]}
 
     components={{
       Buttons: {

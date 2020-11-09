@@ -1,17 +1,18 @@
 import React from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
-import { ColumnSort, DataColumn } from '../table/types';
+import { DataColumn, GroupSort } from '../table/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons/faGripVertical';
 import { faSortUp } from '@fortawesome/free-solid-svg-icons/faSortUp';
 import { faSortDown } from '@fortawesome/free-solid-svg-icons/faSortDown';
+import { faSort } from '@fortawesome/free-solid-svg-icons/faSort';
 import { ColumnDragSource } from './types';
 
 type ToggleSortFn = (index: number) => void;
 
 interface GroupByProps {
   groupedColumns: DataColumn<any>[];
-  groupedDirections: ColumnSort[];
+  groupedDirections: GroupSort[];
   dragColumn: ColumnDragSource | null;
   toggleSort: ToggleSortFn
 }
@@ -69,7 +70,7 @@ export const GroupByList: React.FC<GroupByProps> = ({ dragColumn, groupedDirecti
 interface ColumnProps {
   colIndex: number
   col: DataColumn<any>
-  sort: ColumnSort
+  sort: GroupSort
   toggleSort: ToggleSortFn
 }
 
@@ -90,7 +91,8 @@ const ColumnEl: React.FC<ColumnProps> = ({ col, sort, colIndex, toggleSort }) =>
         <span className='column-header'>{col.header}</span>
         <button type='button' title={`Sort `} className='toggle-sort' onClick={() => toggleSort(colIndex)}>
           {sort.direction === 'asc' && <FontAwesomeIcon icon={faSortUp} className='sort-icon' fixedWidth />}
-          {sort.direction !== 'asc' && <FontAwesomeIcon icon={faSortDown} className='sort-icon' fixedWidth />}
+          {sort.direction === 'desc' && <FontAwesomeIcon icon={faSortDown} className='sort-icon' fixedWidth />}
+          {sort.direction === null && <FontAwesomeIcon icon={faSort} style={{opacity: .3}} className='sort-icon' fixedWidth />}
         </button>
       </div>
     )}

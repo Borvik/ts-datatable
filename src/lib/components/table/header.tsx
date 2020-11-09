@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { doSetColumnSort } from '../../utils/setColumnSort';
 import { RowSelector } from '../row-selector';
 import { ColumnContext } from './contexts';
 import { HeaderSort } from './sortable';
@@ -17,14 +18,14 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
     setColumnSort,
     DetailRow,
     canSelectRows,
-    groupBy,
+    groupByOrder,
   } = useContext(ColumnContext);
 
   if (headerRows.length < 1) return null;
 
   let hasDetailRenderer = (!!DetailRow);
 
-  let indentStyle: any = {'--indent': groupBy.length};
+  let indentStyle: any = {'--indent': groupByOrder.length};
   return (
     <thead ref={props.headRef}>
       {headerRows.map((row, rowIdx) => (
@@ -41,26 +42,7 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
                 ? {...sort, direction: sort.direction === 'asc' ? 'desc' : 'asc' }
                 : {column: col.name!, direction: col.defaultSortDir};
 
-              if (multiColumnSorts && e.shiftKey) {
-                if (sort) {
-                  setColumnSort(state => ({
-                    sort: state.sort.map(s => {
-                      if (sort.column === s.column)
-                        return newSort;
-                      return s;
-                    })
-                  }));
-                } else {
-                  setColumnSort(state => ({
-                    sort: [
-                      ...state.sort,
-                      newSort
-                    ]
-                  }));
-                }
-              } else {
-                setColumnSort({ sort: [ newSort ] });
-              }
+              doSetColumnSort(setColumnSort, newSort, e.shiftKey, multiColumnSorts);
             }
 
             return (<React.Fragment key={`row-key-${colIdx}`}>

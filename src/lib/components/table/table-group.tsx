@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useContext, useState } from 'react';
-import { ColumnContext } from './contexts';
+import React, { useContext } from 'react';
+import { ColumnContext, GroupCollapseContext } from './contexts';
 import { TableRow } from './table-row';
 import { DataGroup, isDataGroupArray, isDataRowArray } from './types';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
@@ -12,12 +12,15 @@ interface TableGroupProps {
 }
 
 export const TableGroup: React.FC<TableGroupProps> = ({ group, canEditRow }) => {
-  const [ isExpanded, setExpanded ] = useState(true);
   const {
     actualColumns: columns,
     canSelectRows,
     DetailRow,
+    groupsExpandedByDefault,
   } = useContext(ColumnContext);
+  const { collapsedState, setExpanded } = useContext(GroupCollapseContext);
+
+  const isExpanded = collapsedState[group.key] ?? groupsExpandedByDefault;
 
   let columnCount = columns.reduce((v,c) => (c.isVisible && !c.isGrouped) ? v + 1 : v, 0);
   let hasDetailRenderer = (!!DetailRow);
@@ -31,7 +34,7 @@ export const TableGroup: React.FC<TableGroupProps> = ({ group, canEditRow }) => 
     {!!groupColumn && <tr style={groupStyle}>
       <th className='row-group'>
         <div className='row-group-container'>
-          <button type='button' className='mdr-button' onClick={() => setExpanded(v => !v)}>
+          <button type='button' className='mdr-button' onClick={() => setExpanded(group.key, !isExpanded)}>
             <FontAwesomeIcon fixedWidth icon={isExpanded ? faChevronDown : faChevronRight} />
           </button>
           <div className='group-column-name'>{groupColumn.header}</div>

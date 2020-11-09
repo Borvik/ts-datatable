@@ -12,6 +12,7 @@ import { cloneDeep } from 'lodash';
  */
 export function transformColumns<T>(tableId: string, propColumns: Partial<DataColumnProp<T>>[], columnVisibility: ColumnVisibilityStorage, groupBy: ColumnSort[], parentKey: string = ''): DataColumn<T>[] {
   let columns: DataColumn<T>[] = [];
+  let groupByNames = groupBy.map(g => g.column);
 
   let index: number = 0,
       numColumns: number = propColumns.length;
@@ -65,7 +66,7 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       isGrouped: false,
     };
 
-    transformedColumn.isGrouped = !!groupBy.find(g => g.column === transformedColumn.name);
+    transformedColumn.isGrouped = transformedColumn.name ? !!groupByNames.includes(transformedColumn.name) : false;
 
     if (transformedColumn.columns?.length) {
       let visibleChildren = transformedColumn.columns.filter(c => c.isVisible).length;

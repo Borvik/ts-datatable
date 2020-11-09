@@ -1,14 +1,15 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Dialog, DialogHeader, DialogBody, DialogFooter } from '../dialog';
 import { ColumnContext } from '../table/contexts';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
-import { ColumnSort, ColumnVisibilityStorage, DataColumn } from '../table/types';
+import { ColumnSort, ColumnVisibilityStorage, DataColumn, GroupSort } from '../table/types';
 import { update } from '../../utils/immutable';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { OrderByList } from './orderBy';
 import { GroupByList } from './groupBy';
 import { ColumnDragSource } from './types';
+import { isset } from '../filter/editor/value-editors/isEmpty';
 
 
 export const ColumnPickerDialog: React.FC = () => {
@@ -21,9 +22,11 @@ export const ColumnPickerDialog: React.FC = () => {
     setGroupBy,
     classNames,
     labels,
-    groupBy,
+    groupByOrder,
+    groupBySort,
     canGroupBy,
   } = useContext(ColumnContext);
+
   const [visible, setVisible] = useDeepDerivedState<ColumnVisibilityStorage>((prev) => {
     let newVisible: ColumnVisibilityStorage = {};
     for (let col of actualColumns) {
@@ -32,11 +35,24 @@ export const ColumnPickerDialog: React.FC = () => {
     return newVisible;
   }, [ actualColumns ]);
 
+  const mergedGroupBy = useMemo(() => {
+    return groupByOrder.map<GroupSort | null>(go => {
+      let sort = groupBySort.find(gs => gs.column === go.column);
+      if (!sort) {
+        let col = actualColumns.find(c => c.name === go.column);
+        if (!col) return null;
+        return { column: go.column, direction: null };
+      } else {
+        return sort;
+      }
+    }).filter(isset);
+  }, [ groupByOrder, groupBySort, actualColumns ]);
+
   const [dialogOrder, setOrder] = useState(columnOrder);
-  const [dialogGroup, setGroup] = useState(groupBy);
+  const [dialogGroup, setGroup] = useState(mergedGroupBy);
   const [sourceDroppable, setSourceDroppable] = useState<ColumnDragSource | null>(null);
 
-  const groupedColumns = actualColumns.filter(c => !!dialogGroup.find(g => g.column === c.name));
+  const groupedColumns = dialogGroup.map(g => actualColumns.find(c => g.column === c.name)).filter(isset);
   const fixedColumns = actualColumns.filter(c => !!c.fixed && !groupedColumns.find(gc => gc.key === c.key));
   const fixedLeftColumns = fixedColumns.filter(c => c.fixed === 'left');
   const fixedRightColumns = fixedColumns.filter(c => c.fixed === 'right');
@@ -63,18 +79,18 @@ export const ColumnPickerDialog: React.FC = () => {
 
   function toggleSort(index: number) {
     let sort = dialogGroup[index];
-    let newSort: ColumnSort = {
-      ...sort,
-      direction: sort.direction === 'asc' ? 'desc' : 'asc'
-    };
+    let col = actualColumns.find(c => c.name === sort.column);
+    let newSort: ColumnSort = sort.direction === null
+      ? { column: sort.column, direction: col?.defaultSortDir ?? 'asc' }
+      : { ...sort, direction: sort.direction === 'asc' ? 'desc' : 'asc' };
     setGroup(update(dialogGroup, { [index]: { $set: newSort } }));
   }
 
   return <Dialog dialogRef={dialogEl} onSubmit={async (close) => {
     ReactDOM.unstable_batchedUpdates(() => {
       setColumnVisibility(visible);
-      setColumnOrder(dialogOrder)
-      setGroupBy({ group: dialogGroup });
+      setColumnOrder(dialogOrder);
+      setGroupBy(dialogGroup);
     });
     close();
   }}>

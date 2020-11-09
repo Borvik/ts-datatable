@@ -74,11 +74,14 @@ export interface DataTableProperties<T> {
 
   canReorderColumns?: boolean
   canGroupBy?: boolean
+  groupsExpandedByDefault?: boolean
 
   components?: CustomComponents
 
   classNames?: CustomClasses
   labels?: CustomLabels
+
+  suppressFixedWarning?: boolean
 }
 
 export interface CustomComponents {
@@ -195,6 +198,11 @@ export interface TableBodyProps {
 export interface ColumnSort {
   column: string;
   direction: 'asc' | 'desc';
+}
+
+export interface GroupSort {
+  column: string;
+  direction: 'asc' | 'desc' | null;
 }
 
 export interface ColumnSorts {
