@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useState, useEffect, useRef, useCallback } from 'react';
-import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData, QSGroupBy, GroupBy, ColumnSort, GroupSort } from './types';
+import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData, QSGroupBy, GroupBy, ColumnSort } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { useQueryState, batchedQSUpdate } from '../../utils/useQueryState';
 import { transformColumns, getFlattenedColumns, generateHeaderRows } from '../../utils/transformColumnProps';
@@ -19,7 +19,6 @@ import { TableEditorButton } from './editors/editButton';
 import { TableActionButtons } from './actions';
 import { getRowKey } from '../../utils/getRowKey';
 import { update } from '../../utils/immutable';
-import { isset } from '../filter/editor/value-editors/isEmpty';
 
 const primaryKeyWarned: {[x:string]: boolean} = {};
 const fixedLeftWarned: Record<string, boolean> = {};
@@ -46,10 +45,9 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
   );
 
   const [columnOrder, setColumnOrder] = useLocalState<string[]>(`table.${props.id}.columnOrder`, [], [ props.id ]);
-  const [groupByOrder, setGroupByOrder] = useLocalState<ColumnSort[]>(`table.${props.id}.groupByOrder`, props.defaultGroupBy ?? [], [ props.id ]);
 
-  const [groupBySort, setGroupBySort] = useParsedQs<GroupBy, QSGroupBy>(
-    { group: [] },
+  const [groupBy, setGroupBy] = useParsedQs<GroupBy, QSGroupBy>(
+    { group: props.defaultGroupBy ?? [] },
     (qsSort) => ({ // parse
       group: qsSort.group.map(v => {
         let parts = v.split(' ').filter(a => !!a);
@@ -86,7 +84,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
    */
   const [columnData] = useDeepDerivedState(() => {
     // First Clean the columns - transforms "resolve | type" column properties
-    let visibleColumns = transformColumns(props.id, props.columns, columnVisibility, canGroupBy ? groupByOrder : []);
+    let visibleColumns = transformColumns(props.id, props.columns, columnVisibility, canGroupBy ? groupBy.group : []);
     let actualColumns = getFlattenedColumns(visibleColumns);
     let headerRows = generateHeaderRows(actualColumns, props.canReorderColumns ? columnOrder : []);
 
@@ -135,7 +133,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       hasEditor,
       primaryKeyCount,
     }
-  }, [ props.id, columnVisibility, props.columns, columnOrder, groupByOrder, props.canReorderColumns, canGroupBy ]);
+  }, [ props.id, columnVisibility, props.columns, columnOrder, groupBy.group, props.canReorderColumns, canGroupBy ]);
 
   const canEdit = typeof props.onSaveQuickEdit === 'function' && columnData.hasEditor && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
   const canSelectRows = !!props.canSelectRows && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
@@ -162,33 +160,6 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       }
     }
   )
-
-  function setGroupBy(groups: GroupSort[]) {
-    let sorted = groups.map<ColumnSort | null>(grp => {
-      if (!grp.direction) {
-        let col = columnData.actualColumns.find(c => c.name === grp.column);
-        if (!col) return null;
-
-        return {
-          column: grp.column,
-          direction: col.defaultSortDir,
-        }
-      }
-      return { column: grp.column, direction: grp.direction };
-    }).filter(isset);
-    setGroupBySort({ group: sorted });
-    setGroupByOrder(sorted);
-  }
-
-  useEffect(() => {
-    if (groupByOrder.length && !groupBySort.group.length) {
-      setGroupBySort({ group : groupByOrder });
-    }
-    // Unable to do both this and the reverse
-    // Two different storage mechanisms and took different hooks
-    // triggers two rerenders, making this not work
-    // Maybe with a CUSTOM `set` hook that can batch them?
-  }, [groupBySort, groupByOrder, setGroupBySort, setGroupByOrder]);
 
   const [columnSort, setColumnSort] = useParsedQs<ColumnSorts, QSColumnSorts>(
     { sort: props.defaultSort ?? [] },
@@ -234,8 +205,8 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
   useDeepEffect(() => {
     async function getData() {
       let fullSort: ColumnSort[] = [
-        ...(canGroupBy ? groupBySort.group : []),
-        ...columnSort.sort.filter(s => (!canGroupBy || !groupBySort.group.find(g => g.column === s.column))),
+        ...(canGroupBy ? groupBy.group : []),
+        ...columnSort.sort.filter(s => (!canGroupBy || !groupBy.group.find(g => g.column === s.column))),
       ];
 
       if (typeof props.onQueryChange === 'function') {
@@ -271,13 +242,10 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       }
     }
 
-    if (groupByOrder.length && !groupBySort.group.length) {
-      return;
-    }
     setLoading(true);
     doSetSelectedRows({});
     getData();
-  }, [ pagination, searchQuery.query, filter, columnSort, groupBySort, editCount, canGroupBy ]);
+  }, [ pagination, searchQuery.query, filter, columnSort, groupBy.group, editCount, canGroupBy ]);
 
   const Paginate = props.components?.Paginate ?? PageNav;
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
@@ -409,11 +377,10 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       ...columnData,
       canGroupBy,
       columnSorts:  [
-        ...(canGroupBy ? groupBySort.group : []),
-        ...columnSort.sort.filter(s => (!canGroupBy || !groupBySort.group.find(g => g.column === s.column))),
+        ...(canGroupBy ? groupBy.group : []),
+        ...columnSort.sort.filter(s => (!canGroupBy || !groupBy.group.find(g => g.column === s.column))),
       ],
-      groupBySort: canGroupBy ? groupBySort.group : [],
-      groupByOrder: canGroupBy ? groupByOrder : [],
+      groupBy: canGroupBy ? groupBy.group : [],
       multiColumnSorts: props.multiColumnSorts ?? false,
       filter,
       filterSettings: props.filterSettings,

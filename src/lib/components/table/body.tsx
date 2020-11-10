@@ -11,11 +11,11 @@ import { TableGroup } from './table-group';
 import { update } from '../../utils/immutable';
 
 export const TableBody: React.FC<TableBodyProps> = ({ data, loading, canEditRow, LoadingComponent, ...props }) => {
-  const { actualColumns: columns, groupByOrder } = useContext(ColumnContext);
+  const { actualColumns: columns, groupBy } = useContext(ColumnContext);
   const tbodyRef = useRef<HTMLTableSectionElement>(null);
 
   let [groupedData] = useArrayDerivedState(() => {
-    if (!groupByOrder.length) {
+    if (!groupBy.length) {
       return data.map<DataRow>((row, rowIndex) => ({
         row,
         rowIndex,
@@ -26,7 +26,7 @@ export const TableBody: React.FC<TableBodyProps> = ({ data, loading, canEditRow,
     let nestedGroups: DataGroup[] = [];
     for (let i = 0; i < data.length; i++) {
       // get group values as a array
-      let groupValues = getGroupKeys(data[i], groupByOrder, columns);
+      let groupValues = getGroupKeys(data[i], groupBy, columns);
 
       let currentGroup: GroupKey[] = [],
           currentGroupKey: string,
@@ -61,7 +61,7 @@ export const TableBody: React.FC<TableBodyProps> = ({ data, loading, canEditRow,
       });
     }
     return nestedGroups;
-  }, [columns, groupByOrder, data]);
+  }, [columns, groupBy, data]);
 
   let [groupCollapsed, setGroupCollapsed] = useState<Record<string, boolean>>({});
   function setGroupExpanded(groupKey: string, expanded: boolean) {

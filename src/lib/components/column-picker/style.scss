@@ -27,6 +27,14 @@
       outline: none;
     }
   }
+
+  &.grouped {
+    opacity: .5;
+
+    .column-header {
+      font-style: italic;
+    }
+  }
 }
 
 .group-by-container {

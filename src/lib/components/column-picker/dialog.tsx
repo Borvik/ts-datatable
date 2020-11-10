@@ -1,9 +1,9 @@
-import React, { useContext, useMemo, useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Dialog, DialogHeader, DialogBody, DialogFooter } from '../dialog';
 import { ColumnContext } from '../table/contexts';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
-import { ColumnSort, ColumnVisibilityStorage, DataColumn, GroupSort } from '../table/types';
+import { ColumnSort, ColumnVisibilityStorage, DataColumn } from '../table/types';
 import { update } from '../../utils/immutable';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { OrderByList } from './orderBy';
@@ -22,8 +22,7 @@ export const ColumnPickerDialog: React.FC = () => {
     setGroupBy,
     classNames,
     labels,
-    groupByOrder,
-    groupBySort,
+    groupBy,
     canGroupBy,
   } = useContext(ColumnContext);
 
@@ -35,30 +34,17 @@ export const ColumnPickerDialog: React.FC = () => {
     return newVisible;
   }, [ actualColumns ]);
 
-  const mergedGroupBy = useMemo(() => {
-    return groupByOrder.map<GroupSort | null>(go => {
-      let sort = groupBySort.find(gs => gs.column === go.column);
-      if (!sort) {
-        let col = actualColumns.find(c => c.name === go.column);
-        if (!col) return null;
-        return { column: go.column, direction: null };
-      } else {
-        return sort;
-      }
-    }).filter(isset);
-  }, [ groupByOrder, groupBySort, actualColumns ]);
-
   const [dialogOrder, setOrder] = useState(columnOrder);
-  const [dialogGroup, setGroup] = useState(mergedGroupBy);
+  const [dialogGroup, setGroup] = useState(groupBy);
   const [sourceDroppable, setSourceDroppable] = useState<ColumnDragSource | null>(null);
 
   const groupedColumns = dialogGroup.map(g => actualColumns.find(c => g.column === c.name)).filter(isset);
-  const fixedColumns = actualColumns.filter(c => !!c.fixed && !groupedColumns.find(gc => gc.key === c.key));
+  const fixedColumns = actualColumns.filter(c => !!c.fixed);
   const fixedLeftColumns = fixedColumns.filter(c => c.fixed === 'left');
   const fixedRightColumns = fixedColumns.filter(c => c.fixed === 'right');
 
   const [sortedColumns] = useDeepDerivedState(() => {
-    let cols = actualColumns.filter(c => !c.fixed && !groupedColumns.find(gc => gc.key === c.key)).map(c => {
+    let cols = actualColumns.filter(c => !c.fixed).map(c => {
       let idx = dialogOrder.findIndex(k => k === c.key);
       if (idx < 0) return c;
       return update(c, { sortIndex: { $set: idx } });
@@ -90,7 +76,7 @@ export const ColumnPickerDialog: React.FC = () => {
     ReactDOM.unstable_batchedUpdates(() => {
       setColumnVisibility(visible);
       setColumnOrder(dialogOrder);
-      setGroupBy(dialogGroup);
+      setGroupBy({group: dialogGroup});
     });
     close();
   }}>
@@ -152,13 +138,7 @@ export const ColumnPickerDialog: React.FC = () => {
           else if (source.droppableId === 'group-by' && destination.droppableId === 'order-by-main') {
             // moving from group-by to main column list
             // remove from origin, add to main (if not fixed)
-            let movingCol = groupedColumns[source.index];
-            ReactDOM.unstable_batchedUpdates(() => {
-              if (!movingCol.fixed) {
-                setOrder(update(dialogOrder, { $splice: [[destination.index, 0, movingCol.key]]}));
-              }
-              setGroup(update(dialogGroup, { $splice: [[source.index, 1]] }));
-            });
+            setGroup(update(dialogGroup, { $splice: [[source.index, 1]] }));
           }
           else if (destination.droppableId === 'group-by') {
             // moving from A column list to group-by
@@ -180,12 +160,7 @@ export const ColumnPickerDialog: React.FC = () => {
 
             // determine default sort
             let newSort: ColumnSort = {column: col.name!, direction: col.defaultSortDir};
-            ReactDOM.unstable_batchedUpdates(() => {
-              if (source.droppableId === 'order-by-main') {
-                setOrder(update(dialogOrder, { $splice: [[source.index, 1]]}));
-              }
-              setGroup(update(dialogGroup, { $splice: [[destination.index, 0, newSort]] }));
-            });
+            setGroup(update(dialogGroup, { $splice: [[destination.index, 0, newSort]] }));
           }
           
           /**
@@ -210,6 +185,7 @@ export const ColumnPickerDialog: React.FC = () => {
             dragColumn={sourceDroppable}
             isDropDisabled={true}
             isDragDisabled={!canGroupBy}
+            currentGroupBy={dialogGroup}
           />
           <OrderByList
             containerId='order-by-main'
@@ -217,6 +193,7 @@ export const ColumnPickerDialog: React.FC = () => {
             visibleColumns={visible}
             setVisibleColumns={setVisible}
             dragColumn={sourceDroppable}
+            currentGroupBy={dialogGroup}
             isDragDisabled={false}
             isDropDisabled={
               sourceDroppable !== null &&
@@ -238,6 +215,7 @@ export const ColumnPickerDialog: React.FC = () => {
             dragColumn={sourceDroppable}
             isDropDisabled={true}
             isDragDisabled={!canGroupBy}
+            currentGroupBy={dialogGroup}
           />
         </div>
         {canGroupBy && <GroupByList

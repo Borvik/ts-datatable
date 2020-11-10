@@ -18,14 +18,14 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
     setColumnSort,
     DetailRow,
     canSelectRows,
-    groupByOrder,
+    groupBy,
   } = useContext(ColumnContext);
 
   if (headerRows.length < 1) return null;
 
   let hasDetailRenderer = (!!DetailRow);
 
-  let indentStyle: any = {'--indent': groupByOrder.length};
+  let indentStyle: any = {'--indent': groupBy.length};
   return (
     <thead ref={props.headRef}>
       {headerRows.map((row, rowIdx) => (

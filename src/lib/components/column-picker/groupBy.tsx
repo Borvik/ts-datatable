@@ -76,7 +76,7 @@ interface ColumnProps {
 
 const ColumnEl: React.FC<ColumnProps> = ({ col, sort, colIndex, toggleSort }) => {
   return <Draggable
-    draggableId={col.key}
+    draggableId={'grp-' + col.key}
     index={colIndex}
   >
     {(provided) => (

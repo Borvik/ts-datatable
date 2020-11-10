@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
-import { ColumnVisibilityStorage, DataColumn } from '../table/types';
+import { ColumnSort, ColumnVisibilityStorage, DataColumn } from '../table/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons/faGripVertical';
 import { faEye } from '@fortawesome/free-solid-svg-icons/faEye';
@@ -16,9 +16,10 @@ interface OrderByProps {
   isDropDisabled: boolean
   dragColumn: ColumnDragSource | null;
   isDragDisabled: boolean
+  currentGroupBy: ColumnSort[]
 }
 
-export const OrderByList: React.FC<OrderByProps> = ({ dragColumn, containerId, isDropDisabled, sortedColumns, visibleColumns, setVisibleColumns, isDragDisabled }) => {
+export const OrderByList: React.FC<OrderByProps> = ({ currentGroupBy, dragColumn, containerId, isDropDisabled, sortedColumns, visibleColumns, setVisibleColumns, isDragDisabled }) => {
 
   return (
     <Droppable
@@ -59,6 +60,7 @@ export const OrderByList: React.FC<OrderByProps> = ({ dragColumn, containerId, i
                 isVisible={isVisible}
                 isDragDisabled={isDragDisabled}
                 toggleVisibility={() => setVisibleColumns(prev => ({ ...prev, [col.key]: !prev[col.key] }))}
+                currentGroupBy={currentGroupBy}
               />
             })}
             {provided.placeholder}
@@ -75,10 +77,15 @@ interface ColumnProps {
   isVisible: boolean
   isDragDisabled: boolean
   toggleVisibility: () => void
+  currentGroupBy: ColumnSort[]
 }
 
-const ColumnEl: React.FC<ColumnProps> = ({ col, colIndex, isVisible, toggleVisibility, isDragDisabled }) => {
+const ColumnEl: React.FC<ColumnProps> = ({ col, colIndex, isVisible, toggleVisibility, isDragDisabled, currentGroupBy }) => {
   const { canReorderColumns } = useContext(ColumnContext);
+
+  let classNames: string[] = ['config-column'];
+  let group = currentGroupBy.find(g => g.column === col.name);
+  if (group) classNames.push('grouped');
 
   return <Draggable
     draggableId={col.key}
@@ -87,7 +94,7 @@ const ColumnEl: React.FC<ColumnProps> = ({ col, colIndex, isVisible, toggleVisib
   >
     {(provided) => (
       <div
-        className='config-column'
+        className={classNames.join(' ')}
         {...provided.draggableProps}
         {...(!canReorderColumns ? provided.dragHandleProps : {})}
         ref={provided.innerRef}
