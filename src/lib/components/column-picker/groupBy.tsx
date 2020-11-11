@@ -20,7 +20,9 @@ interface GroupByProps {
 export const GroupByList: React.FC<GroupByProps> = ({ dragColumn, groupedDirections, toggleSort, groupedColumns }) => {
 
   const col = dragColumn?.column;
-  const isSortable = (col?.sortable && col.colSpan === 1 && col.name);
+  // can't use col.isGrouped - can change before save
+  const isGrouped = !!groupedColumns.find(c => c.key === col?.key);
+  const isSortable = (col?.sortable && col.colSpan === 1 && col.name && !isGrouped);
 
   return (
     <Droppable

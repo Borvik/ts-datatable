@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Droppable, Draggable, DraggingStyle, NotDraggingStyle, DraggableStateSnapshot } from 'react-beautiful-dnd';
 import { ColumnSort, ColumnVisibilityStorage, DataColumn } from '../table/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons/faGripVertical';
@@ -61,9 +61,11 @@ export const OrderByList: React.FC<OrderByProps> = ({ currentGroupBy, dragColumn
                 isDragDisabled={isDragDisabled}
                 toggleVisibility={() => setVisibleColumns(prev => ({ ...prev, [col.key]: !prev[col.key] }))}
                 currentGroupBy={currentGroupBy}
+                dragColumn={dragColumn}
               />
             })}
-            {provided.placeholder}
+            {dragColumn?.sourceList === 'group-by' && <span style={{ display: 'none' }}>{provided.placeholder}</span>}
+            {dragColumn?.sourceList !== 'group-by' && <>{provided.placeholder}</>}
           </div>
         )
       }}
@@ -78,9 +80,17 @@ interface ColumnProps {
   isDragDisabled: boolean
   toggleVisibility: () => void
   currentGroupBy: ColumnSort[]
+  dragColumn: ColumnDragSource | null;
 }
 
-const ColumnEl: React.FC<ColumnProps> = ({ col, colIndex, isVisible, toggleVisibility, isDragDisabled, currentGroupBy }) => {
+type DragStyle = DraggingStyle | NotDraggingStyle | undefined;
+function getDragStyle(style: DragStyle, snapshot: DraggableStateSnapshot, dragColumn: ColumnDragSource | null) {
+  if (dragColumn?.sourceList === 'group-by')
+    return {};
+  return style;
+}
+
+const ColumnEl: React.FC<ColumnProps> = ({ dragColumn, col, colIndex, isVisible, toggleVisibility, isDragDisabled, currentGroupBy }) => {
   const { canReorderColumns } = useContext(ColumnContext);
 
   let classNames: string[] = ['config-column'];
@@ -92,12 +102,13 @@ const ColumnEl: React.FC<ColumnProps> = ({ col, colIndex, isVisible, toggleVisib
     index={colIndex}
     isDragDisabled={!canReorderColumns || isDragDisabled}
   >
-    {(provided) => (
+    {(provided, snapshot) => (
       <div
         className={classNames.join(' ')}
         {...provided.draggableProps}
         {...(!canReorderColumns ? provided.dragHandleProps : {})}
         ref={provided.innerRef}
+        style={getDragStyle(provided.draggableProps.style, snapshot, dragColumn)}
       >
         {canReorderColumns && <>
           {isDragDisabled && <div className='column-drag-placeholder' />}
