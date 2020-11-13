@@ -59,9 +59,15 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       })
       .filter(notEmpty)
     }),
-    (state) => ({ // encode
-      group: state.group.map(v => `${v.column} ${v.direction}`)
-    }),
+    (state) => { // encode
+      if (!state.group.length && props.defaultGroupBy?.length) {
+        return { group: [''] };
+      }
+
+      return {
+        group: state.group.map(v => `${v.column} ${v.direction}`)
+      };
+    },
     {
       ...props.qs,
       properties: {

@@ -119,7 +119,8 @@ export function convertQsValue(value: any, toType: typeofWithArrays) {
   }
 
   if (toType === 'string[]') {
-    if (!value) return undefined;
+    if (typeof value === 'undefined' || value === null)
+      return undefined;
     if (Array.isArray(value))
       return value;
     if (typeof value !== 'string')
