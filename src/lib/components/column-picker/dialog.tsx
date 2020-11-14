@@ -8,7 +8,7 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import { OrderByList } from './orderBy';
 import { GroupByList } from './groupBy';
 import { ColumnDragSource } from './types';
-import { isset } from '../filter/editor/value-editors/isEmpty';
+import { isset } from '../../utils/isset';
 
 
 export const ColumnPickerDialog: React.FC = () => {
