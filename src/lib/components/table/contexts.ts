@@ -1,7 +1,6 @@
 import { createContext } from 'react';
 import {
   DataColumn,
-  ColumnVisibilityStorage,
   ColumnSorts,
   ColumnSort,
   OnShowColumnPicker,
@@ -14,7 +13,7 @@ import {
   SetFilterCb,
   SetPaginationCb,
   OnShowFilterEditor,
-  GroupBy,
+  ColumnConfigurationWithGroup,
 } from './types';
 import { FilterSettings } from '../filter/types';
 
@@ -33,9 +32,7 @@ interface ColumnContextInterface<T> {
   canGroupBy: boolean;
   selectedRows: Record<string | number, T>;
   setFormData: React.Dispatch<React.SetStateAction<EditFormData>>;
-  setColumnVisibility: (newState: (ColumnVisibilityStorage | ((state: ColumnVisibilityStorage) => ColumnVisibilityStorage))) => void;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
-  setGroupBy: (newState: GroupBy | ((state: GroupBy) => GroupBy)) => void;
   setAllSelected: (selectAll: boolean) => void;
   setRowSelected: (row: T, rowIndex: number) => void;
   onShowColumnPicker?: OnShowColumnPicker;
@@ -47,7 +44,7 @@ interface ColumnContextInterface<T> {
   DetailRow?: React.ElementType<{parentRow: T}>
   canRowShowDetail?: (row: T) => boolean
   columnOrder: string[]
-  setColumnOrder: (newState: string[] | ((state: string[]) => string[])) => void
+  setColumnConfig: (config: ColumnConfigurationWithGroup) => void
   canReorderColumns: boolean
   canSelectRow?: (row: T) => boolean;
   classNames?: CustomClasses
@@ -69,16 +66,14 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   canSelectRows: false,
   selectedRows: {},
   setFormData: () => {},
-  setColumnVisibility: () => {},
   setColumnSort: () => {},
-  setGroupBy: () => {},
   setAllSelected: () => {},
   setRowSelected: () => {},
   setFilter: () => {},
   setPagination: () => {},
   onSaveQuickEdit: async () => {},
   columnOrder: [],
-  setColumnOrder: () => {},
+  setColumnConfig: () => {},
   canReorderColumns: false,
   canGroupBy: false,
   groupsExpandedByDefault: true,

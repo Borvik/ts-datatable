@@ -15,9 +15,10 @@ interface GroupByProps {
   groupedDirections: GroupSort[];
   dragColumn: ColumnDragSource | null;
   toggleSort: ToggleSortFn
+  isDragDisabled: boolean
 }
 
-export const GroupByList: React.FC<GroupByProps> = ({ dragColumn, groupedDirections, toggleSort, groupedColumns }) => {
+export const GroupByList: React.FC<GroupByProps> = ({ isDragDisabled, dragColumn, groupedDirections, toggleSort, groupedColumns }) => {
 
   const col = dragColumn?.column;
   // can't use col.isGrouped - can change before save
@@ -58,6 +59,7 @@ export const GroupByList: React.FC<GroupByProps> = ({ dragColumn, groupedDirecti
                   col={col}
                   sort={groupedDirections[index]}
                   toggleSort={toggleSort}
+                  isDragDisabled={isDragDisabled}
                 />
               })}
               {provided.placeholder}
@@ -74,12 +76,14 @@ interface ColumnProps {
   col: DataColumn<any>
   sort: GroupSort
   toggleSort: ToggleSortFn
+  isDragDisabled: boolean
 }
 
-const ColumnEl: React.FC<ColumnProps> = ({ col, sort, colIndex, toggleSort }) => {
+const ColumnEl: React.FC<ColumnProps> = ({ col, sort, colIndex, toggleSort, isDragDisabled }) => {
   return <Draggable
     draggableId={'grp-' + col.key}
     index={colIndex}
+    isDragDisabled={isDragDisabled}
   >
     {(provided) => (
       <div
@@ -87,9 +91,10 @@ const ColumnEl: React.FC<ColumnProps> = ({ col, sort, colIndex, toggleSort }) =>
         {...provided.draggableProps}
         ref={provided.innerRef}
       >
-        <div className='column-drag' {...provided.dragHandleProps}>
+        {isDragDisabled && <div className='column-drag-placeholder' />}
+        {!isDragDisabled && <div className='column-drag' {...provided.dragHandleProps}>
           <FontAwesomeIcon icon={faGripVertical} fixedWidth />
-        </div>
+        </div>}
         <span className='column-header'>{col.header}</span>
         <button type='button' title={`Sort `} className='toggle-sort' onClick={() => toggleSort(colIndex)}>
           {sort.direction === 'asc' && <FontAwesomeIcon icon={faSortUp} className='sort-icon' fixedWidth />}

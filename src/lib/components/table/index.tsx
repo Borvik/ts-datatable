@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, useState, useEffect, useRef, useCallback } from 'react';
-import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData, QSGroupBy, GroupBy, ColumnSort } from './types';
+import ReactDOM from 'react-dom';
+import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData, QSGroupBy, GroupBy, ColumnSort, ColumnConfigurationWithGroup } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { useQueryState, batchedQSUpdate } from '../../utils/useQueryState';
 import { transformColumns, getFlattenedColumns, generateHeaderRows } from '../../utils/transformColumnProps';
@@ -46,7 +47,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
 
   const [columnOrder, setColumnOrder] = useLocalState<string[]>(`table.${props.id}.columnOrder`, [], [ props.id ]);
 
-  const [groupBy, setGroupBy] = useParsedQs<GroupBy, QSGroupBy>(
+  const [qsGroupBy, setGroupBy] = useParsedQs<GroupBy, QSGroupBy>(
     { group: props.defaultGroupBy ?? [] },
     (qsSort) => ({ // parse
       group: qsSort.group.map(v => {
@@ -76,6 +77,18 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     }
   );
 
+  const groupBy = canGroupBy
+    ? qsGroupBy.group
+    : [];
+
+  const setColumnConfig = useCallback((config: ColumnConfigurationWithGroup) => {
+    ReactDOM.unstable_batchedUpdates(() => {
+      setColumnVisibility(config.visibility);
+      setColumnOrder(config.columnOrder);
+      setGroupBy({ group: config.groupBy });
+    });
+  }, [setColumnVisibility, setColumnOrder, setGroupBy]);
+
   /**
    * Using a deep comparison get the memoized column data.
    * 
@@ -90,7 +103,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
    */
   const [columnData] = useDeepDerivedState(() => {
     // First Clean the columns - transforms "resolve | type" column properties
-    let visibleColumns = transformColumns(props.id, props.columns, columnVisibility, canGroupBy ? groupBy.group : []);
+    let visibleColumns = transformColumns(props.id, props.columns, columnVisibility, groupBy);
     let actualColumns = getFlattenedColumns(visibleColumns);
     let headerRows = generateHeaderRows(actualColumns, props.canReorderColumns ? columnOrder : []);
 
@@ -139,7 +152,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       hasEditor,
       primaryKeyCount,
     }
-  }, [ props.id, columnVisibility, props.columns, columnOrder, groupBy.group, props.canReorderColumns, canGroupBy ]);
+  }, [ props.id, columnVisibility, props.columns, columnOrder, groupBy, props.canReorderColumns, canGroupBy ]);
 
   const canEdit = typeof props.onSaveQuickEdit === 'function' && columnData.hasEditor && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
   const canSelectRows = !!props.canSelectRows && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
@@ -211,8 +224,8 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
   useDeepEffect(() => {
     async function getData() {
       let fullSort: ColumnSort[] = [
-        ...(canGroupBy ? groupBy.group : []),
-        ...columnSort.sort.filter(s => (!canGroupBy || !groupBy.group.find(g => g.column === s.column))),
+        ...groupBy,
+        ...columnSort.sort.filter(s => (!groupBy.length || !groupBy.find(g => g.column === s.column))),
       ];
 
       if (typeof props.onQueryChange === 'function') {
@@ -251,7 +264,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     setLoading(true);
     doSetSelectedRows({});
     getData();
-  }, [ pagination, searchQuery.query, filter, columnSort, groupBy.group, editCount, canGroupBy ]);
+  }, [ pagination, searchQuery.query, filter, columnSort, groupBy, editCount, canGroupBy ]);
 
   const Paginate = props.components?.Paginate ?? PageNav;
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
@@ -383,10 +396,10 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       ...columnData,
       canGroupBy,
       columnSorts:  [
-        ...(canGroupBy ? groupBy.group : []),
-        ...columnSort.sort.filter(s => (!canGroupBy || !groupBy.group.find(g => g.column === s.column))),
+        ...groupBy,
+        ...columnSort.sort.filter(s => (!groupBy.length || !groupBy.find(g => g.column === s.column))),
       ],
-      groupBy: canGroupBy ? groupBy.group : [],
+      groupBy: groupBy,
       multiColumnSorts: props.multiColumnSorts ?? false,
       filter,
       filterSettings: props.filterSettings,
@@ -397,9 +410,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       selectedRows,
       setFormData: setFormData,
       setFilter,
-      setColumnVisibility,
       setColumnSort,
-      setGroupBy,
       setAllSelected,
       setRowSelected,
       onShowColumnPicker: props.onShowColumnPicker,
@@ -410,7 +421,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       DetailRow: props.DetailRow,
       canRowShowDetail: props.canRowShowDetail,
       columnOrder,
-      setColumnOrder,
+      setColumnConfig,
       canReorderColumns: props.canReorderColumns ?? false,
       classNames: props.classNames,
       labels: props.labels,

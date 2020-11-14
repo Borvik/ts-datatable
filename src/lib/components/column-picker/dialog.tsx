@@ -1,5 +1,4 @@
 import React, { useContext, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
 import { Dialog, DialogHeader, DialogBody, DialogFooter } from '../dialog';
 import { ColumnContext } from '../table/contexts';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
@@ -16,10 +15,8 @@ export const ColumnPickerDialog: React.FC = () => {
   const dialogEl = useRef<HTMLDialogElement | null>(null);
   const {
     actualColumns,
-    setColumnVisibility,
     columnOrder,
-    setColumnOrder,
-    setGroupBy,
+    setColumnConfig,
     classNames,
     labels,
     groupBy,
@@ -73,10 +70,10 @@ export const ColumnPickerDialog: React.FC = () => {
   }
 
   return <Dialog dialogRef={dialogEl} onSubmit={async (close) => {
-    ReactDOM.unstable_batchedUpdates(() => {
-      setColumnVisibility(visible);
-      setColumnOrder(dialogOrder);
-      setGroupBy({group: dialogGroup});
+    setColumnConfig({
+      visibility: visible,
+      columnOrder: dialogOrder,
+      groupBy: dialogGroup,
     });
     close();
   }}>
@@ -223,6 +220,7 @@ export const ColumnPickerDialog: React.FC = () => {
           groupedDirections={dialogGroup}
           dragColumn={sourceDroppable}
           toggleSort={toggleSort}
+          isDragDisabled={false}
         />}
       </DragDropContext>
     </DialogBody>

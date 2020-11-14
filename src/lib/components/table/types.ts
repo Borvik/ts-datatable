@@ -176,8 +176,8 @@ export interface DataColumn<T> extends ResolvableColumnTypes, BaseColumnProps<T>
 export interface ColumnVisibilityStorage {
   [x: string]: boolean;
 }
-type SetColumnVisibilityCallback = (columnVisibility: ColumnVisibilityStorage) => void;
-export type OnShowColumnPicker = (columns: DataColumn<any>[], setColumnVisibility: SetColumnVisibilityCallback, btnElement: HTMLButtonElement) => void | Promise<void>;
+type SetColumnConfigCallback = (config: ColumnConfigurationWithGroup) => void;
+export type OnShowColumnPicker = (columns: DataColumn<any>[], setColumnConfig: SetColumnConfigCallback, btnElement: HTMLButtonElement) => void | Promise<void>;
 
 export type OnShowFilterEditor = (filter: QueryFilterGroup, applyFilter: (filter: QueryFilterGroup) => void, btnElement: HTMLButtonElement) => void | Promise<void>;
 
@@ -186,6 +186,15 @@ export type SetPaginationCb = (newState: Partial<{ page: number; perPage: number
 
 export type QuickEditFormData<T> = Record<PropertyKey, Partial<T>>;
 export type OnSaveQuickEdit<T> = (formData: QuickEditFormData<T>) => Promise<void>
+
+export interface ColumnConfiguration {
+  visibility: ColumnVisibilityStorage
+  columnOrder: string[]
+}
+
+export interface ColumnConfigurationWithGroup extends ColumnConfiguration {
+  groupBy: ColumnSort[]
+}
 
 export interface TableBodyProps {
   data: any[];
