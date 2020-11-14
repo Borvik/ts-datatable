@@ -28,10 +28,7 @@ export const GroupByList: React.FC<GroupByProps> = ({ isDragDisabled, dragColumn
   return (
     <Droppable
       droppableId='group-by'
-      // type=''
-      // ignoreContainerClipping={false} // true?
       isDropDisabled={!isSortable}
-      // isCombineEnabled={true} // false? not likely
     >
       {(provided, snapshot) => {
         let classNames: string[] = ['group-by-column-list']

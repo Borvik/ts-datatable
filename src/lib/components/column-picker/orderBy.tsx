@@ -24,18 +24,10 @@ export const OrderByList: React.FC<OrderByProps> = ({ currentGroupBy, dragColumn
   return (
     <Droppable
       droppableId={containerId}
-      // type=''
-      // ignoreContainerClipping={false} // true?
       isDropDisabled={isDropDisabled}
-      // isCombineEnabled={true} // false? not likely
-      
     >
       {(provided, snapshot) => {
         let classNames: string[] = ['config-column-list']
-
-        // if (snapshot.isDraggingOver) {
-        //   classNames.push('is-droppable');
-        // }
 
         if (!isDropDisabled && !!dragColumn) {
           classNames.push('is-droppable');

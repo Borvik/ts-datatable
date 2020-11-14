@@ -89,24 +89,9 @@ export const ColumnPickerDialog: React.FC = () => {
             sourceList: start.source.droppableId,
           });
         }}
-        // onDragUpdate
         onDragEnd={(result) => {
           setSourceDroppable(null);
-          /*
-            result: {
-              draggableId: // column.key
-              type: ''?
-              reason: 'DROP' | 'CANCEL'
-              source: {
-                droppableId: 'order-by' | 'group-by'
-                index: 0 // index in source list
-              }
-              destination: {
-                droppableId: 'order-by' | 'group-by'
-                index: 0 // index to place in new lsit
-              }
-            }
-          */
+          
           const { destination, source, reason } = result;
           if (reason === 'CANCEL' || !destination) return;
 
@@ -159,18 +144,6 @@ export const ColumnPickerDialog: React.FC = () => {
             let newSort: ColumnSort = {column: col.name!, direction: col.defaultSortDir};
             setGroup(update(dialogGroup, { $splice: [[destination.index, 0, newSort]] }));
           }
-          
-          /**
-           * Need complex logic
-           * 
-           * Fixed column, not dragged to main list or other fixed area
-           *  - but _can_ to Group By
-           * 
-           * Grouped Columns, only draggable to main list
-           *  - fixed items will auto gravitate to their area
-           * 
-           * Non-sortable items _cannot_ be grouped
-           */
         }}
       >
         <div className='ungrouped-columns'>
@@ -198,12 +171,6 @@ export const ColumnPickerDialog: React.FC = () => {
               sourceDroppable.sourceList !== 'order-by-main'
             }
           />
-          {/* <OrderByList 
-            containerId='order-by-main-copy'
-            sortedColumns={sortedColumns}
-            visibleColumns={visible}
-            setVisibleColumns={setVisible}
-          /> */}
           <OrderByList
             containerId='order-by-fixed-right'
             sortedColumns={fixedRightColumns}
