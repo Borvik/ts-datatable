@@ -41,6 +41,7 @@ export interface DataTableProperties<T> {
 
   multiColumnSorts?: boolean;
   defaultSort?: ColumnSort[];
+  defaultGroupBy?: ColumnSort[];
 
   qs?: QueryStateOptions;
 
@@ -72,11 +73,15 @@ export interface DataTableProperties<T> {
   DetailRow?: React.ElementType<{parentRow: T}>;
 
   canReorderColumns?: boolean
+  canGroupBy?: boolean
+  groupsExpandedByDefault?: boolean
 
   components?: CustomComponents
 
   classNames?: CustomClasses
   labels?: CustomLabels
+
+  suppressFixedWarning?: boolean
 }
 
 export interface CustomComponents {
@@ -161,6 +166,7 @@ export interface DataColumn<T> extends ResolvableColumnTypes, BaseColumnProps<T>
   rowSpan: number;
   colSpan: number;
   sortIndex: number;
+  isGrouped: boolean;
 }
 
 /**
@@ -170,8 +176,8 @@ export interface DataColumn<T> extends ResolvableColumnTypes, BaseColumnProps<T>
 export interface ColumnVisibilityStorage {
   [x: string]: boolean;
 }
-type SetColumnVisibilityCallback = (columnVisibility: ColumnVisibilityStorage) => void;
-export type OnShowColumnPicker = (columns: DataColumn<any>[], setColumnVisibility: SetColumnVisibilityCallback, btnElement: HTMLButtonElement) => void | Promise<void>;
+type SetColumnConfigCallback = (config: ColumnConfigurationWithGroup) => void;
+export type OnShowColumnPicker = (columns: DataColumn<any>[], setColumnConfig: SetColumnConfigCallback, btnElement: HTMLButtonElement) => void | Promise<void>;
 
 export type OnShowFilterEditor = (filter: QueryFilterGroup, applyFilter: (filter: QueryFilterGroup) => void, btnElement: HTMLButtonElement) => void | Promise<void>;
 
@@ -180,6 +186,15 @@ export type SetPaginationCb = (newState: Partial<{ page: number; perPage: number
 
 export type QuickEditFormData<T> = Record<PropertyKey, Partial<T>>;
 export type OnSaveQuickEdit<T> = (formData: QuickEditFormData<T>) => Promise<void>
+
+export interface ColumnConfiguration {
+  visibility: ColumnVisibilityStorage
+  columnOrder: string[]
+}
+
+export interface ColumnConfigurationWithGroup extends ColumnConfiguration {
+  groupBy: ColumnSort[]
+}
 
 export interface TableBodyProps {
   data: any[];
@@ -194,12 +209,59 @@ export interface ColumnSort {
   direction: 'asc' | 'desc';
 }
 
+export interface GroupSort {
+  column: string;
+  direction: 'asc' | 'desc' | null;
+}
+
 export interface ColumnSorts {
   sort: ColumnSort[];
 }
 
 export interface QSColumnSorts {
   sort: string[];
+}
+
+export interface GroupBy {
+  group: ColumnSort[];
+}
+
+export interface QSGroupBy {
+  group: string[];
+}
+
+export interface DataGroup {
+  key: string
+  level: number
+  column: string
+  value: any
+  children: DataGroup[] | DataRow[]
+}
+
+export interface DataRow {
+  key: string | number
+  rowIndex: number
+  row: any
+}
+
+export function isDataGroup(value?: DataGroup | DataRow | null): value is DataGroup {
+  if (!value) return false;
+  return (typeof (value as any).column === 'string');
+}
+
+export function isDataRow(value?: DataGroup | DataRow | null): value is DataRow {
+  if (!value) return false;
+  return (typeof (value as any).column === 'undefined');
+}
+
+export function isDataGroupArray(value?: DataGroup[] | DataRow[]): value is DataGroup[] {
+  if (!value?.length) return false;
+  return (typeof (value[0] as any).column === 'string');
+}
+
+export function isDataRowArray(value?: DataGroup[] | DataRow[]): value is DataRow[] {
+  if (!value?.length) return false;
+  return (typeof (value[0] as any).column === 'undefined');
 }
 
 /**

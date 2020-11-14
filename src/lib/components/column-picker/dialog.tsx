@@ -1,54 +1,28 @@
 import React, { useContext, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
 import { Dialog, DialogHeader, DialogBody, DialogFooter } from '../dialog';
 import { ColumnContext } from '../table/contexts';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye } from '@fortawesome/free-solid-svg-icons/faEye';
-import { faEyeSlash } from '@fortawesome/free-solid-svg-icons/faEyeSlash';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
-import { ColumnVisibilityStorage, DataColumn } from '../table/types';
-import { faGripVertical } from '@fortawesome/free-solid-svg-icons/faGripVertical';
-import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
+import { ColumnSort, ColumnVisibilityStorage, DataColumn } from '../table/types';
 import { update } from '../../utils/immutable';
+import { DragDropContext } from 'react-beautiful-dnd';
+import { OrderByList } from './orderBy';
+import { GroupByList } from './groupBy';
+import { ColumnDragSource } from './types';
+import { isset } from '../../utils/isset';
 
-const DragHandle = SortableHandle(() => (
-  <div className='column-drag'>
-    <FontAwesomeIcon icon={faGripVertical} fixedWidth />
-  </div>
-))
-
-interface ColumnProps {
-  col: DataColumn<any>
-  isVisible: boolean
-  toggleVisibility: () => void
-}
-
-const ColumnEl: React.FC<ColumnProps> = ({ col, isVisible, toggleVisibility }) => {
-  const { canReorderColumns } = useContext(ColumnContext);
-  return <div className='config-column'>
-    {canReorderColumns && <>
-      {!!col.fixed && <div className='column-drag-placeholder'></div>}
-      {!col.fixed && <DragHandle />}
-    </>}
-    <span className='column-header'>{col.header}</span>
-    {!!col.canToggleVisibility && <>
-      <button className='visibility-toggle' type='button' title='Toggle Visibility' onClick={() => toggleVisibility()}>
-        {isVisible && <FontAwesomeIcon icon={faEye} fixedWidth />}
-        {!isVisible && <FontAwesomeIcon icon={faEyeSlash} fixedWidth />}
-      </button>
-    </>}
-  </div>
-}
-
-const SortableColumn = SortableElement(((props) => <ColumnEl {...props} />) as React.FC<ColumnProps>);
-
-const SortableColumns = SortableContainer((({ children }) => {
-  return <div className='config-column-list'>{children}</div>;
-}) as React.FC)
 
 export const ColumnPickerDialog: React.FC = () => {
   const dialogEl = useRef<HTMLDialogElement | null>(null);
-  const { actualColumns, setColumnVisibility, columnOrder, setColumnOrder, classNames, labels } = useContext(ColumnContext);
+  const {
+    actualColumns,
+    columnOrder,
+    setColumnConfig,
+    classNames,
+    labels,
+    groupBy,
+    canGroupBy,
+  } = useContext(ColumnContext);
+
   const [visible, setVisible] = useDeepDerivedState<ColumnVisibilityStorage>((prev) => {
     let newVisible: ColumnVisibilityStorage = {};
     for (let col of actualColumns) {
@@ -58,7 +32,10 @@ export const ColumnPickerDialog: React.FC = () => {
   }, [ actualColumns ]);
 
   const [dialogOrder, setOrder] = useState(columnOrder);
+  const [dialogGroup, setGroup] = useState(groupBy);
+  const [sourceDroppable, setSourceDroppable] = useState<ColumnDragSource | null>(null);
 
+  const groupedColumns = dialogGroup.map(g => actualColumns.find(c => g.column === c.name)).filter(isset);
   const fixedColumns = actualColumns.filter(c => !!c.fixed);
   const fixedLeftColumns = fixedColumns.filter(c => c.fixed === 'left');
   const fixedRightColumns = fixedColumns.filter(c => c.fixed === 'right');
@@ -83,63 +60,136 @@ export const ColumnPickerDialog: React.FC = () => {
     btnApplyClass = `${classNames?.dialogButton ?? ''} ${classNames?.dialogApplyButton ?? ''}`.trim();
   }
 
+  function toggleSort(index: number) {
+    let sort = dialogGroup[index];
+    let col = actualColumns.find(c => c.name === sort.column);
+    let newSort: ColumnSort = sort.direction === null
+      ? { column: sort.column, direction: col?.defaultSortDir ?? 'asc' }
+      : { ...sort, direction: sort.direction === 'asc' ? 'desc' : 'asc' };
+    setGroup(update(dialogGroup, { [index]: { $set: newSort } }));
+  }
+
   return <Dialog dialogRef={dialogEl} onSubmit={async (close) => {
-    ReactDOM.unstable_batchedUpdates(() => {
-      setColumnVisibility(visible);
-      setColumnOrder(dialogOrder)
+    setColumnConfig({
+      visibility: visible,
+      columnOrder: dialogOrder,
+      groupBy: dialogGroup,
     });
     close();
   }}>
     <DialogHeader>
       {labels?.columns ?? 'Columns'}
     </DialogHeader>
-    <DialogBody>
-      {!!fixedLeftColumns.length && <div className='config-column-list'>
-        {fixedLeftColumns.map(col => {
-          const isVisible = visible[col.key];
-          return <ColumnEl
-            key={col.key}
-            col={col}
-            isVisible={isVisible}
-            toggleVisibility={() => setVisible(prev => ({ ...prev, [col.key]: !prev[col.key] }))}
-          />;
-        })}
-      </div>}
-      <SortableColumns
-        axis='y'
-        lockAxis='y'
-        useDragHandle={true}
-        helperContainer={() => dialogEl.current!}
-        onSortEnd={({ oldIndex, newIndex }) => {
-          let keys = sortedColumns.map(c => c.key);
-          let movingItem = keys[oldIndex];
-          keys.splice(oldIndex, 1);
-          keys.splice(newIndex, 0, movingItem);
-          setOrder(keys);
+    <DialogBody className='order-by-dialog-body'>
+      <DragDropContext
+        onDragStart={(start) => {
+          let column = actualColumns.find(c => c.key === start.draggableId)!;
+          setSourceDroppable({
+            column,
+            sourceList: start.source.droppableId,
+          });
+        }}
+        onDragEnd={(result) => {
+          setSourceDroppable(null);
+          
+          const { destination, source, reason } = result;
+          if (reason === 'CANCEL' || !destination) return;
+
+          if (destination.droppableId === source.droppableId && destination.index === source.index)
+            return;
+
+          if (destination.droppableId === source.droppableId) {
+            if (destination.droppableId === 'order-by-main') {
+              // drag/drop within main list
+              let keys = sortedColumns.map(c => c.key);
+              let movingItem = keys[source.index];
+              keys.splice(source.index, 1);
+              keys.splice(destination.index, 0, movingItem);
+              setOrder(keys);
+            } else if (destination.droppableId === 'group-by') {
+              // drag/drop within group list
+              let movingItem = dialogGroup[source.index];
+              setGroup(update(dialogGroup, {
+                $splice: [
+                  [source.index, 1],
+                  [destination.index, 0, movingItem]
+                ]
+              }));
+            }
+          }
+          else if (source.droppableId === 'group-by' && destination.droppableId === 'order-by-main') {
+            // moving from group-by to main column list
+            // remove from origin, add to main (if not fixed)
+            setGroup(update(dialogGroup, { $splice: [[source.index, 1]] }));
+          }
+          else if (destination.droppableId === 'group-by') {
+            // moving from A column list to group-by
+            let col: DataColumn<any> | null = null;
+            if (source.droppableId === 'order-by-fixed-left') {
+              col = fixedLeftColumns[source.index];
+            }
+            else if (source.droppableId === 'order-by-fixed-right') {
+              col = fixedRightColumns[source.index];
+            }
+            else if (source.droppableId === 'order-by-main') {
+              col = sortedColumns[source.index];
+            }
+
+            if (!col) {
+              console.warn('Unable to find source column!!!');
+              return;
+            }
+
+            // determine default sort
+            let newSort: ColumnSort = {column: col.name!, direction: col.defaultSortDir};
+            setGroup(update(dialogGroup, { $splice: [[destination.index, 0, newSort]] }));
+          }
         }}
       >
-        {sortedColumns.map((col, index) => {
-          const isVisible = visible[col.key];
-          return <SortableColumn
-            key={col.key}
-            index={index}
-            col={col}
-            isVisible={isVisible}
-            toggleVisibility={() => setVisible(prev => ({ ...prev, [col.key]: !prev[col.key] }))}
+        <div className='ungrouped-columns'>
+          <OrderByList
+            containerId='order-by-fixed-left'
+            sortedColumns={fixedLeftColumns}
+            visibleColumns={visible}
+            setVisibleColumns={setVisible}
+            dragColumn={sourceDroppable}
+            isDropDisabled={true}
+            isDragDisabled={!canGroupBy}
+            currentGroupBy={dialogGroup}
           />
-        })}
-      </SortableColumns>
-      {!!fixedRightColumns.length && <div className='config-column-list'>
-        {fixedRightColumns.map(col => {
-          const isVisible = visible[col.key];
-          return <ColumnEl
-            key={col.key}
-            col={col}
-            isVisible={isVisible}
-            toggleVisibility={() => setVisible(prev => ({ ...prev, [col.key]: !prev[col.key] }))}
-          />;
-        })}
-      </div>}
+          <OrderByList
+            containerId='order-by-main'
+            sortedColumns={sortedColumns}
+            visibleColumns={visible}
+            setVisibleColumns={setVisible}
+            dragColumn={sourceDroppable}
+            currentGroupBy={dialogGroup}
+            isDragDisabled={false}
+            isDropDisabled={
+              sourceDroppable !== null &&
+              sourceDroppable.sourceList !== 'group-by' &&
+              sourceDroppable.sourceList !== 'order-by-main'
+            }
+          />
+          <OrderByList
+            containerId='order-by-fixed-right'
+            sortedColumns={fixedRightColumns}
+            visibleColumns={visible}
+            setVisibleColumns={setVisible}
+            dragColumn={sourceDroppable}
+            isDropDisabled={true}
+            isDragDisabled={!canGroupBy}
+            currentGroupBy={dialogGroup}
+          />
+        </div>
+        {canGroupBy && <GroupByList
+          groupedColumns={groupedColumns}
+          groupedDirections={dialogGroup}
+          dragColumn={sourceDroppable}
+          toggleSort={toggleSort}
+          isDragDisabled={false}
+        />}
+      </DragDropContext>
     </DialogBody>
     <DialogFooter>
       <button type='button' className={btnCloseClass} onClick={() => {

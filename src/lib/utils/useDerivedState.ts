@@ -1,7 +1,7 @@
 // Adapted from: https://hackernoon.com/whats-the-right-way-to-fetch-data-in-react-hooks-a-deep-dive-2jc13230
 
 import { useState, useCallback, useDebugValue } from 'react';
-import { deepCompare, simpleCompare, ComparatorFn } from './comparators';
+import { deepCompare, simpleCompare, arrayCompare, ComparatorFn } from './comparators';
 
 export function useDeepDerivedState<State>(onDepChange: (prevState: State | null) => State, depList: any[]): [State, (newState: State | ((state: State) => State)) => void] {
   let value = useCommonDerivedState(onDepChange, depList, deepCompare);
@@ -11,6 +11,12 @@ export function useDeepDerivedState<State>(onDepChange: (prevState: State | null
 
 export function useDerivedState<State>(onDepChange: (prevState: State | null) => State, depList: any[]): [State, (newState: State | ((state: State) => State)) => void] {
   let value = useCommonDerivedState(onDepChange, depList, simpleCompare);
+  useDebugValue(value[0]);
+  return value;
+}
+
+export function useArrayDerivedState<State>(onDepChange: (prevState: State | null) => State, depList: any[][]): [State, (newState: State | ((state: State) => State)) => void] {
+  let value = useCommonDerivedState(onDepChange, depList, arrayCompare);
   useDebugValue(value[0]);
   return value;
 }

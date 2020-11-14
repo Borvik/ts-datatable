@@ -10,6 +10,8 @@
   max-height: 100%;
   box-sizing: border-box;
   padding-top: .25em;
+  --indent-width: .75em;
+  --indent: 0;
 
   .ts-datatable-wrapper {
     position: relative;
@@ -62,6 +64,44 @@
 
   .ts-datatable-table {
     border-collapse: collapse;
+    width: 100%;
+
+    .row-group {
+      text-align: left;
+      position: sticky;
+      background-clip: padding-box;
+      background-color: var(--ts-dt-fixed-bg, white);
+      z-index: 2;
+      left: 0;
+      height: 2em;
+
+      .row-group-container {
+        display: flex;
+        align-items: center;
+        height: 2em;
+        position: absolute;
+        left: calc(var(--indent) * var(--indent-width));
+        top: 0;
+        white-space: nowrap;
+
+        .mdr-button {
+          margin: 0;
+          padding: 0;
+          background: none;
+          border: none;
+          font-size: inherit;
+        }
+
+        .group-column-name {
+          margin-left: .25em;
+          margin-right: .25em;
+
+          &::after {
+            content: ':'
+          }
+        }
+      }
+    }
 
     th, td {
       &.row-selector {
@@ -88,15 +128,15 @@
           left: 0;
 
           &.mdr-control + .fixed-left {
-            left: 1.5em;
+            left: calc(var(--indent) * var(--indent-width) + 1.5em);
           }
 
           &.row-selector + .fixed-left {
-            left: var(--ts-selector-width, 25px); // unknown
+            left: calc(var(--indent) * var(--indent-width) + var(--ts-selector-width, 25px));
           }
 
           &.mdr-control + .row-selector + .fixed-left {
-            left: calc(1.5em + var(--ts-selector-width, 25px)); // unknown
+            left: calc(var(--indent) * var(--indent-width) + 1.5em + var(--ts-selector-width, 25px));
           }
         }
 
@@ -123,6 +163,20 @@
         border: none;
         font-size: inherit;
         top: calc(50% - .5em);
+      }
+    }
+
+    th, td {
+      &:first-child {
+        padding-left: calc(var(--indent) * var(--indent-width));
+
+        &.mdr-control {
+          padding-left: calc(var(--indent) * var(--indent-width) + 1.25em);
+
+          > .mdr-button {
+            left: calc(var(--indent) * var(--indent-width));
+          }
+        }
       }
     }
   }

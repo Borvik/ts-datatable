@@ -1,7 +1,6 @@
 import { createContext } from 'react';
 import {
   DataColumn,
-  ColumnVisibilityStorage,
   ColumnSorts,
   ColumnSort,
   OnShowColumnPicker,
@@ -14,6 +13,7 @@ import {
   SetFilterCb,
   SetPaginationCb,
   OnShowFilterEditor,
+  ColumnConfigurationWithGroup,
 } from './types';
 import { FilterSettings } from '../filter/types';
 
@@ -21,6 +21,7 @@ interface ColumnContextInterface<T> {
   actualColumns: DataColumn<T>[]; // the flat list of columns (lowest level)
   headerRows: DataColumn<T>[][];
   columnSorts: ColumnSort[];
+  groupBy: ColumnSort[]
   filter: QueryFilterGroup,
   filterSettings?: FilterSettings,
   multiColumnSorts: boolean;
@@ -28,9 +29,9 @@ interface ColumnContextInterface<T> {
   isSavingQuickEdit: boolean;
   editData: EditFormData;
   canSelectRows: boolean;
+  canGroupBy: boolean;
   selectedRows: Record<string | number, T>;
   setFormData: React.Dispatch<React.SetStateAction<EditFormData>>;
-  setColumnVisibility: (newState: (ColumnVisibilityStorage | ((state: ColumnVisibilityStorage) => ColumnVisibilityStorage))) => void;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
   setAllSelected: (selectAll: boolean) => void;
   setRowSelected: (row: T, rowIndex: number) => void;
@@ -43,18 +44,20 @@ interface ColumnContextInterface<T> {
   DetailRow?: React.ElementType<{parentRow: T}>
   canRowShowDetail?: (row: T) => boolean
   columnOrder: string[]
-  setColumnOrder: (newState: string[] | ((state: string[]) => string[])) => void
+  setColumnConfig: (config: ColumnConfigurationWithGroup) => void
   canReorderColumns: boolean
   canSelectRow?: (row: T) => boolean;
   classNames?: CustomClasses
   labels?: CustomLabels
   components?: CustomComponents
+  groupsExpandedByDefault: boolean
 }
 
 export const ColumnContext = createContext<ColumnContextInterface<any>>({
   actualColumns: [],
   headerRows: [],
   columnSorts: [],
+  groupBy: [],
   filter: {groupOperator: 'and', filters: []},
   multiColumnSorts: false,
   isEditing: false,
@@ -63,7 +66,6 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   canSelectRows: false,
   selectedRows: {},
   setFormData: () => {},
-  setColumnVisibility: () => {},
   setColumnSort: () => {},
   setAllSelected: () => {},
   setRowSelected: () => {},
@@ -71,6 +73,18 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   setPagination: () => {},
   onSaveQuickEdit: async () => {},
   columnOrder: [],
-  setColumnOrder: () => {},
+  setColumnConfig: () => {},
   canReorderColumns: false,
+  canGroupBy: false,
+  groupsExpandedByDefault: true,
+});
+
+interface GroupCollapseContextInterface {
+  setExpanded: (groupKey: string, expanded: boolean) => void
+  collapsedState: Record<string, boolean>
+}
+
+export const GroupCollapseContext = createContext<GroupCollapseContextInterface>({
+  setExpanded: () => {},
+  collapsedState: {}
 });

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { EditorProps, getValue } from './types';
-import { isset } from './isEmpty';
+import { isset } from '../../../../utils/isset';
 import { setValue } from './setValue';
 
 

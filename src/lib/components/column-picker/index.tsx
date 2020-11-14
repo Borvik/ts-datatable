@@ -9,7 +9,7 @@ export const ColumnPickerButton: React.FC = (props) => {
   const { dialog, showDialog } = useDialog(<ColumnPickerDialog />);
   const {
     actualColumns,
-    setColumnVisibility,
+    setColumnConfig,
     onShowColumnPicker,
     classNames,
     labels,
@@ -19,7 +19,7 @@ export const ColumnPickerButton: React.FC = (props) => {
   async function onButtonClick(e: React.MouseEvent<HTMLButtonElement>) {
     try {
       if (onShowColumnPicker) {
-        await onShowColumnPicker(actualColumns, setColumnVisibility, e.currentTarget);
+        await onShowColumnPicker(actualColumns, setColumnConfig, e.currentTarget);
       } else {
         await showDialog()
       }

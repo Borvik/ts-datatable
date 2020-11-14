@@ -7,7 +7,7 @@ import set from 'lodash/set';
 import { isEqual } from './isEqual';
 import { useDeepDerivedState } from './useDerivedState';
 import { QueryString } from './querystring';
-import { isset } from '../components/filter/editor/value-editors/isEmpty';
+import { isset } from './isset';
 
 const VALID_TYPES: string[] = ["any", "string", "number", "bigint", "boolean", "string[]", "number[]", "bigint[]", "boolean[]"];
 type typeofResult = "any" | "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function";
@@ -119,7 +119,8 @@ export function convertQsValue(value: any, toType: typeofWithArrays) {
   }
 
   if (toType === 'string[]') {
-    if (!value) return undefined;
+    if (typeof value === 'undefined' || value === null)
+      return undefined;
     if (Array.isArray(value))
       return value;
     if (typeof value !== 'string')

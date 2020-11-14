@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { doSetColumnSort } from '../../utils/setColumnSort';
 import { RowSelector } from '../row-selector';
 import { ColumnContext } from './contexts';
 import { HeaderSort } from './sortable';
@@ -17,12 +18,14 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
     setColumnSort,
     DetailRow,
     canSelectRows,
+    groupBy,
   } = useContext(ColumnContext);
 
   if (headerRows.length < 1) return null;
 
   let hasDetailRenderer = (!!DetailRow);
 
+  let indentStyle: any = {'--indent': groupBy.length};
   return (
     <thead ref={props.headRef}>
       {headerRows.map((row, rowIdx) => (
@@ -39,33 +42,14 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
                 ? {...sort, direction: sort.direction === 'asc' ? 'desc' : 'asc' }
                 : {column: col.name!, direction: col.defaultSortDir};
 
-              if (multiColumnSorts && e.shiftKey) {
-                if (sort) {
-                  setColumnSort(state => ({
-                    sort: state.sort.map(s => {
-                      if (sort.column === s.column)
-                        return newSort;
-                      return s;
-                    })
-                  }));
-                } else {
-                  setColumnSort(state => ({
-                    sort: [
-                      ...state.sort,
-                      newSort
-                    ]
-                  }));
-                }
-              } else {
-                setColumnSort({ sort: [ newSort ] });
-              }
+              doSetColumnSort(setColumnSort, newSort, e.shiftKey, multiColumnSorts);
             }
 
             return (<React.Fragment key={`row-key-${colIdx}`}>
               {(colIdx === 0 && rowIdx === 0) && <>
-                {hasDetailRenderer && <th scope='col' key='mdr' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'>
+                {hasDetailRenderer && <th scope='col' style={indentStyle} key='mdr' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'>
                 </th>}
-                {canSelectRows && <th scope='col' key='sel' rowSpan={headerRows.length} className='fixed fixed-left row-selector'>
+                {canSelectRows && <th scope='col' style={indentStyle} key='sel' rowSpan={headerRows.length} className='fixed fixed-left row-selector'>
                   <RowSelector
                     row={null}
                     rowIndex={-1}
@@ -73,7 +57,7 @@ export const TableHeader: React.FC<HeadProps> = (props) => {
                   />
                 </th>}
               </>}
-              <th key={colIdx} className={`${col.className ?? ''} ${col.fixed ? `fixed fixed-${col.fixed}` : ''}`.trim()} colSpan={col.colSpan > 1 ? col.colSpan : undefined} rowSpan={col.rowSpan > 1 ? col.rowSpan : undefined} scope={colScope}>
+              <th key={colIdx} style={colIdx === 0 ? indentStyle : undefined} className={`${col.className ?? ''} ${col.fixed ? `fixed fixed-${col.fixed}` : ''}`.trim()} colSpan={col.colSpan > 1 ? col.colSpan : undefined} rowSpan={col.rowSpan > 1 ? col.rowSpan : undefined} scope={colScope}>
                 <span className={`ts-datatable-header-cell ${isSortable ? 'sortable' : ''}`.trim()} onClick={isSortable ? onClick : undefined} onMouseDown={isSortable ? (e) => { if (e.shiftKey) { e.preventDefault() } } : undefined}>
                   <span className='ts-datatable-header-content'>{col.header}</span>
                   <HeaderSort column={col} sort={sort} />

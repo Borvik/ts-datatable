@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { EditorProps, getValue } from './types';
 import { setValue } from './setValue';
-import { isset, isEmpty } from './isEmpty';
+import { isEmpty } from '../../../../utils/isEmpty';
+import { isset } from '../../../../utils/isset';
 import { CustomColumnFilter } from '../../../table/types';
 
 interface CustomEditorProps extends EditorProps {

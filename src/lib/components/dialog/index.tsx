@@ -112,11 +112,12 @@ export const Dialog: React.FC<DialogProps> = ({ className, style, onSubmit, chil
 
 interface HeaderProps {
   showClose?: boolean;
+  className?: string
 }
 
-export const DialogHeader: React.FC<HeaderProps> = ({ showClose = true, children }) => {
+export const DialogHeader: React.FC<HeaderProps> = ({ className, showClose = true, children }) => {
   const { dialog: dialogEl } = useContext(DialogContext);
-  return <div className='dialog-header'>
+  return <div className={`dialog-header ${className ?? ''}`.trim()}>
     <div>
       {children}
     </div>
@@ -128,14 +129,22 @@ export const DialogHeader: React.FC<HeaderProps> = ({ showClose = true, children
   </div>
 };
 
-export const DialogBody: React.FC = ({ children }) => {
-  return <div className='dialog-body'>
+interface BodyProps {
+  className?: string
+}
+
+export const DialogBody: React.FC<BodyProps> = ({ className, children }) => {
+  return <div className={`dialog-body ${className ?? ''}`.trim()}>
     {children}
   </div>
 };
 
-export const DialogFooter: React.FC = ({ children }) => {
-  return <div className='dialog-footer'>
+interface FooterProps {
+  className?: string
+}
+
+export const DialogFooter: React.FC<FooterProps> = ({ className, children }) => {
+  return <div className={`dialog-footer ${className ?? ''}`.trim()}>
     {children}
   </div>
 };
