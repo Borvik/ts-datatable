@@ -6,11 +6,11 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
 import { ColumnContext } from '../table/contexts';
 
 export const SearchForm: React.FC<SearchProps> = (props) => {
-  const { isEditing, labels } = useContext(ColumnContext);
+  const { isEditing, editMode, labels } = useContext(ColumnContext);
   const [searchQuery, setSearchQuery] = useDerivedState(() => props.searchQuery, [props.searchQuery]);
 
   return (
-    <form className='ts-datatable-search-form' onSubmit={ isEditing ? undefined : (e) => {
+    <form className='ts-datatable-search-form' onSubmit={ isEditing && editMode === 'default' ? undefined : (e) => {
       e.preventDefault();
       e.stopPropagation();
       
@@ -20,10 +20,10 @@ export const SearchForm: React.FC<SearchProps> = (props) => {
         type='search'
         value={searchQuery}
         placeholder={labels?.search ?? 'Search'}
-        disabled={isEditing}
+        disabled={isEditing && editMode === 'default'}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      <button type='submit' title={labels?.search ?? 'Search'} disabled={isEditing}>
+      <button type='submit' title={labels?.search ?? 'Search'} disabled={isEditing && editMode === 'default'}>
         <FontAwesomeIcon icon={faSearch} />
       </button>
     </form>

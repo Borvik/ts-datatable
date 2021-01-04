@@ -1,5 +1,5 @@
 import React from "react";
-import { CustomEditorProps, CustomFilterEditorProps } from "../lib";
+import { CustomEditorProps, CustomFilterEditorProps, EditorWrapperProps } from "../lib";
 import { Pokemon, query } from "./db";
 
 interface DBPokemonType {
@@ -48,12 +48,24 @@ export class CustomTypeColumnEditor extends React.Component<CustomEditorProps<Po
   render() {
     // don't warn on unused row/column
     // eslint-disable-next-line
-    const { value, setValue, row, column } = this.props;
+    const { value, setValue, row, column, editMode, autoSave } = this.props;
     const { options } = this.state;
     
-    return <select value={value} onChange={(e) => setValue(e.target.value)}>
+    return <select value={value} onChange={(e) => setValue(e.target.value)} onBlur={editMode === 'autosave' ? autoSave : undefined}>
       <option></option>
       {options.map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
     </select>
+  }
+}
+
+export class CustomInputWrapper extends React.Component<EditorWrapperProps<Pokemon>> {
+  
+  render() {
+    const { value, children } = this.props;
+    
+    return <>
+      <div>{children}</div>
+      <div>{value}</div>
+    </>
   }
 }

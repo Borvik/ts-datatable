@@ -13,6 +13,7 @@ interface ButtonProps {
 export const TableEditorButton: React.FC<ButtonProps> = ({ setEditing, canEdit }) => {
   const {
     isEditing,
+    editMode,
     setFormData,
     onSaveQuickEdit,
     editData,
@@ -21,7 +22,9 @@ export const TableEditorButton: React.FC<ButtonProps> = ({ setEditing, canEdit }
     labels,
   } = useContext(ColumnContext);
 
-  if (!isEditing) {
+  if (editMode === 'autosave') return null;
+
+  if (!isEditing && editMode === 'default') {
     if (canEdit) {
       let btnEditClass: string | undefined;
       if (classNames?.actionButton || classNames?.actionButtonEdit)

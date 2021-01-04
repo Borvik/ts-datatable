@@ -33,6 +33,15 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
+### `yarn build:dev`
+
+Same as `yarn build`, but uses webpack in development mode.
+
+### `yarn build:test`
+
+Specifically designed to do a development build (`yarn build:dev`), and
+prep the environment to be tested as an external library using `npm link`.
+
 ### `yarn eject`
 
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**

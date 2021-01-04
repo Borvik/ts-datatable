@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataColumnProp } from "../lib";
-import { CustomTypeColumnEditor, CustomTypeSelectEditor } from "./custom-editors";
+import { CustomInputWrapper, CustomTypeColumnEditor, CustomTypeSelectEditor } from "./custom-editors";
 import { Pokemon } from "./db";
 
 export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
@@ -36,6 +36,7 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     header: 'Name',
     accessor: 'name',
     editor: { type: 'text' },
+    EditorWrapper: CustomInputWrapper,
     canEdit: (row) => row.id !== 3,
     filter: {
       type: 'string',

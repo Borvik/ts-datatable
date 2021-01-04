@@ -8,6 +8,7 @@ export function FullFeaturedExample() {
   
   return <DataTable<Pokemon>
     id='pokemon'
+    editMode='autosave'
     filterSettings={{
       allowOr: true,
       allowNested: true,

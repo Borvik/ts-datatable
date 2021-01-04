@@ -60,6 +60,7 @@ export interface DataTableProperties<T> {
   onShowFilterEditor?: OnShowFilterEditor;
   onSaveQuickEdit?: OnSaveQuickEdit<T>;
   quickEditPosition?: 'top' | 'bottom' | 'both';
+  editMode?: EditModes;
 
   tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
@@ -83,6 +84,8 @@ export interface DataTableProperties<T> {
 
   suppressFixedWarning?: boolean
 }
+
+export type EditModes = 'default' | 'show' | 'autosave';
 
 export interface CustomComponents {
   Paginate?: React.ElementType<PaginateRequiredProps>;
@@ -150,6 +153,7 @@ interface BaseColumnProps<T> {
   filter?: ColumnFilter; // defines the filter capabilities
   editor?: ColumnEditor<T>;
   canEdit?: (row: T, column: DataColumn<T>) => boolean;
+  EditorWrapper?: React.ElementType<EditorWrapperProps<T>>
 }
 
 /** Provides definition for columns as they are to be passed in */
@@ -413,8 +417,18 @@ export interface CustomEditorProps<T> {
   row: T;
   column: DataColumn<T>;
   setValue: (newValue: any) => void;
+  originalValue: any;
+  autoSave: () => void;
+  editMode: EditModes;
 }
 
 type ColumnEditor<T> = BasicColumnEditor | CustomColumnEditor<T>;
 
 export type InputType = 'text' | 'email' | 'date' | 'datetime-local' | 'month' | 'number' | 'range' | 'search' | 'tel' | 'url' | 'week' | 'password' | 'datetime' | 'time' | 'color';
+
+export interface EditorWrapperProps<T> {
+  value: any;
+  rawValue: any;
+  row: T;
+  column: DataColumn<T>;
+}

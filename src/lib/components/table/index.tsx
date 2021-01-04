@@ -263,6 +263,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
 
     setLoading(true);
     doSetSelectedRows({});
+    // TODO: clear edit data (on filter/page/search)?
     getData();
   }, [ pagination, searchQuery.query, filter, columnSort, groupBy, editCount, canGroupBy ]);
 
@@ -334,6 +335,8 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
         setSaving(true)
         await propOnSave(data);
         setFormData({});
+        // prop to allow _not_ requerying on change
+        // allows something graphql _cache_ update to auto-update data in list
         setEditCount(c => c + 1);
       }
       setEditing(false);
@@ -406,6 +409,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       isEditing,
       isSavingQuickEdit,
       editData: editFormData,
+      editMode: props.editMode ?? 'default',
       canSelectRows,
       selectedRows,
       setFormData: setFormData,

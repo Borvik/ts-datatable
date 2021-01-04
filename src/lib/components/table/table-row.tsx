@@ -20,12 +20,13 @@ export const TableRow: React.FC<TableRowProps> = ({ row, group, ...props }) => {
   const {
     actualColumns: columns,
     isEditing,
+    editMode,
     DetailRow,
     canRowShowDetail,
     canSelectRows,
   } = useContext(ColumnContext);
 
-  let canEditRow = isEditing;
+  let canEditRow = (isEditing || editMode !== 'default');
   if (canEditRow && typeof props.canEditRow === 'function')
     canEditRow = props.canEditRow(row);
 
@@ -58,13 +59,22 @@ export const TableRow: React.FC<TableRowProps> = ({ row, group, ...props }) => {
 
         let rendered: any = null;
 
-        if (isEditing && col.editor) {
+        if ((isEditing || editMode !== 'default') && col.editor) {
           let canEdit: boolean = canEditRow;
           if (canEditRow && typeof col.canEdit === 'function')
             canEdit = col.canEdit(row, col);
 
-          if (canEdit)
-            rendered = <CellEditor column={col} value={value} row={row} />
+          if (canEdit) {
+            rendered = <CellEditor column={col} value={value} row={row} />;
+            if (col.EditorWrapper) {
+              let renderValue = typeof col.render !== 'undefined'
+                ? col.render(value, row, col)
+                : value;
+
+              const Wrapper = col.EditorWrapper;
+              rendered = <Wrapper value={renderValue} rawValue={value} row={row} column={col}>{rendered}</Wrapper>;
+            }
+          }
         }
 
         if (rendered === null) {

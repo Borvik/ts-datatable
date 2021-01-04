@@ -179,7 +179,7 @@ export async function onQueryChange({ pagination, search, sorts, filters }: Data
         total: countResult[0].total,
         loading: false,
       });
-      resolve();
+      resolve(0);
     }, 750)
   })
 }

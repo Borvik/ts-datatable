@@ -6,7 +6,14 @@ import { update } from '../../../utils/immutable';
 import get from 'lodash/get';
 
 export const BooleanEditor: React.FC<EditorProps> = ({row, column, value}) => {
-  const { actualColumns: columns, editData, setFormData, getRowKey } = useContext(ColumnContext);
+  const {
+    actualColumns: columns,
+    editData,
+    setFormData,
+    getRowKey,
+    editMode,
+    onSaveQuickEdit,
+  } = useContext(ColumnContext);
 
   // yes we should be able to count on this
   // earlier validation assures editing only if either
@@ -22,11 +29,15 @@ export const BooleanEditor: React.FC<EditorProps> = ({row, column, value}) => {
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     let fieldValue: any = e.target.checked;
 
-    setFormData(form => update(form, {
-      [keyValue]: { $auto: {
-        [column.key]: { $set: fieldValue }
-      } }
-    }));
+    if (editMode === 'autosave') {
+      onSaveQuickEdit({ [column.key]: fieldValue });
+    } else {
+      setFormData(form => update(form, {
+        [keyValue]: { $auto: {
+          [column.key]: { $set: fieldValue }
+        } }
+      }));
+    }
   }
 
   return <input type='checkbox' checked={actualValue} onChange={onChange} />;

@@ -7,7 +7,14 @@ import { update } from '../../../utils/immutable';
 import get from 'lodash/get';
 
 export const CustomEditor: React.FC<EditorProps> = ({row, column, value}) => {
-  const { actualColumns: columns, editData, setFormData, getRowKey } = useContext(ColumnContext);
+  const {
+    actualColumns: columns,
+    editData,
+    setFormData,
+    getRowKey,
+    editMode,
+    onSaveQuickEdit,
+  } = useContext(ColumnContext);
   const Editor = (column.editor as CustomColumnEditor<any>).Editor;
 
   // yes we should be able to count on this
@@ -29,10 +36,18 @@ export const CustomEditor: React.FC<EditorProps> = ({row, column, value}) => {
     }));
   }
 
+  function autoSave() {
+    if (Object.keys(editData).length)
+      onSaveQuickEdit(editData as any);
+  }
+
   return <Editor
     value={actualValue}
+    originalValue={value}
     row={row}
     column={column}
     setValue={onChange}
+    autoSave={autoSave}
+    editMode={editMode}
   />;
 }

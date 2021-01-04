@@ -9,6 +9,7 @@ export type {
   CustomEditorProps,
   DataProps,
   DataColumnProp,
+  EditorWrapperProps,
 } from './components/table/types';
 export type {
   TableActionButtonsProps
