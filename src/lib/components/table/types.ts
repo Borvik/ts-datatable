@@ -236,6 +236,7 @@ export interface DataGroup {
   column: string
   value: any
   children: DataGroup[] | DataRow[]
+  firstRow: any
 }
 
 export interface DataRow {

@@ -39,7 +39,7 @@ export const TableGroup: React.FC<TableGroupProps> = ({ group, canEditRow }) => 
           </button>
           <div className='group-column-name'>{groupColumn.header}</div>
           <div className='group-column-value'>
-            {typeof groupColumn.render !== 'undefined' ? groupColumn.render(group.value, null, groupColumn) : group.value}
+            {typeof groupColumn.render !== 'undefined' ? groupColumn.render(group.value, group.firstRow, groupColumn) : group.value}
           </div>
         </div>
       </th>

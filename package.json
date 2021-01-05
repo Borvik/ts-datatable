@@ -1,13 +1,10 @@
 {
   "name": "@borvik/ts-datatable",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "license": "MIT",
   "repository": "github:Borvik/ts-datatable",
   "bugs": {
     "url": "https://github.com/Borvik/ts-datatable/issues"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
   },
   "main": "dist/index.js",
   "module": "dist/index.js",

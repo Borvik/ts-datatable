@@ -48,6 +48,7 @@ export const TableBody: React.FC<TableBodyProps> = ({ data, loading, canEditRow,
             column: grp.column,
             value: grp.value,
             children: [],
+            firstRow: data[i],
           };
           grpContainer.push(dgrp);
         }
