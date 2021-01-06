@@ -143,6 +143,7 @@ interface BaseColumnProps<T> {
   key: string;
   isPrimaryKey?: boolean;
   render?: (value: any, row: T, column: DataColumn<T>) => ReactRenderable;
+  renderGroup?: (value: any, group: DataGroup<T>, column: DataColumn<T>) => ReactRenderable;
   accessor?: string | number;
   getValue?: (row: T, column: DataColumn<T>) => any;
   className?: string;
@@ -230,13 +231,13 @@ export interface QSGroupBy {
   group: string[];
 }
 
-export interface DataGroup {
+export interface DataGroup<T> {
   key: string
   level: number
   column: string
   value: any
-  children: DataGroup[] | DataRow[]
-  firstRow: any
+  children: DataGroup<T>[] | DataRow[]
+  firstRow: T
 }
 
 export interface DataRow {
@@ -245,22 +246,22 @@ export interface DataRow {
   row: any
 }
 
-export function isDataGroup(value?: DataGroup | DataRow | null): value is DataGroup {
+export function isDataGroup<T>(value?: DataGroup<T> | DataRow | null): value is DataGroup<T> {
   if (!value) return false;
   return (typeof (value as any).column === 'string');
 }
 
-export function isDataRow(value?: DataGroup | DataRow | null): value is DataRow {
+export function isDataRow<T>(value?: DataGroup<T> | DataRow | null): value is DataRow {
   if (!value) return false;
   return (typeof (value as any).column === 'undefined');
 }
 
-export function isDataGroupArray(value?: DataGroup[] | DataRow[]): value is DataGroup[] {
+export function isDataGroupArray<T>(value?: DataGroup<T>[] | DataRow[]): value is DataGroup<T>[] {
   if (!value?.length) return false;
   return (typeof (value[0] as any).column === 'string');
 }
 
-export function isDataRowArray(value?: DataGroup[] | DataRow[]): value is DataRow[] {
+export function isDataRowArray<T>(value?: DataGroup<T>[] | DataRow[]): value is DataRow[] {
   if (!value?.length) return false;
   return (typeof (value[0] as any).column === 'undefined');
 }

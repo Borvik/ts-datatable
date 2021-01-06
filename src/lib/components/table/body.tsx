@@ -10,7 +10,7 @@ import { getGroupKey, getGroupKeys, GroupKey } from '../../utils/getGroupKey';
 import { TableGroup } from './table-group';
 import { update } from '../../utils/immutable';
 
-export const TableBody: React.FC<TableBodyProps> = ({ data, loading, canEditRow, LoadingComponent, ...props }) => {
+export const TableBody = function<T>({ data, loading, canEditRow, LoadingComponent, ...props }: TableBodyProps) {
   const { actualColumns: columns, groupBy } = useContext(ColumnContext);
   const tbodyRef = useRef<HTMLTableSectionElement>(null);
 
@@ -23,20 +23,20 @@ export const TableBody: React.FC<TableBodyProps> = ({ data, loading, canEditRow,
       }));
     }
 
-    let nestedGroups: DataGroup[] = [];
+    let nestedGroups: DataGroup<T>[] = [];
     for (let i = 0; i < data.length; i++) {
       // get group values as a array
       let groupValues = getGroupKeys(data[i], groupBy, columns);
 
       let currentGroup: GroupKey[] = [],
           currentGroupKey: string,
-          lastGroup: DataGroup | null = null;
+          lastGroup: DataGroup<T> | null = null;
       while (groupValues.length) {
         let grp = groupValues.shift()!;
         currentGroup.push(grp);
         currentGroupKey = getGroupKey(currentGroup);
 
-        let grpContainer: DataGroup[] = (lastGroup?.children as DataGroup[] | undefined) ?? nestedGroups;
+        let grpContainer: DataGroup<T>[] = (lastGroup?.children as DataGroup<T>[] | undefined) ?? nestedGroups;
         
         // eslint (no-loop-func)
         // eslint-disable-next-line

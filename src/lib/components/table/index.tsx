@@ -168,6 +168,13 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     ...props.qs
   });
 
+  const [rawFilter, setRawFilter] = useQueryState<{filter?: any}>({}, {
+    ...props.qs,
+    properties: {
+      filter: 'any'
+    }
+  });
+
   const [filter, setFilter] = useParsedQs<QueryFilterGroup, {filter?: any}>(
     { groupOperator: 'and', filters: [] },
     (qsFilter) => convertFromQS(qsFilter, columnData.actualColumns),
@@ -434,9 +441,16 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
           <div className='ts-datatable-search-filters'>
             {!hideSearchForm && <SearchForm
               searchQuery={searchQuery.query}
+              filter={rawFilter.filter}
               onSearch={(query) => {
                 batchedQSUpdate(() => {
                   setSearchQuery({ query });
+                  setPagination({ page: 1 });
+                });
+              }}
+              applyFilter={(newFilter) => {
+                batchedQSUpdate(() => {
+                  setRawFilter({ filter: newFilter });
                   setPagination({ page: 1 });
                 });
               }}
