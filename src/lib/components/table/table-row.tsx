@@ -8,14 +8,14 @@ import { faChevronDown } from '@fortawesome/free-solid-svg-icons/faChevronDown';
 import { RowSelector } from '../row-selector';
 import { DataGroup } from './types';
 
-interface TableRowProps {
+interface TableRowProps<T> {
   row: any;
   rowIndex: number;
   canEditRow?: (row: any) => boolean;
-  group?: DataGroup
+  group?: DataGroup<T>
 }
 
-export const TableRow: React.FC<TableRowProps> = ({ row, group, ...props }) => {
+export const TableRow = function<T>({ row, group, ...props }: TableRowProps<T>) {
   const [ isExpanded, setExpanded ] = useState(false);
   const {
     actualColumns: columns,

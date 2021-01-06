@@ -38,6 +38,7 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
     let transformedColumn: DataColumn<T> = {
       key,
       render: column.render,
+      renderGroup: column.renderGroup,
       accessor: column.accessor,
       getValue: column.getValue,
       className: column.className,

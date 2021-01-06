@@ -6,12 +6,12 @@ import { DataGroup, isDataGroupArray, isDataRowArray } from './types';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons/faChevronDown';
 
-interface TableGroupProps {
-  group: DataGroup
+interface TableGroupProps<T> {
+  group: DataGroup<T>
   canEditRow?: (row: any) => boolean
 }
 
-export const TableGroup: React.FC<TableGroupProps> = ({ group, canEditRow }) => {
+export const TableGroup = function<T> ({ group, canEditRow }: TableGroupProps<T>) {
   const {
     actualColumns: columns,
     canSelectRows,
@@ -30,6 +30,18 @@ export const TableGroup: React.FC<TableGroupProps> = ({ group, canEditRow }) => 
   let groupColumn = columns.find(c => c.name === group.column);
 
   let groupStyle: any = {'--indent': group.level - 1};
+  let rendered: any = null;
+
+  if (typeof groupColumn?.renderGroup === 'function') {
+    rendered = groupColumn.renderGroup(group.value, group, groupColumn);
+  }
+  else if (typeof groupColumn?.render === 'function') {
+    rendered = groupColumn.render(group.value, group.firstRow, groupColumn);
+  }
+  else {
+    rendered = group.value;
+  }
+
   return <>
     {!!groupColumn && <tr style={groupStyle}>
       <th className='row-group'>
@@ -39,7 +51,7 @@ export const TableGroup: React.FC<TableGroupProps> = ({ group, canEditRow }) => 
           </button>
           <div className='group-column-name'>{groupColumn.header}</div>
           <div className='group-column-value'>
-            {typeof groupColumn.render !== 'undefined' ? groupColumn.render(group.value, group.firstRow, groupColumn) : group.value}
+            {rendered}
           </div>
         </div>
       </th>
