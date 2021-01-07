@@ -35,6 +35,7 @@ export type DataFn<T> = (props: DataProps, cb: DataFnCb<T>) => DataFnResultUnion
 export interface DataTableProperties<T> {
   id: string;
   columns: Partial<DataColumnProp<T>>[];
+  filters?: ColumnFilter[];
   data: DataFn<T[]> | T[];
   totalCount?: number;
   isLoading?: boolean;
@@ -148,7 +149,7 @@ interface BaseColumnProps<T> {
   getValue?: (row: T, column: DataColumn<T>) => any;
   className?: string;
   name?: string; // used for qs filter/sorts
-  filter?: ColumnFilter; // defines the filter capabilities
+  filter?: PartialColumnFilter; // defines the filter capabilities
   editor?: ColumnEditor<T>;
   canEdit?: (row: T, column: DataColumn<T>) => boolean;
 }
@@ -273,6 +274,9 @@ export function isDataRowArray<T>(value?: DataGroup<T>[] | DataRow[]): value is 
  * 88     88 88ood8   88   888888 88  Yb 
  */
 
+type MandateProps<T extends {}, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
+type FKReq<T extends BaseColumnFilter> = MandateProps<T, 'filterKey' | 'label'>
+
 interface BaseColumnFilter {
   parseAsType?: QueryStringFilterTypes
   filterKey?: string
@@ -366,7 +370,8 @@ export const QuickOperatorLabels: OperatorMap<AllFilterOperators> = {
   'none': 'is not in',
 }
 
-export type ColumnFilter = StringColumnFilter | NumberColumnFilter | BooleanColumnFilter | CustomColumnFilter;
+export type PartialColumnFilter = StringColumnFilter | NumberColumnFilter | BooleanColumnFilter | CustomColumnFilter;
+export type ColumnFilter = FKReq<StringColumnFilter> | FKReq<NumberColumnFilter> | FKReq<BooleanColumnFilter> | FKReq<CustomColumnFilter>;
 
 export interface QueryFilterItem {
   column: string;

@@ -13,7 +13,7 @@ interface Props {
 }
 
 export const QuickFilterGroup: React.FC<Props> = ({ topLevel, value, path }) => {
-  const { actualColumns } = useContext(ColumnContext);
+  const { filterColumns } = useContext(ColumnContext);
   const { removeAtPath } = useContext(QuickBarContext);
 
   const prefix = '(', suffix = ')';
@@ -26,7 +26,7 @@ export const QuickFilterGroup: React.FC<Props> = ({ topLevel, value, path }) => 
     if (groupContents.length) groupContents.push(` ${value.groupOperator} `);
     if (isFilterGroup(filter)) groupContents.push(<QuickFilterGroup key={newPath.join(',')} topLevel={false} value={filter} path={newPath} />)
     else {
-      let column = actualColumns.find(c => c.filter?.filterKey === (filter as QueryFilterItem).column);
+      let column = filterColumns.find(c => c.filter?.filterKey === (filter as QueryFilterItem).column);
       if (column) {
         groupContents.push(<QuickFilterItem path={newPath} key={newPath.join(',')} column={column} filter={filter} parentCollectionCount={value.filters.length} />);
       }

@@ -16,6 +16,9 @@ export function buildSQL(filter?: QueryFilterGroup, fieldCounter: number = 0): S
       sql = fgRes.sql;
       fieldCounter = fgRes.fieldCounter;
       Object.assign(params, fgRes.params);
+    } else if (fgi.column === 'who_knows') {
+      // do nothing...
+      sql = `(1 = 1)`;
     } else {
       switch (fgi.operator) {
         case 'eq':

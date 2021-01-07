@@ -25,11 +25,11 @@ interface Props {
 
 export const FilterFieldEditor: React.FC<Props> = ({ canLimitConditions, filter, path, index, setState, groupValue }) => {
   const itemEl = useRef<HTMLDivElement>(null);
-  const { actualColumns, filterSettings } = useContext(ColumnContext);
+  const { filterColumns, filterSettings } = useContext(ColumnContext);
   const [{column, sortedColumns}] = useDerivedState(() => {
     return {
-      column: actualColumns.find(c => c.filter?.filterKey === filter.column),
-      sortedColumns: [...actualColumns]
+      column: filterColumns.find(c => c.filter?.filterKey === filter.column),
+      sortedColumns: [...filterColumns]
         .filter(c => {
           if (canLimitConditions) {
             return !!c.filter && !groupValue.filters.find((f) => {
@@ -47,7 +47,7 @@ export const FilterFieldEditor: React.FC<Props> = ({ canLimitConditions, filter,
           return 0;
         })
     }
-  }, [actualColumns, filter, canLimitConditions, groupValue])
+  }, [filterColumns, filter, canLimitConditions, groupValue])
 
   const currentPath = [...(path ?? []), index];
   const currentPathAsString = currentPath.join(',');

@@ -15,7 +15,7 @@ import { useParsedQs } from '../../utils/useParsedQS';
 import { notEmpty } from '../../utils/comparators';
 import { ColumnPickerButton } from '../column-picker';
 import { FilterButton, FilterBar } from '../filter';
-import { convertFromQS, convertToQS } from '../../utils/transformFilter';
+import { convertFromQS, convertToQS, transformTableFiltersToColumns } from '../../utils/transformFilter';
 import { TableEditorButton } from './editors/editButton';
 import { TableActionButtons } from './actions';
 import { getRowKey } from '../../utils/getRowKey';
@@ -154,6 +154,14 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     }
   }, [ props.id, columnVisibility, props.columns, columnOrder, groupBy, props.canReorderColumns, canGroupBy ]);
 
+  const [filterColumns] = useDeepDerivedState(() => {
+    let transformedFilters = transformTableFiltersToColumns<T>(props.filters ?? []);
+    return [
+      ...columnData.actualColumns,
+      ...transformedFilters
+    ]
+  }, [props.filters, columnData.actualColumns])
+
   const canEdit = typeof props.onSaveQuickEdit === 'function' && columnData.hasEditor && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
   const canSelectRows = !!props.canSelectRows && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
 
@@ -177,8 +185,8 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
 
   const [filter, setFilter] = useParsedQs<QueryFilterGroup, {filter?: any}>(
     { groupOperator: 'and', filters: [] },
-    (qsFilter) => convertFromQS(qsFilter, columnData.actualColumns),
-    (state) => convertToQS(state, columnData.actualColumns),
+    (qsFilter) => convertFromQS(qsFilter, filterColumns),
+    (state) => convertToQS(state, filterColumns),
     {
       ...props.qs,
       properties: {
@@ -401,6 +409,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     {dataLoaderEl}
     <ColumnContext.Provider value={{
       ...columnData,
+      filterColumns,
       canGroupBy,
       columnSorts:  [
         ...groupBy,

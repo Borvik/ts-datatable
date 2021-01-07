@@ -22,7 +22,7 @@ interface Props {
 }
 
 export const FilterGroupEditor: React.FC<Props> = ({ value, path, setState }) => {
-  const { filterSettings, actualColumns } = useContext(ColumnContext);
+  const { filterSettings, filterColumns } = useContext(ColumnContext);
   const groupEl = useRef<HTMLDivElement>(null);
 
   const [{
@@ -32,7 +32,7 @@ export const FilterGroupEditor: React.FC<Props> = ({ value, path, setState }) =>
     canLimitConditions,
     availableColumns,
   }] = useDerivedState(() => {
-    const filterableColumns = actualColumns.filter(c => !!c.filter);
+    const filterableColumns = filterColumns.filter(c => !!c.filter);
     const allowOr = filterSettings?.allowOr ?? false;
     const allowNested = filterSettings?.allowNested ?? false;
     const limitOneColumnUse = filterSettings?.limitOneColumnUse ?? false;
@@ -57,7 +57,7 @@ export const FilterGroupEditor: React.FC<Props> = ({ value, path, setState }) =>
       canLimitConditions,
       availableColumns,
     }
-  }, [actualColumns, filterSettings, value]);
+  }, [filterColumns, filterSettings, value]);
   
   const currentPath = path ?? [];
   const currentPathAsString = currentPath.join(',');

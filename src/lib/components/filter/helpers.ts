@@ -1,6 +1,6 @@
-import { ColumnFilter, AllFilterOperators, StringOperators, NumberOperators, BooleanOperators } from "../table/types";
+import { PartialColumnFilter, AllFilterOperators, StringOperators, NumberOperators, BooleanOperators } from "../table/types";
 
-export function getAvailableOperators(filter?: ColumnFilter): AllFilterOperators[] {
+export function getAvailableOperators(filter?: PartialColumnFilter): AllFilterOperators[] {
   if (!filter) return [];
   if (filter.operators?.length)
     return filter.operators;
@@ -18,12 +18,12 @@ export function getAvailableOperators(filter?: ColumnFilter): AllFilterOperators
   }
 }
 
-export function getDefaultOperator(filter?: ColumnFilter): AllFilterOperators {
+export function getDefaultOperator(filter?: PartialColumnFilter): AllFilterOperators {
   let available = getAvailableOperators(filter);
   return filter?.defaultOperator ?? available?.[0] ?? 'eq';
 }
 
-export function getDefaultValue(filter?: ColumnFilter): any {
+export function getDefaultValue(filter?: PartialColumnFilter): any {
   if (!filter) return null;
   if (filter.type === 'custom') {
     return filter.defaultValue ?? null;

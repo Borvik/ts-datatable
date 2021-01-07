@@ -1,6 +1,25 @@
-import { AllFilterOperators, QueryFilterGroup, DataColumn, isFilterItem, QueryFilterItem, FilterCollection } from "../components/table/types";
+import { AllFilterOperators, QueryFilterGroup, DataColumn, ColumnFilter, isFilterItem, QueryFilterItem, FilterCollection } from "../components/table/types";
 import { QueryStringFilterTypes, convertQsValue } from "./useQueryState";
 import { getDefaultOperator } from "../components/filter/helpers";
+
+export function transformTableFiltersToColumns<T>(filters: ColumnFilter[]): DataColumn<T>[] {
+  return filters.map(filter => ({
+    isVisible: true,
+    rowSpan: 1,
+    colSpan: 1,
+    sortIndex: 0,
+    isGrouped: false,
+    header: '',
+    fixed: false,
+    sortable: false,
+    defaultSortDir: 'asc',
+    enabled: false,
+    visibleByDefault: false,
+    canToggleVisibility: false,
+    key: '',
+    filter
+  }));
+}
 
 export function transformFilterValue(value: any, parseType: QueryStringFilterTypes, operator: AllFilterOperators): any {
   // based on operator depends on how value should be transformed

@@ -8,6 +8,13 @@ export function FullFeaturedExample() {
   
   return <DataTable<Pokemon>
     id='pokemon'
+    filters={[
+      {
+        filterKey: 'who_knows',
+        label: 'WhoKnows',
+        type: 'string',
+      }
+    ]}
     filterSettings={{
       allowOr: true,
       allowNested: true,

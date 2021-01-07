@@ -12,7 +12,7 @@ export { FilterBar } from './bar';
 export const FilterButton: React.FC = (props) => {
   const { dialog, showDialog } = useDialog(<FilterDialog />);
   const {
-    actualColumns,
+    filterColumns,
     isEditing,
     classNames,
     labels,
@@ -44,7 +44,7 @@ export const FilterButton: React.FC = (props) => {
   }
 
   let canFilter: boolean = false;
-  for (let col of actualColumns) {
+  for (let col of filterColumns) {
     if (col.filter?.filterKey) {
       canFilter = true;
       break;
