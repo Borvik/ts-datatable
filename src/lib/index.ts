@@ -16,3 +16,4 @@ export type {
 export type {
   RowSelectorCheckboxProps
 } from './components/row-selector';
+export type { ColumnContext } from './components/table/contexts';
