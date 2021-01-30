@@ -1,5 +1,5 @@
 import React, { useRef, useContext, useState } from 'react';
-import { Dialog, DialogHeader, DialogBody, DialogFooter } from '../dialog';
+import { Dialog, DialogHeader, DialogBody, DialogFooter } from '@borvik/use-dialog';
 import { ColumnContext } from '../table/contexts';
 import { batchedQSUpdate } from '../../utils/useQueryState';
 import { FilterEditor } from './editor';

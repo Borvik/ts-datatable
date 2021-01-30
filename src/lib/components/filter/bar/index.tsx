@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { ColumnContext } from '../../table/contexts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons/faFilter';
-import { useDialog } from '../../dialog';
+import { useDialog } from '@borvik/use-dialog';
 import { FilterDialog } from '../dialog';
 import { QuickFilterGroup } from './group';
 import { QuickBarContext } from './context';

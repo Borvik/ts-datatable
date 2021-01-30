@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useDialog } from '../dialog';
+import { useDialog } from '@borvik/use-dialog';
 import { ColumnContext } from '../table/contexts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog';

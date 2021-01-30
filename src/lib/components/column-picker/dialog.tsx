@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from 'react';
-import { Dialog, DialogHeader, DialogBody, DialogFooter } from '../dialog';
+import { Dialog, DialogHeader, DialogBody, DialogFooter } from '@borvik/use-dialog';
 import { ColumnContext } from '../table/contexts';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { ColumnSort, ColumnVisibilityStorage, DataColumn } from '../table/types';

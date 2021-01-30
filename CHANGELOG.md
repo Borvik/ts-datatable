@@ -1,4 +1,6 @@
 ## [Unreleased]
+### Changed
+- Moved internal dialog definition to separate library `@borvik/use-dialog`
 
 ## [1.1.4] - 2020-01-07
 ### Added
