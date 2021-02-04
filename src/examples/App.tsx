@@ -43,7 +43,7 @@ function App() {
     <div className={`App`}>
       <header className="App-header">
         <button type='button' onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Toggle Theme</button>
-        <span> Note: Because Type/Weakness are actually stored as a comma separated list - the filter is there as an example only and doesn't work as expected.</span>
+        <span> Note: Because Type/Weakness are actually stored as a comma separated list - the filter is there as an example only and doesn't work as expected.  Also "View" button does nothing.</span>
         <select style={{marginLeft: 'auto'}} value={selectedExample} onChange={(e) => setExample(e.target.value)}>
           {examples.map(exampleKey => (<option key={exampleKey} value={exampleKey}>{exampleKey} Example</option>))}
         </select>

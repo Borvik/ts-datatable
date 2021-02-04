@@ -130,6 +130,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       for (let c of actualColumns) {
         if (c.fixed === 'left') {
           fixedLeftCount++;
+          // TODO: if more than 1 fixed column becomes supported - adjust left/right filters in column-picker/dialog to filter out first/last "hidden" columns respectively
           if (fixedLeftCount > 1 && !fixedLeftWarned[props.id]) {
             console.warn(`Default styles only support 1 fixed left column`);
             fixedLeftWarned[props.id] = true;

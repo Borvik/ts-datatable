@@ -155,10 +155,19 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     header: 'Collected',
     accessor: 'collected',
     className: 'no-wrap',
-    fixed: 'right',
     render: (value: any) => value ? 'Yes' : 'No',
     editor: {
       type: 'checkbox',
     }
+  },
+  {
+    header: '',
+    accessor: '~~non-field~~', // something is necessary to attempt to grab data, doesn't _have_ to exist
+    fixed: 'right',
+    className: 'no-wrap',
+    canEdit: () => false,
+    sortable: false,
+    canToggleVisibility: false,
+    render: () => <button>View</button>
   }
 ]

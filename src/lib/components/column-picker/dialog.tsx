@@ -37,8 +37,8 @@ export const ColumnPickerDialog: React.FC = () => {
 
   const groupedColumns = dialogGroup.map(g => actualColumns.find(c => g.column === c.name)).filter(isset);
   const fixedColumns = actualColumns.filter(c => !!c.fixed);
-  const fixedLeftColumns = fixedColumns.filter(c => c.fixed === 'left');
-  const fixedRightColumns = fixedColumns.filter(c => c.fixed === 'right');
+  const fixedLeftColumns = fixedColumns.filter(c => c.fixed === 'left' && (c.sortable || c.canToggleVisibility));
+  const fixedRightColumns = fixedColumns.filter(c => c.fixed === 'right' && (c.sortable || c.canToggleVisibility));
 
   const [sortedColumns] = useDeepDerivedState(() => {
     let cols = actualColumns.filter(c => !c.fixed).map(c => {
