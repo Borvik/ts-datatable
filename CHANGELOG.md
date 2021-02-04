@@ -1,6 +1,9 @@
 ## [Unreleased]
+
+## [1.1.5] - 2020-02-04
 ### Changed
 - Moved internal dialog definition to separate library `@borvik/use-dialog`
+- Hide columns from column-picker that are fixed and are not allowed to have their visibility toggled or are not sortable (groupable).
 
 ## [1.1.4] - 2020-01-07
 ### Added
