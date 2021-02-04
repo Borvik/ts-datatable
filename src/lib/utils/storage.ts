@@ -1,5 +1,5 @@
 export function getLocalState<T>(key: string): T | null {
-  if (!window || !window.localStorage) return null;
+  if (typeof window === 'undefined' || !window.localStorage) return null;
 
   try {
     let state = window.localStorage.getItem(key);
@@ -12,7 +12,7 @@ export function getLocalState<T>(key: string): T | null {
 }
 
 export function saveLocalState(key: string, value: any): void {
-  if (!window || !window.localStorage) return;
+  if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
   }
