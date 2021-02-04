@@ -126,7 +126,7 @@ function isset<T>(obj: T): obj is T {
   return (typeof obj !== 'undefined' && obj !== null);
 }
 
-if (window) {
+if (typeof window !== 'undefined') {
   (window as any).qs_stringify = QueryString.stringify;
   (window as any).qs_parse = QueryString.parse;
 }

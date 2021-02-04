@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.1.6] - 2020-02-04
+### Fixed
+- SSR issue with `window` issue #41
+
 ## [1.1.5] - 2020-02-04
 ### Changed
 - Moved internal dialog definition to separate library `@borvik/use-dialog`
