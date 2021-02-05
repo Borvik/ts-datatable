@@ -19,6 +19,7 @@ module.exports = {
   },
   externals: [nodeExternals({
     whitelist: [
+      '@borvik/use-dialog',
       /^\@fortawesome/,
       /^lodash/,
       'clean-deep',

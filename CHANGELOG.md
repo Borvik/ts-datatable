@@ -1,12 +1,16 @@
 ## [Unreleased]
 
+## [1.1.9] - 2020-02-05
+### Fixed
+- Embedded `@borvik/use-dialog` to prevent usage errors - fixes #40
+
 ## [1.1.8] - 2020-02-04
 ### Fixed
 - SSR issue with `window` issue (storage)
 
 ## [1.1.6] - 2020-02-04
 ### Fixed
-- SSR issue with `window` issue (querystring) #41
+- SSR issue with `window` issue #41 (querystring)
 
 ## [1.1.5] - 2020-02-04
 ### Changed
