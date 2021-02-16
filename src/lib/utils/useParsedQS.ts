@@ -1,10 +1,11 @@
-import { useQueryState, QueryStateOptions } from "./useQueryState";
+import { useQueryState } from '@borvik/use-querystate';
+import { QueryStateOptions } from '@borvik/use-querystate/dist/types';
 import { useDeepDerivedState } from "./useDerivedState";
 import { useCallback, useDebugValue } from "react";
 
 type ConvertFn<T, V> = (value: T) => V;
 
-export function useParsedQs<State, QSState>(initialState: State, parse: ConvertFn<QSState, State>, encode: ConvertFn<State, QSState>, options?: QueryStateOptions): [State, (newState: State | ((state: State) => State)) => void] {
+export function useParsedQs<State, QSState extends object>(initialState: State, parse: ConvertFn<QSState, State>, encode: ConvertFn<State, QSState>, options?: QueryStateOptions): [State, (newState: State | ((state: State) => State)) => void] {
   const [qsInitialState] = useDeepDerivedState(() => encode(initialState), [ initialState ]);
   const [localState, setLocalState] = useQueryState(qsInitialState, options);
   const [actualState] = useDeepDerivedState(() => parse(localState), [localState]);

@@ -1,7 +1,7 @@
 import React, { useRef, useContext, useState } from 'react';
 import { Dialog, DialogHeader, DialogBody, DialogFooter } from '@borvik/use-dialog';
 import { ColumnContext } from '../table/contexts';
-import { batchedQSUpdate } from '../../utils/useQueryState';
+import { batchedQSUpdate } from '@borvik/use-querystate';
 import { FilterEditor } from './editor';
 
 export const FilterDialog: React.FC = (props) => {

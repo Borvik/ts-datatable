@@ -1,34 +1,36 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { getLocalState, saveLocalState } from './storage';
 import { simpleCompare } from './comparators';
 
+type LocalState<State> = {init: false} | {init: true, publicState: State, depList: any[]};
+
 export function useLocalState<State>(key: string, defaultValue: State, depList: any[]): [State, (newState: State | ((state: State) => State)) => void] {
-  const [localState, setLocalState] = useState<{init: false} | {init: true, publicState: State, depList: any[]}>({init: false});
+  const [,setRerender] = useState(1);
+  const localRef = useRef<LocalState<State>>({init: false});
   
   let currPublicState: State;
-  if (!localState.init || !simpleCompare(depList, localState.depList)) {
+  if (!localRef.current.init || !simpleCompare(depList, localRef.current.depList)) {
     currPublicState = getLocalState(key) ?? defaultValue;
-    setLocalState({
+    localRef.current = {
       init: true,
       publicState: currPublicState,
       depList
-    });
+    };
   } else {
-    currPublicState = localState.publicState;
+    currPublicState = localRef.current.publicState;
   }
 
   const publicSetState = useCallback(
     (newState: (State | ((state: State) => State))) => {
-      setLocalState(localState => {
-        if (!localState.init) throw new Error();
-        const publicState = typeof newState === 'function'
-        ? (newState as any)(localState.publicState)
+      if (!localRef.current.init) throw new Error();
+      const publicState = typeof newState === 'function'
+        ? (newState as any)(localRef.current.publicState)
         : newState;
-        saveLocalState(key, publicState);
-        return {...localState, publicState};
-      });
+      saveLocalState(key, publicState);
+      localRef.current = {...localRef.current, publicState};
+      setRerender(v => 0 - v); // toggle's between 1 and -1
     },
-    [key]
+    [key, localRef]
   );
   return [currPublicState, publicSetState];
 }

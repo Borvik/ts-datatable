@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [1.2.0] - 2020-02-16
+### Changed
+- Moved internal query parsing to separate libraries `@borvik/use-querystate` and `@borvik/querystring`
+- Updated custom hooks that provide setters to have a consistent setter
+
 ## [1.1.9] - 2020-02-05
 ### Fixed
 - Embedded `@borvik/use-dialog` to prevent usage errors - fixes #40

@@ -6,7 +6,7 @@ import { useDialog } from '@borvik/use-dialog';
 import { FilterDialog } from '../dialog';
 import { QuickFilterGroup } from './group';
 import { QuickBarContext } from './context';
-import { batchedQSUpdate } from '../../../utils/useQueryState';
+import { batchedQSUpdate } from '@borvik/use-querystate';
 import { QueryFilterGroup } from '../../table/types';
 import { update } from '../../../utils/immutable';
 import get from 'lodash/get';

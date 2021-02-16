@@ -4,7 +4,7 @@ import { FilterDialog } from './dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons/faFilter';
 import { ColumnContext } from '../table/contexts';
-import { batchedQSUpdate } from '../../utils/useQueryState';
+import { batchedQSUpdate } from '@borvik/use-querystate';
 import { QueryFilterGroup } from '../table/types';
 
 export { FilterBar } from './bar';

@@ -1,8 +1,8 @@
-import React, { PropsWithChildren, useState, useEffect, useRef, useCallback } from 'react';
+import React, { PropsWithChildren, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData, QSGroupBy, GroupBy, ColumnSort, ColumnConfigurationWithGroup } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
-import { useQueryState, batchedQSUpdate } from '../../utils/useQueryState';
+import { useQueryState, batchedQSUpdate } from '@borvik/use-querystate';
 import { transformColumns, getFlattenedColumns, generateHeaderRows } from '../../utils/transformColumnProps';
 import { useLocalState } from '../../utils/useLocalState';
 import { ColumnContext } from './contexts';
@@ -71,7 +71,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     },
     {
       ...props.qs,
-      properties: {
+      types: {
         group: 'string[]'
       }
     }
@@ -179,7 +179,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
 
   const [rawFilter, setRawFilter] = useQueryState<{filter?: any}>({}, {
     ...props.qs,
-    properties: {
+    types: {
       filter: 'any'
     }
   });
@@ -190,7 +190,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     (state) => convertToQS(state, filterColumns),
     {
       ...props.qs,
-      properties: {
+      types: {
         filter: 'any'
       }
     }
@@ -214,7 +214,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     }),
     {
       ...props.qs,
-      properties: {
+      types: {
         sort: 'string[]'
       }
     }
@@ -402,6 +402,27 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     }
   }
 
+  const searchFormOnSearch = useCallback((query: string) => {
+    batchedQSUpdate(() => {
+      setSearchQuery({ query });
+      setPagination({ page: 1 });
+    });
+  }, [setSearchQuery, setPagination]);
+
+  const searchFormApplyFilter = useCallback((newFilter: any) => {
+    batchedQSUpdate(() => {
+      setRawFilter({ filter: newFilter });
+      setPagination({ page: 1 });
+    });
+  }, [setRawFilter, setPagination]);
+
+  const actualColumnSorts = useMemo(() => {
+    return [
+      ...groupBy,
+      ...columnSort.sort.filter(s => (!groupBy.length || !groupBy.find(g => g.column === s.column))),
+    ]
+  }, [ groupBy, columnSort ]);
+
   /**
    * Finally we setup the contexts that will house all the data
    * and pass it to all the subcomponents for eventual display.
@@ -412,10 +433,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       ...columnData,
       filterColumns,
       canGroupBy,
-      columnSorts:  [
-        ...groupBy,
-        ...columnSort.sort.filter(s => (!groupBy.length || !groupBy.find(g => g.column === s.column))),
-      ],
+      columnSorts: actualColumnSorts,
       groupBy: groupBy,
       multiColumnSorts: props.multiColumnSorts ?? false,
       filter,
@@ -452,18 +470,8 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
             {!hideSearchForm && <SearchForm
               searchQuery={searchQuery.query}
               filter={rawFilter.filter}
-              onSearch={(query) => {
-                batchedQSUpdate(() => {
-                  setSearchQuery({ query });
-                  setPagination({ page: 1 });
-                });
-              }}
-              applyFilter={(newFilter) => {
-                batchedQSUpdate(() => {
-                  setRawFilter({ filter: newFilter });
-                  setPagination({ page: 1 });
-                });
-              }}
+              onSearch={searchFormOnSearch}
+              applyFilter={searchFormApplyFilter}
             />}
             <FilterBar />
           </div>

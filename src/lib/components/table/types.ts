@@ -5,7 +5,8 @@ import {
   HTMLProps,
   ReactElement
 } from 'react';
-import { QueryStateOptions, QueryStringFilterTypes } from '../../utils/useQueryState';
+import { QueryStateOptions } from '@borvik/use-querystate/dist/types';
+import { QueryStringFilterTypes } from '@borvik/querystring/dist/types';
 import { PaginateRequiredProps, PaginateOptions, PageChange } from '../pagination/types';
 import { SearchRequiredProps } from '../search/types';
 import { CustomFilterButtonProps, FilterSettings } from '../filter/types';

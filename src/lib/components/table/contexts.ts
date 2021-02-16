@@ -17,7 +17,7 @@ import {
 } from './types';
 import { FilterSettings } from '../filter/types';
 
-interface ColumnContextInterface<T> {
+export interface ColumnContextInterface<T> {
   actualColumns: DataColumn<T>[]; // the flat list of columns (lowest level)
   filterColumns: DataColumn<T>[]; // contains actualColumns, but also faux columns defined by separate filters prop
   headerRows: DataColumn<T>[][];

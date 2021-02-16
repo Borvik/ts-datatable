@@ -1,5 +1,6 @@
 import { AllFilterOperators, QueryFilterGroup, DataColumn, ColumnFilter, isFilterItem, QueryFilterItem, FilterCollection } from "../components/table/types";
-import { QueryStringFilterTypes, convertQsValue } from "./useQueryState";
+import { QueryStringFilterTypes } from '@borvik/querystring/dist/types';
+import { convertValue } from '@borvik/querystring/dist/convert/convertValue';
 import { getDefaultOperator } from "../components/filter/helpers";
 
 export function transformTableFiltersToColumns<T>(filters: ColumnFilter[]): DataColumn<T>[] {
@@ -36,8 +37,8 @@ export function transformFilterValue(value: any, parseType: QueryStringFilterTyp
           ? []
           : [value];
       if (parseType.match(/\[\]$/))
-        return convertQsValue(arrBetweenValue, parseType);
-      return arrBetweenValue.map(v => convertQsValue(v, parseType));
+        return convertValue(arrBetweenValue, parseType);
+      return arrBetweenValue.map(v => convertValue(v, parseType));
     case 'any':
     case 'none':
       let arrAnyValue = Array.isArray(value)
@@ -46,10 +47,10 @@ export function transformFilterValue(value: any, parseType: QueryStringFilterTyp
           ? []
           : [value];
       if (parseType.match(/\[\]$/))
-        return convertQsValue(arrAnyValue, parseType);
-      return arrAnyValue.map(v => convertQsValue(v, parseType));
+        return convertValue(arrAnyValue, parseType);
+      return arrAnyValue.map(v => convertValue(v, parseType));
     default: // single value operators
-      return convertQsValue(value, parseType);
+      return convertValue(value, parseType);
   }
 }
 

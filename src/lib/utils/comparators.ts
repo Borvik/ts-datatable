@@ -1,4 +1,4 @@
-import { isEqual } from './isEqual';
+import isEqual from 'lodash/isEqual';
 
 export type ComparatorFn = (a: any[] | any[][], b: any[] | any[][]) => boolean;
 
