@@ -181,7 +181,8 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
     ...props.qs,
     types: {
       filter: 'any'
-    }
+    },
+    filterToTypeDef: true,
   });
 
   const [filter, setFilter] = useParsedQs<QueryFilterGroup, {filter?: any}>(
@@ -192,7 +193,8 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       ...props.qs,
       types: {
         filter: 'any'
-      }
+      },
+      filterToTypeDef: true,
     }
   )
 

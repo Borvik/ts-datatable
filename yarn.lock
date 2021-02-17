@@ -1214,10 +1214,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@borvik/querystring@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@borvik/querystring/-/querystring-1.2.0.tgz#16156ea50bd5b4469fb63e0429410bf1a381094e"
-  integrity sha512-CbneALiaJLJPDC5/4oO15SbHLXpqqz3GaKGr0uiMrH5i54pQpIYjImJgfAu9iVvNZf+yM0qN20DCh3cDrtBS3A==
+"@borvik/querystring@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@borvik/querystring/-/querystring-1.3.0.tgz#6f7b72ee2cf43e5983571c38cf5c365222cc4185"
+  integrity sha512-dG3UJIVzzDvtZQEPryOrT/l/fPblqE0vq3/feTLkV+SoSgtLm/o7J5c5l9pR99LKyVrVCOdbD6vR76vip5MyPg==
   dependencies:
     clean-deep "~3.4.0"
     lodash "~4.17.20"
@@ -1227,12 +1227,12 @@
   resolved "https://registry.yarnpkg.com/@borvik/use-dialog/-/use-dialog-1.0.1.tgz#883b54f18f74b9158f7829f8f473874386afeefc"
   integrity sha512-1ECN6fELKvrq05h9ZiEevp7H6XBd3uZYkZ2APDIpLuOCovYVgxLtpqTgKLijS1WLUygNL/bKSVOWUvfLou4xDg==
 
-"@borvik/use-querystate@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@borvik/use-querystate/-/use-querystate-1.0.2.tgz#7b58bfa2d39065d7102490f7c3bdfec86e6ac8dd"
-  integrity sha512-QDWXxeP8l7RVyyHmdbMsQr4cYXuuioKsaGaWR4nJ+8rrkm1K7SNzgMyC+WiF5RhUN2C2kztzpQzeBVgsspx4Ow==
+"@borvik/use-querystate@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@borvik/use-querystate/-/use-querystate-1.1.0.tgz#a46542cbb658cfdedc608b7dd16d08f1aeb45cb0"
+  integrity sha512-l9H1kJ5KkjXmR21Smj9KLbwFwtE1cBYK1sDFmHer03eolUxf2WcWeQ4LoO5w08jOmt3Ak1KIgOOESju9g065eA==
   dependencies:
-    "@borvik/querystring" "^1.2.0"
+    "@borvik/querystring" "^1.3.0"
 
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"

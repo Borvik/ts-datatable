@@ -268,7 +268,6 @@ function convertFiltersToQS(filters: QueryFilterGroup['filters'], columns: DataC
       else
         simpleFilter[ff.column] = ff.value;
     }
-    console.log('Simple Filter To QS:', simpleFilter);
     return simpleFilter;
   }
   
