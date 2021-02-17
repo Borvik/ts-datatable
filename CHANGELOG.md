@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.2.2] - 2020-02-17
+### Changed
+- Use newer version of `@borvik/use-dialog`
+
 ## [1.2.1] - 2020-02-16
 ### Fixed
 - Filters were not being parsed from querystring due to update to `@borvik/use-querystate` and `@borvik/querystring`.

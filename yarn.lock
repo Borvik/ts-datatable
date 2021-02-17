@@ -1222,10 +1222,10 @@
     clean-deep "~3.4.0"
     lodash "~4.17.20"
 
-"@borvik/use-dialog@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@borvik/use-dialog/-/use-dialog-1.0.1.tgz#883b54f18f74b9158f7829f8f473874386afeefc"
-  integrity sha512-1ECN6fELKvrq05h9ZiEevp7H6XBd3uZYkZ2APDIpLuOCovYVgxLtpqTgKLijS1WLUygNL/bKSVOWUvfLou4xDg==
+"@borvik/use-dialog@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@borvik/use-dialog/-/use-dialog-1.0.2.tgz#ef5839b32d1ca3dbb5675650aab2a8fe0efd8f30"
+  integrity sha512-0F1P4a2mGBeL9iFO8dZjaGvMzdHiI3U8aPY+qS5ZA0V/iPQsqfCHAjbzyXz3LtduO95fnDDPXPT6Nek6ehEvFg==
 
 "@borvik/use-querystate@^1.1.0":
   version "1.1.0"
