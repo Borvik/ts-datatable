@@ -106,7 +106,7 @@ export const FilterGroupEditor: React.FC<Props> = ({ value, path, setState }) =>
         </MenuProvider>
         <Menu
           id={`group_menu_${currentPathAsString}`}
-          renderTarget={() => closest(groupEl.current, 'dialog')}
+          renderTarget={() => closest(groupEl.current, 'dialog, .dialog')}
           position='bottom-left'
           animation='zoom'
         >

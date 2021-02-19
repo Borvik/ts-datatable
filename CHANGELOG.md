@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.3.0] - 2020-02-19
+### Added
+- Added option to _not_ use HTML5 dialogs, and instead use a div styled like a dialog. This should make it easier for the filter editor to have a custom editor that has a custom dropdown appended to the `body` that has a higher z-index than the dialog.
+
 ## [1.2.3] - 2020-02-18
 ### Changed
 - Updated to use CommonJS version of `@borvik/use-querystate` and `@borvik/querystring`.

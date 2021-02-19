@@ -52,6 +52,7 @@ export interface ColumnContextInterface<T> {
   labels?: CustomLabels
   components?: CustomComponents
   groupsExpandedByDefault: boolean
+  doNotUseHTML5Dialog?: boolean
 }
 
 export const ColumnContext = createContext<ColumnContextInterface<any>>({

@@ -21,6 +21,7 @@ export const ColumnPickerDialog: React.FC = () => {
     labels,
     groupBy,
     canGroupBy,
+    doNotUseHTML5Dialog,
   } = useContext(ColumnContext);
 
   const [visible, setVisible] = useDeepDerivedState<ColumnVisibilityStorage>((prev) => {
@@ -69,7 +70,7 @@ export const ColumnPickerDialog: React.FC = () => {
     setGroup(update(dialogGroup, { [index]: { $set: newSort } }));
   }
 
-  return <Dialog dialogRef={dialogEl} onSubmit={async (close) => {
+  return <Dialog doNotUseHTML5Dialog={doNotUseHTML5Dialog} className='setting-dialog' dialogRef={dialogEl} onSubmit={async (close) => {
     setColumnConfig({
       visibility: visible,
       columnOrder: dialogOrder,

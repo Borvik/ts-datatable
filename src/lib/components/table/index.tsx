@@ -465,6 +465,7 @@ export const DataTable = function<T>({paginate = 'both', quickEditPosition = 'bo
       components: props.components,
       canSelectRow: props.canSelectRow,
       groupsExpandedByDefault: props.groupsExpandedByDefault ?? true,
+      doNotUseHTML5Dialog: props.doNotUseHTML5Dialog,
     }}>
       <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
         <div ref={topEl} className={`ts-datatable-top`}>

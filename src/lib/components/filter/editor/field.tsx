@@ -121,7 +121,7 @@ export const FilterFieldEditor: React.FC<Props> = ({ canLimitConditions, filter,
     </MenuProvider>
     <Menu
       id={`filter_column_menu_${currentPathAsString}`}
-      renderTarget={() => closest(itemEl.current, 'dialog')}
+      renderTarget={() => closest(itemEl.current, 'dialog, .dialog')}
       position='bottom-left'
       animation='zoom'
     >
@@ -134,7 +134,7 @@ export const FilterFieldEditor: React.FC<Props> = ({ canLimitConditions, filter,
     {!!availableOperators.length && <>
       <Menu
         id={`filter_operator_menu_${currentPathAsString}`}
-        renderTarget={() => closest(itemEl.current, 'dialog')}
+        renderTarget={() => closest(itemEl.current, 'dialog, .dialog')}
         position='bottom-left'
         animation='zoom'
       >

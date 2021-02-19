@@ -84,6 +84,7 @@ export interface DataTableProperties<T> {
   labels?: CustomLabels
 
   suppressFixedWarning?: boolean
+  doNotUseHTML5Dialog?: boolean
 }
 
 export interface CustomComponents {

@@ -6,7 +6,7 @@ import { FilterEditor } from './editor';
 
 export const FilterDialog: React.FC = (props) => {
   const dialogEl = useRef<HTMLDialogElement | null>(null);
-  const { filter, setFilter, setPagination, classNames, labels } = useContext(ColumnContext);
+  const { filter, setFilter, setPagination, classNames, labels, doNotUseHTML5Dialog } = useContext(ColumnContext);
   const [filterState, setFilterState] = useState(filter);
 
   let btnCloseClass: string | undefined;
@@ -18,7 +18,7 @@ export const FilterDialog: React.FC = (props) => {
     btnApplyClass = `${classNames?.dialogButton ?? ''} ${classNames?.dialogApplyButton ?? ''}`.trim();
   }
 
-  return <Dialog className='filter-dialog' dialogRef={dialogEl} onSubmit={async (close) => {
+  return <Dialog doNotUseHTML5Dialog={doNotUseHTML5Dialog} className='filter-dialog' dialogRef={dialogEl} onSubmit={async (close) => {
     batchedQSUpdate(() => {
       setFilter(filterState);
       setPagination({ page: 1 });

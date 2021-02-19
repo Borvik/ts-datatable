@@ -43,12 +43,12 @@
 
 .fw { width: 975px; }
 
-.dark dialog {
+.dark dialog, .dark .dialog {
   color: white;
   background-color: #282c34;
 }
 
-.dark dialog .dialog-header .close {
+.dark dialog .dialog-header .close, .dark .dialog .dialog-header .close {
   color: white;
   text-shadow: 0 1px 0 black;
 }
