@@ -1,0 +1,365 @@
+@use '@borvik/use-dialog/dist/style.css' as dialog;
+@use './components/column-picker/style.scss' as picker;
+@use './components/filter/style.scss' as filter;
+@use './components/context-menu/scss/main.scss' as menu;
+@use './components/table/editors/style.scss' as editors;
+
+.ts-datatable {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  box-sizing: border-box;
+  padding-top: .25em;
+  --indent-width: .75em;
+  --indent: 0;
+
+  .ts-datatable-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: auto;
+  }
+
+  .ts-datatable-top {
+    display: flex;
+
+    &.wrap {
+      flex-wrap: wrap-reverse;
+    }
+
+    .ts-datatable-search-filters {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+
+      .ts-datatable-search-form {
+        margin-bottom: .5em;
+      }
+      .filter-bar {
+        margin-top: auto;
+        margin-right: .5em;
+      }
+    }
+
+    .ts-datatable-page-actions {
+      margin-left: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      flex-basis: 25em;
+      flex-shrink: 0;
+
+      .ts-datatable-actions {
+        margin-bottom: .2em;
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+
+  .ts-datatable-top-page-filters, .ts-datatable-bottom-page {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .ts-datatable-table {
+    border-collapse: collapse;
+    width: 100%;
+
+    .row-group {
+      text-align: left;
+      position: sticky;
+      background-clip: padding-box;
+      background-color: var(--ts-dt-fixed-bg, white);
+      z-index: 2;
+      left: 0;
+      height: 2em;
+
+      .row-group-container {
+        display: flex;
+        align-items: center;
+        height: 2em;
+        position: absolute;
+        left: calc(var(--indent) * var(--indent-width));
+        top: 0;
+        white-space: nowrap;
+
+        .mdr-button {
+          margin: 0;
+          padding: 0;
+          background: none;
+          border: none;
+          font-size: inherit;
+        }
+
+        .group-column-name {
+          margin-left: .25em;
+          margin-right: .25em;
+
+          &::after {
+            content: ':'
+          }
+        }
+      }
+    }
+
+    th, td {
+      &.row-selector {
+        padding-left: 0;
+        padding-right: 0;
+
+        > div {
+          width: var(--ts-selector-width, 25px);
+          display: inline-flex;
+          justify-content: center;
+        }
+      }
+
+      &.fixed {
+        position: sticky;
+        background-clip: padding-box;
+        background-color: var(--ts-dt-fixed-bg, white);
+        z-index: 2;
+
+        &.fixed-right {
+          right: 0;
+        }
+        &.fixed-left {
+          left: 0;
+
+          &.mdr-control + .fixed-left {
+            left: calc(var(--indent) * var(--indent-width) + 1.5em);
+          }
+
+          &.row-selector + .fixed-left {
+            left: calc(var(--indent) * var(--indent-width) + var(--ts-selector-width, 25px));
+          }
+
+          &.mdr-control + .row-selector + .fixed-left {
+            left: calc(var(--indent) * var(--indent-width) + 1.5em + var(--ts-selector-width, 25px));
+          }
+        }
+
+        &:focus-within {
+          z-index: 999;
+          /**
+           * May or may not need a polyfill
+           * https://github.com/matteobad/focus-within-polyfill
+           */
+        }
+      }
+    }
+
+    .mdr-control {
+      padding-left: 1.25em;
+      padding-right: .25em;
+
+      > .mdr-button {
+        position: absolute;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        background: none;
+        border: none;
+        font-size: inherit;
+        top: calc(50% - .5em);
+      }
+    }
+
+    th, td {
+      &:first-child {
+        padding-left: calc(var(--indent) * var(--indent-width));
+
+        &.mdr-control {
+          padding-left: calc(var(--indent) * var(--indent-width) + 1.25em);
+
+          > .mdr-button {
+            left: calc(var(--indent) * var(--indent-width));
+          }
+        }
+      }
+    }
+  }
+
+  thead {
+    .ts-datatable-header-row {
+      th {
+        vertical-align: bottom;
+
+        &[scope=colgroup] {
+          text-align: center;
+          border-bottom: 1px solid;
+        }
+
+        &[scope=col] {
+          border-bottom: 2px solid;
+        }
+
+        .ts-datatable-header-cell {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          &.sortable {
+            cursor: pointer;
+          }
+
+          .sort-icon {
+            margin-left: .25em;
+          }
+        }
+      }
+    }
+  }
+
+  .ts-loading {
+    display: block;
+    height: 2em;
+  }
+
+  .ts-datatable-bottom-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: .15em;
+  }
+
+  .quick-edit-btn-group {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid;
+    padding: .15em .25em;
+    border-radius: 4px;
+
+    &:not(.editing) {
+      border-color: transparent;
+      padding-right: 0;
+      border-right: 0;
+    }
+    
+    &.editing + * {
+      margin-left: .5em;
+    }
+
+    label {
+      font-weight: normal;
+      margin-right: .5em;
+    }
+  }
+}
+
+.ts-pagination {
+  margin-left: auto;
+
+  .ts-pagination-nav {
+    display: inline-flex;
+  }
+
+  .ts-pagination-totals {
+    text-align: center;
+  }
+
+  .ts-pagination-btn-group {
+    &:first-child {
+      margin-right: .25em;
+    }
+    &:last-child {
+      margin-left: .25em;
+    }
+  }
+
+  .ts-paginate-label {
+    margin: 0 .5em;
+  }
+
+  .ts-paginate-current-page {
+    border-bottom: 1px solid;
+    padding: 0 .25em;
+    cursor: pointer;
+  }
+
+  input {
+    text-align: center;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom-width: 1px;
+    -moz-appearance: textfield;
+
+    &::-webkit-inner-spin-button, &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      margin: 0; 
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .per-page-select {
+    &:first-child {
+      margin-right: .5em;
+    }
+
+    select {
+      background: none;
+      border: none;
+    }
+
+    input {
+      width: 3.5em;
+    }
+  }
+
+  .ts-pagination-btn-group + .per-page-select {
+    margin-left: .5em;
+  }
+}
+
+.ts-datatable-loader {
+  position: fixed;
+  display: block;
+  z-index: 3;
+
+  tr, td {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  td {
+    display: flex;
+    background-color: var(--ts-dt-fixed-bg, white);
+    opacity: 80%;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.ts-datatable-search-form {
+  display: flex;
+  max-width: 100%;
+  width: 400px;
+  position: relative;
+
+  input[type=search] {
+    border: none;
+    border-bottom: 1px solid;
+    padding: .375rem 2.75rem .375rem .75rem;
+    flex-grow: 1;
+
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
+  }
+
+  button {
+    background: none;
+    border: none;
+    padding: .375rem .75rem;
+    width: 2.5rem;
+    position: absolute;
+    right: 0;
+  }
+}

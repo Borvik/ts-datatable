@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
     "lib": [
       "dom",
       "dom.iterable",
@@ -13,25 +13,20 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
+    "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "removeComments": true,
     "noImplicitAny": true,
     "jsx": "react",
     "declaration": true,
-    "outDir": "./dist",
-    "noEmit": true
+    "outDir": "./dist"
   },
-  "files": [
-    "src/lib/index.ts"
+  "include": [
+    "src/library/**/*",
+    "types/**/*"
   ],
   "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "src/lib/**/*",
-    "types/**/*"
+    "node_modules",
+    "src/demo/**/*"
   ]
 }

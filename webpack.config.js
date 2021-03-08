@@ -1,105 +1,100 @@
-const path = require("path");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const nodeExternals = require('webpack-node-externals');
-const postCssPresetEnv = require('postcss-preset-env');
+const path = require('path');
+const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+  mode: 'development',
+  target: 'web',
+  externals: {
+    'sql.js': 'initSqlJs',
+  },
   entry: {
-    main: "./src/lib/index.ts"
+    main: './src/demo/index.tsx',
   },
-  resolve: {
-    extensions: [".ts", ".tsx", ".js"]
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: "index.js",
-    libraryTarget: 'umd',
-    globalObject: 'this',
-  },
-  externals: [nodeExternals({
-    whitelist: [
-      '@borvik/use-dialog',
-      /^\@fortawesome/,
-      /^lodash/,
-      'clean-deep',
-      'dialog-polyfill',
-      'react-sortable-hoc',
-      'immutability-helper',
-      'qs',
-    ]
-  })],
-  target: 'node',
-  devtool: 'source-map',
   module: {
     rules: [
       {
-        test: /\.svg$/,
-        use: ['@svgr/webpack']
+        test: /\.m?js$/,
+        enforce: 'pre',
+        use: ['source-map-loader']
       },
       {
         test: /\.tsx?$/,
+        exclude: /node_modules/,
         use: [
           {
-            loader: "ts-loader",
+            loader: 'babel-loader',
+            options: { plugins: ['react-refresh/babel'] },
+          },
+          {
+            loader: 'ts-loader',
             options: {
-              compilerOptions: {
-                noEmit: false,
-              }
+              transpileOnly: true,
             }
           }
         ],
-        exclude: /node_modules/
       },
       {
-        test: /\.(sass|scss|css)$/,
+        test: /\.s?css$/,
         use: [
-          { loader: MiniCssExtractPlugin.loader },
+          'style-loader',
           {
-            loader: "css-loader",
+            loader: 'css-loader',
             options: {
               sourceMap: true,
-            }
-          },
-          {
-            loader: "postcss-loader",
-            options: {
-              sourceMap: true,
-              syntax: 'postcss-scss',
-              plugins: [
-                require('autoprefixer'),
-                postCssPresetEnv({
-                  stage: 0,
-                  features: {
-                    'color-mod-function': true,
-                    'alpha-hex-colors': true
-                  }
-                }),
-              ],
-              browsers: ['> 0.25%', 'ie >= 11']
-            }
+              modules: false,
+            },
           },
           {
             loader: 'sass-loader',
             options: {
               sourceMap: true,
+              implementation: require('sass'),
+              sassOptions: (loaderContext) => {
+                const { rootContext } = loaderContext;
+                const modulesPath = path.join(rootContext, 'node_modules');
+                return {
+                  includePaths: [ modulesPath ]
+                };
+              }
             }
           }
         ]
-      },
-      {
-        test: /\.(png|jpe?g)$/,
-        loader: 'file-loader?name=images/[name].[ext]'
       }
-    ]
+    ],
   },
+
+  resolve: {
+    extensions: ['.tsx', '.ts', '.jsx', '.js'],
+    fallback: {
+      path: require.resolve('path-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      buffer: require.resolve('buffer/'),
+      stream: require.resolve('stream-browserify'),
+      fs: false,
+    }
+  },
+
+  output: {
+    filename: 'bundle.js',
+  },
+
   plugins: [
-    new CleanWebpackPlugin(),
-    new MiniCssExtractPlugin({
-      filename: "style.css"
+    new ReactRefreshPlugin(),
+    new ForkTsCheckerWebpackPlugin(),
+    new HtmlWebPackPlugin({
+      filename: './index.html',
+      template: './public/index.html',
     }),
   ],
-  optimization: {
-    usedExports: true,
-  }
+
+  devServer: {
+    contentBase: path.join(__dirname, 'public'),
+    contentBasePublicPath: '/',
+    hot: true,
+    liveReload: true,
+    compress: true,
+    port: parseInt(process.env.PORT, 10) || 3000,
+  },
 };
