@@ -25,6 +25,10 @@ export function buildSQL(filter?: QueryFilterGroup, fieldCounter: number = 0): S
           sql = `(${fgi.column} = :field${++fieldCounter})`;
           params[':field' + fieldCounter] = fgi.value;
           break;
+        case 'ieq':
+          sql = `(UPPER(${fgi.column}) = UPPER(:field${++fieldCounter}))`;
+          params[':field' + fieldCounter] = fgi.value;
+          break;
         case 'neq':
           sql = `(${fgi.column} <> :field${++fieldCounter})`;
           params[':field' + fieldCounter] = fgi.value;
