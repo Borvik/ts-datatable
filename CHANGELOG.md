@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.3.2] - 2021-05-19
+### Added
+- @JacobHaitsma Added new string operator `Case-insensitive Equals`
+
 ## [1.3.1] - 2021-03-08
 ### Changed
 - Changed dev/build process to _not_ be based on create-react-app, and _not_ require webpack for release builds. This prevents webpack from obfuscating the function/component names and allows them to be seen in React Developer Tools for applications using this component.
