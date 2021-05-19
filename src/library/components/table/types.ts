@@ -321,7 +321,7 @@ export interface CustomFilterEditorProps {
   onLoseFocus: () => void;
 }
 
-export const StringOperators = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'bet', 'nbet', 'con', 'ncon', 'beg', 'end', 'nul', 'nnul', 'any', 'none'] as const;
+export const StringOperators = ['eq', 'ieq', 'neq', 'gt', 'gte', 'lt', 'lte', 'bet', 'nbet', 'con', 'ncon', 'beg', 'end', 'nul', 'nnul', 'any', 'none'] as const;
 export const NumberOperators = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'bet', 'nbet', 'nul', 'nnul', 'any', 'none'] as const;
 export const BooleanOperators = ['eq', 'neq', 'nul', 'nnul'] as const;
 
@@ -336,6 +336,7 @@ export type OperatorMap<U extends string> = {
 
 export const OperatorLabels: OperatorMap<AllFilterOperators> = {
   'eq': 'Equals',
+  'ieq': 'Case-insensitive Equals',
   'neq': 'Does not equal',
   'gt': 'Is greater than',
   'gte': 'Is greater than or equal to',
@@ -355,6 +356,7 @@ export const OperatorLabels: OperatorMap<AllFilterOperators> = {
 
 export const QuickOperatorLabels: OperatorMap<AllFilterOperators> = {
   'eq': '=',
+  'ieq': '≈',
   'neq': '≠',
   'gt': '>',
   'gte': '≥',
