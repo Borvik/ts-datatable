@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.3.3] - 2021-09-13
+### Fixed
+- Updated use-querystate library to latest version to solve issue with query parameters not updating.
+
 ## [1.3.2] - 2021-05-19
 ### Added
 - @JacobHaitsma Added new string operator `Case-insensitive Equals`

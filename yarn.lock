@@ -902,10 +902,10 @@
   dependencies:
     "@borvik/dialog-polyfill" "^0.5.7-beta.0"
 
-"@borvik/use-querystate@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@borvik/use-querystate/-/use-querystate-2.0.1.tgz#58b12490c70b6aec0b43ef81c85737f693a9da9b"
-  integrity sha512-890MpWjnaCfAjLWZ1ph5jJCD2/cXmLmPwHf3CgxB+N2L/kNakXKk73ns7SVMZY4rY9PgpVDhnFK4OgIubZZPkA==
+"@borvik/use-querystate@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@borvik/use-querystate/-/use-querystate-2.0.2.tgz#8f90392083bb92e083b3fe8cf9ed4f278922f3b7"
+  integrity sha512-6QkoOaOdey9BJO6R0rgRonKv/qvBJfCA7Wba1qJmSvze53LdLEyZWbYpkFh5mPDLcS5nycfpw6Ce05NlbleX0g==
   dependencies:
     "@borvik/querystring" "^2.0.1"
 
