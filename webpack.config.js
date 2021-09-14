@@ -90,11 +90,13 @@ module.exports = {
   ],
 
   devServer: {
-    contentBase: path.join(__dirname, 'public'),
-    contentBasePublicPath: '/',
+    static: {
+      directory: path.join(__dirname, 'public'),
+      staticOptions: {},
+      publicPath: '/',
+    },
     hot: true,
     liveReload: true,
-    compress: true,
     port: parseInt(process.env.PORT, 10) || 3000,
   },
 };
