@@ -44,6 +44,7 @@ export interface DataTableProperties<T> {
   multiColumnSorts?: boolean;
   defaultSort?: ColumnSort[];
   defaultGroupBy?: ColumnSort[];
+  defaultFilter?: string | Record<string, any>;
 
   qs?: QueryStateOptions;
 

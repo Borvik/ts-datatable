@@ -25,7 +25,7 @@ const primaryKeyWarned: {[x:string]: boolean} = {};
 const fixedLeftWarned: Record<string, boolean> = {};
 const fixedRightWarned: Record<string, boolean> = {};
 
-export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, ...props}: PropsWithChildren<DataTableProperties<T>>) {
+export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, defaultFilter, ...props}: PropsWithChildren<DataTableProperties<T>>) {
   const canGroupBy = !!props.canGroupBy && !!props.multiColumnSorts;
 
   /**
@@ -177,7 +177,23 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
     ...props.qs
   });
 
-  const [rawFilter, setRawFilter] = useQueryState<{filter?: any}>({}, {
+  const { defaultRawFilter, defaultConvertedFilter } = useMemo(() => {
+    if (typeof defaultFilter === 'string') {
+      if (!defaultFilter.trim()) {
+        return { defaultRawFilter: {}, defaultConvertedFilter: { groupOperator: 'and', filters: [] } as QueryFilterGroup };
+      }
+      // parse the filter string like query
+      return { defaultRawFilter: {}, defaultConvertedFilter: { groupOperator: 'and', filters: [] } as QueryFilterGroup };
+    }
+
+    const defaultRawFilter = { filter: defaultFilter };
+    return {
+      defaultRawFilter,
+      defaultConvertedFilter: convertFromQS(defaultRawFilter, filterColumns),
+    };
+  }, [ defaultFilter, filterColumns ]);
+
+  const [rawFilter, setRawFilter] = useQueryState<{filter?: any}>(defaultRawFilter, {
     ...props.qs,
     types: {
       filter: 'any'
@@ -186,7 +202,7 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   });
 
   const [filter, setFilter] = useParsedQs<QueryFilterGroup, {filter?: any}>(
-    { groupOperator: 'and', filters: [] },
+    defaultConvertedFilter,
     (qsFilter) => convertFromQS(qsFilter, filterColumns),
     (state) => convertToQS(state, filterColumns),
     {
