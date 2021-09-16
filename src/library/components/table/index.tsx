@@ -20,6 +20,7 @@ import { TableEditorButton } from './editors/editButton';
 import { TableActionButtons } from './actions';
 import { getRowKey } from '../../utils/getRowKey';
 import { update } from '../../utils/immutable';
+import { QueryString } from '@borvik/querystring';
 
 const primaryKeyWarned: {[x:string]: boolean} = {};
 const fixedLeftWarned: Record<string, boolean> = {};
@@ -178,12 +179,18 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   });
 
   const { defaultRawFilter, defaultConvertedFilter } = useMemo(() => {
-    if (typeof defaultFilter === 'string') {
-      if (!defaultFilter.trim()) {
+    if (typeof defaultFilter === 'string' || typeof defaultFilter === 'undefined') {
+      if (!defaultFilter?.trim()) {
         return { defaultRawFilter: {}, defaultConvertedFilter: { groupOperator: 'and', filters: [] } as QueryFilterGroup };
       }
+
       // parse the filter string like query
-      return { defaultRawFilter: {}, defaultConvertedFilter: { groupOperator: 'and', filters: [] } as QueryFilterGroup };
+      let parsedDefaultRawFilter = QueryString.parse(defaultFilter);
+      parsedDefaultRawFilter = Object.keys(parsedDefaultRawFilter).length ? { filter: parsedDefaultRawFilter } : {};
+      return {
+        defaultRawFilter: parsedDefaultRawFilter,
+        defaultConvertedFilter: convertFromQS(parsedDefaultRawFilter, filterColumns),
+      };
     }
 
     const defaultRawFilter = { filter: defaultFilter };

@@ -21,5 +21,8 @@ export function ManualDataExample() {
     fixedColBg='var(--dt-fixed-bg, white)'
     defaultSort={DEFAULT_SORT}
     columns={CommonColumns}
+    defaultFilter={{
+      num: "002"
+    }}
   />
 }
