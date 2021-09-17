@@ -98,7 +98,7 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
           if (cellProps.className) {
             classNames.push(cellProps.className)
           }
-          classNames.filter(s => !!s);
+          classNames = classNames.filter(s => !!s);
           cellProps.className = classNames.join(' ').trim();
         }
         
