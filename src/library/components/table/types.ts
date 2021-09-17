@@ -2,6 +2,8 @@ import { ReactRenderable, ResolveProps } from '../../types';
 import {
   DetailedHTMLProps,
   TableHTMLAttributes,
+  TdHTMLAttributes,
+  HTMLAttributes,
   HTMLProps,
   ReactElement
 } from 'react';
@@ -66,6 +68,8 @@ export interface DataTableProperties<T> {
   tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableProps?: DetailedHTMLProps<TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>;
+  tableRowProps?: (row: T) => DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement>;
+  tableCellProps?: (column: DataColumn<T>, row: T) => DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement>;
 
   fixedColBg?: string;
 

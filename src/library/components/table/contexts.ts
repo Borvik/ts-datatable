@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, DetailedHTMLProps, TdHTMLAttributes, HTMLAttributes } from 'react';
 import {
   DataColumn,
   ColumnSorts,
@@ -53,6 +53,8 @@ export interface ColumnContextInterface<T> {
   components?: CustomComponents
   groupsExpandedByDefault: boolean
   doNotUseHTML5Dialog?: boolean
+  tableRowProps?: (row: T) => (DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement> | undefined)
+  tableCellProps?: (column: DataColumn<T>, row: T) => (DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement> | undefined)
 }
 
 export const ColumnContext = createContext<ColumnContextInterface<any>>({
@@ -80,6 +82,8 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   canReorderColumns: false,
   canGroupBy: false,
   groupsExpandedByDefault: true,
+  tableRowProps: () => undefined,
+  tableCellProps: () => undefined
 });
 
 interface GroupCollapseContextInterface {
