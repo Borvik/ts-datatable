@@ -81,11 +81,10 @@ export function FullFeaturedExample() {
         return {style: { backgroundColor: 'gray'}}
       }
     }}
-    getTableCellProps={(column, row) => {
+    getTableCellProps={(_value, row, column) => {
       if(column.accessor === "id" && row.id === 1) {
         return {
           className: 'gold-border',
-          id: `td-top-id`,
           style: {
             textAlign: 'center',
           }

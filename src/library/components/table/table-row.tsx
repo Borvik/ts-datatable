@@ -92,7 +92,7 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
         let cellProps: DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement> = {};
         
         if (getTableCellProps && typeof getTableCellProps === 'function'){
-          cellProps = getTableCellProps(col, row) ?? {}
+          cellProps = getTableCellProps(rendered, row, col) ?? {}
 
           if (cellProps.className) {
             classNames.push(cellProps.className)
