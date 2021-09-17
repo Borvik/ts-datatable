@@ -69,7 +69,7 @@ export interface DataTableProperties<T> {
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableProps?: DetailedHTMLProps<TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>;
   getTableRowProps?: (row: T) => DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement>;
-  getTableCellProps?: (column: DataColumn<T>, row: T) => DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement>;
+  getTableCellProps?: (value: any, row: T, column: DataColumn<T>) => DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement>;
 
   fixedColBg?: string;
 
