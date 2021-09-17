@@ -24,8 +24,8 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
     DetailRow,
     canRowShowDetail,
     canSelectRows,
-    tableRowProps,
-    tableCellProps
+    getTableRowProps,
+    getTableCellProps
   } = useContext(ColumnContext);
 
   let canEditRow = isEditing;
@@ -43,8 +43,8 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
   let rowStyle: any = {'--indent': group?.level ?? 0};
   let rowProps: DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement> = {};
   
-  if (tableRowProps && typeof tableRowProps === 'function'){
-    rowProps = tableRowProps(row) ?? {};
+  if (getTableRowProps && typeof getTableRowProps === 'function'){
+    rowProps = getTableRowProps(row) ?? {};
 
     if (rowProps.style) {
       rowProps.style = {...rowProps.style, ...rowStyle};
@@ -91,8 +91,8 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
         let classNames: string[] = [col.className ?? '', col.fixed ? `fixed fixed-${col.fixed}` : ''];
         let cellProps: DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement> = {};
         
-        if (tableCellProps && typeof tableCellProps === 'function'){
-          cellProps = tableCellProps(col, row) ?? {}
+        if (getTableCellProps && typeof getTableCellProps === 'function'){
+          cellProps = getTableCellProps(col, row) ?? {}
           if(cellProps.key) delete cellProps.key;
 
           if (cellProps.className) {

@@ -53,8 +53,8 @@ export interface ColumnContextInterface<T> {
   components?: CustomComponents
   groupsExpandedByDefault: boolean
   doNotUseHTML5Dialog?: boolean
-  tableRowProps?: (row: T) => (DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement> | undefined)
-  tableCellProps?: (column: DataColumn<T>, row: T) => (DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement> | undefined)
+  getTableRowProps?: (row: T) => (DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement> | undefined)
+  getTableCellProps?: (column: DataColumn<T>, row: T) => (DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement> | undefined)
 }
 
 export const ColumnContext = createContext<ColumnContextInterface<any>>({
@@ -82,8 +82,8 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   canReorderColumns: false,
   canGroupBy: false,
   groupsExpandedByDefault: true,
-  tableRowProps: () => undefined,
-  tableCellProps: () => undefined
+  getTableRowProps: () => undefined,
+  getTableCellProps: () => undefined
 });
 
 interface GroupCollapseContextInterface {
