@@ -7,6 +7,7 @@ import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons/faChevronDown';
 import { RowSelector } from '../row-selector';
 import { DataGroup } from './types';
+import { DetailedHTMLProps, HTMLAttributes, TdHTMLAttributes } from 'react';
 
 interface TableRowProps<T> {
   row: any;
@@ -23,6 +24,8 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
     DetailRow,
     canRowShowDetail,
     canSelectRows,
+    getTableRowProps,
+    getTableCellProps
   } = useContext(ColumnContext);
 
   let canEditRow = isEditing;
@@ -38,8 +41,20 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
   const DetailRowRenderer = DetailRow ?? FakeDetailRow;
 
   let rowStyle: any = {'--indent': group?.level ?? 0};
+  let rowProps: DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement> = {};
+  
+  if (getTableRowProps && typeof getTableRowProps === 'function'){
+    rowProps = getTableRowProps(row) ?? {};
+
+    if (rowProps.style) {
+      rowProps.style = {...rowProps.style, ...rowStyle};
+    } else {
+      rowProps.style = rowStyle;
+    }
+  }
+  
   return <>
-    <tr style={rowStyle}>
+    <tr {...rowProps}>
       {hasDetailRenderer && <td key={`mdr`} className='fixed fixed-left mdr-control'>
         {detailRowAvailable && <>
           <button type='button' className='mdr-button' onClick={() => setExpanded(v => !v)}>
@@ -73,14 +88,20 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
             : value;
         }
 
-        let classNames: string[] = [
-          col.className ?? '',
-          col.fixed ? `fixed fixed-${col.fixed}` : '',
-        ].filter(s => !!s);
+        let classNames: string[] = [col.className ?? '', col.fixed ? `fixed fixed-${col.fixed}` : ''];
+        let cellProps: DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement> = {};
+        
+        if (getTableCellProps && typeof getTableCellProps === 'function'){
+          cellProps = getTableCellProps(rendered, row, col) ?? {}
 
-        return <td key={colIdx} className={classNames.join(' ').trim()}>
-          {rendered}
-        </td>;
+          if (cellProps.className) {
+            classNames.push(cellProps.className)
+          }
+          classNames = classNames.filter(s => !!s);
+          cellProps.className = classNames.join(' ').trim();
+        }
+        
+        return <td {...cellProps} key={colIdx}>{rendered}</td>;
       })}
     </tr>
     {isExpanded && !!DetailRow && <tr>
