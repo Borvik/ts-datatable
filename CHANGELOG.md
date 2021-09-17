@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.3.4] - 2021-09-17
+### Added
+- @BlairCurrey Added `getTableRowProps` and `getTableCellProps` to customize row/cell styles.
+
 ## [1.3.3] - 2021-09-13
 ### Fixed
 - Updated use-querystate library to latest version to solve issue with query parameters not updating.
