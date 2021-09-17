@@ -6,6 +6,7 @@ export type {
   CustomEditorProps,
   DataProps,
   DataColumnProp,
+  DataColumn
 } from './components/table/types';
 export type {
   TableActionButtonsProps
