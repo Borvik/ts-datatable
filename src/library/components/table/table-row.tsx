@@ -93,7 +93,6 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
         
         if (getTableCellProps && typeof getTableCellProps === 'function'){
           cellProps = getTableCellProps(col, row) ?? {}
-          if(cellProps.key) delete cellProps.key;
 
           if (cellProps.className) {
             classNames.push(cellProps.className)
@@ -102,7 +101,7 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
           cellProps.className = classNames.join(' ').trim();
         }
         
-        return <td key={colIdx} {...cellProps}>{rendered}</td>;
+        return <td {...cellProps} key={colIdx}>{rendered}</td>;
       })}
     </tr>
     {isExpanded && !!DetailRow && <tr>
