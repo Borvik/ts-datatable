@@ -172,14 +172,6 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   const [editFormData, setFormData] = useState<EditFormData>({});
   const [selectedRows, setSelectedRows] = useState<Record<string | number, T>>({});
 
-  // const [qsPagination, setPagination] = useQueryState({page: 1, perPage: props.paginateOptions?.defaultPerPage ?? 10}, {
-  //   ...props.qs
-  // });
-
-  // const pagination = {
-  //   page: qsPagination.page ?? 1,
-  //   perPage: qsPagination.perPage ?? props.paginateOptions?.defaultPerPage ?? 10,
-  // };
   const [pagination, setPagination] = useParsedQs<Pagination, DeepPartial<Pagination>>(
     {page: 1, perPage: props.paginateOptions?.defaultPerPage ?? 10},
     (qsPagination) => ({

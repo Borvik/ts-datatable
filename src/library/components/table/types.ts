@@ -7,7 +7,6 @@ import {
   HTMLProps,
   ReactElement
 } from 'react';
-// import { useQueryState } from '@borvik/use-querystate';
 import { QueryStateOptions } from '@borvik/use-querystate/dist/types';
 import { QueryStringFilterTypes } from '@borvik/querystring/dist/types';
 import { PaginateRequiredProps, PaginateOptions, PageChange } from '../pagination/types';
@@ -18,8 +17,6 @@ import { TableActionButtonsProps } from './actions';
 import { RowSelectorCheckboxProps } from '../row-selector';
 
 export type Pagination = { page: number; perPage: number };
-// const returnTypeFunction = () => useQueryState<Pagination>({page: 1, perPage: 2});
-// type SetPaginationState = ReturnType<typeof returnTypeFunction>[1]
 // export type EditFn<T> = (row: T, changes: Partial<T>) => Promise<boolean>;
 
 export interface DataFnResult<T> {
