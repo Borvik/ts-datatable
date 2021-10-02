@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+### Added
+- Ability to specify a default filter (thanks to the update to the underlying querystring libraries).
+
 ## [1.3.3] - 2021-09-13
 ### Fixed
 - Updated use-querystate library to latest version to solve issue with query parameters not updating.
