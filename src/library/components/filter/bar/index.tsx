@@ -22,7 +22,7 @@ export const FilterBar: React.FC = function FilterBar() {
   function applyFilter(filterState: QueryFilterGroup) {
     batchedQSUpdate(() => {
       setFilter(filterState);
-      setPagination({ page: 1 });
+      setPagination(prev => ({ ...prev, page: 1 }));
     });
   }
   
@@ -104,7 +104,7 @@ export const FilterBar: React.FC = function FilterBar() {
 
     batchedQSUpdate(() => {
       setFilter(newFilter!)
-      setPagination({ page: 1 });
+      setPagination(prev => ({ ...prev, page: 1 }));
     });
   }
 

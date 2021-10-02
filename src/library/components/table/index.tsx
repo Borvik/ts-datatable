@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
-import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData, QSGroupBy, GroupBy, ColumnSort, ColumnConfigurationWithGroup } from './types';
+import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData, QSGroupBy, GroupBy, ColumnSort, ColumnConfigurationWithGroup, Pagination } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { useQueryState, batchedQSUpdate } from '@borvik/use-querystate';
 import { transformColumns, getFlattenedColumns, generateHeaderRows } from '../../utils/transformColumnProps';
@@ -21,6 +21,8 @@ import { TableActionButtons } from './actions';
 import { getRowKey } from '../../utils/getRowKey';
 import { update } from '../../utils/immutable';
 import { QueryString } from '@borvik/querystring';
+import { defaults } from 'lodash';
+import { DeepPartial } from '@borvik/use-querystate/dist/types';
 
 const primaryKeyWarned: {[x:string]: boolean} = {};
 const fixedLeftWarned: Record<string, boolean> = {};
@@ -51,8 +53,8 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   const [qsGroupBy, setGroupBy] = useParsedQs<GroupBy, QSGroupBy>(
     { group: props.defaultGroupBy ?? [] },
     (qsSort) => ({ // parse
-      group: qsSort.group.map(v => {
-        let parts = v.split(' ').filter(a => !!a);
+      group: (qsSort?.group ?? []).map(v => {
+        let parts = v!.split(' ').filter(a => !!a);
         if (parts.length !== 2) return null;
         return {
           column: parts[0],
@@ -170,9 +172,25 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   const [editFormData, setFormData] = useState<EditFormData>({});
   const [selectedRows, setSelectedRows] = useState<Record<string | number, T>>({});
 
-  const [pagination, setPagination] = useQueryState({page: 1, perPage: props.paginateOptions?.defaultPerPage ?? 10}, {
-    ...props.qs
-  });
+  // const [qsPagination, setPagination] = useQueryState({page: 1, perPage: props.paginateOptions?.defaultPerPage ?? 10}, {
+  //   ...props.qs
+  // });
+
+  // const pagination = {
+  //   page: qsPagination.page ?? 1,
+  //   perPage: qsPagination.perPage ?? props.paginateOptions?.defaultPerPage ?? 10,
+  // };
+  const [pagination, setPagination] = useParsedQs<Pagination, DeepPartial<Pagination>>(
+    {page: 1, perPage: props.paginateOptions?.defaultPerPage ?? 10},
+    (qsPagination) => ({
+      page: qsPagination.page ?? 1,
+      perPage: qsPagination.perPage ?? props.paginateOptions?.defaultPerPage ?? 10,
+    }),
+    (state) => state,
+    {
+      ...props.qs
+    }
+  )
 
   const [searchQuery, setSearchQuery] = useQueryState({query: ''}, {
     ...props.qs
@@ -224,8 +242,8 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   const [columnSort, setColumnSort] = useParsedQs<ColumnSorts, QSColumnSorts>(
     { sort: props.defaultSort ?? [] },
     (qsSort) => ({ // parse
-      sort: qsSort.sort.map(v => {
-        let parts = v.split(' ').filter(a => !!a);
+      sort: (qsSort?.sort ?? []).map(v => {
+        let parts = v!.split(' ').filter(a => !!a);
         if (parts.length !== 2) return null;
         return {
           column: parts[0],
@@ -272,7 +290,7 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
       if (typeof props.onQueryChange === 'function') {
         props.onQueryChange({
           pagination,
-          search: hideSearchForm ? '' : searchQuery.query,
+          search: hideSearchForm ? '' : (searchQuery.query ?? ''),
           sorts: fullSort,
           filters: filter.filters.length ? filter : undefined,
         });
@@ -281,7 +299,7 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
       if (typeof props.data === 'function') {
         let returnedData = await props.data({
           pagination,
-          search: hideSearchForm ? '' : searchQuery.query,
+          search: hideSearchForm ? '' : (searchQuery.query ?? ''),
           sorts: fullSort,
           filters: filter.filters.length ? filter : undefined,
         }, doSetDataList);
@@ -430,14 +448,14 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   const searchFormOnSearch = useCallback((query: string) => {
     batchedQSUpdate(() => {
       setSearchQuery({ query });
-      setPagination({ page: 1 });
+      setPagination(prev => ({ page: 1, perPage: prev.perPage }));
     });
   }, [setSearchQuery, setPagination]);
 
   const searchFormApplyFilter = useCallback((newFilter: any) => {
     batchedQSUpdate(() => {
       setRawFilter({ filter: newFilter });
-      setPagination({ page: 1 });
+      setPagination(prev => ({ page: 1, perPage: prev.perPage }));
     });
   }, [setRawFilter, setPagination]);
 
@@ -494,7 +512,7 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
         <div ref={topEl} className={`ts-datatable-top`}>
           <div className='ts-datatable-search-filters'>
             {!hideSearchForm && <SearchForm
-              searchQuery={searchQuery.query}
+              searchQuery={searchQuery.query ?? ''}
               filter={rawFilter.filter}
               onSearch={searchFormOnSearch}
               applyFilter={searchFormApplyFilter}
@@ -520,7 +538,7 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
               <Paginate
                 {...props.paginateOptions}
                 {...pagination}
-                changePage={(page) => setPagination(page)}
+                changePage={(page) => setPagination(prev => ({ ...prev, ...page }))}
                 total={typeof props.data === 'function' ? stateDataList.total : props.totalCount}
             />}
           </div>
@@ -545,7 +563,7 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
             <Paginate
               {...props.paginateOptions}
               {...pagination}
-              changePage={(page) => setPagination(page)}
+              changePage={(page) => setPagination(prev => ({ ...prev, ...page }))}
               total={typeof props.data === 'function' ? stateDataList.total : props.totalCount}
             />
           </div>}

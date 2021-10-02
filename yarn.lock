@@ -932,10 +932,10 @@
   resolved "https://registry.yarnpkg.com/@borvik/dialog-polyfill/-/dialog-polyfill-0.5.7-beta.0.tgz#aad25e835bf808a2148193d572998ff986c87181"
   integrity sha512-7jfTP2Ov4pu9+O8zv+qekxHXtwdUF2SV3yrr5kPpzj5OFXbpqoao1AHbFziq6bB7FRJuQqnbt0dFe6KQAgMyNQ==
 
-"@borvik/querystring@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@borvik/querystring/-/querystring-2.0.1.tgz#dc3ff3ce2f9fc15a169dc9194b1f0087c8ff85b2"
-  integrity sha512-LdEPqGTUO5pGDAXeHmmkfw/Jsy7GXVJ5WjrDLcsuKJt1G694JTu9xkreb1oyv/2lJaU36YwrxPuc0J5ATfk3Hg==
+"@borvik/querystring@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@borvik/querystring/-/querystring-3.0.0.tgz#a81e5f972953faec702865502feb49b790f1f24c"
+  integrity sha512-mMTW4c/53n6MGEjyUjA0MQZGViwxxEBPyCGmqHHjk1LuTSQLofUYCnB/XhZsbMzcodya017wt60bjyv0WYV6nw==
   dependencies:
     clean-deep "~3.4.0"
     lodash "~4.17.20"
@@ -947,12 +947,12 @@
   dependencies:
     "@borvik/dialog-polyfill" "^0.5.7-beta.0"
 
-"@borvik/use-querystate@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@borvik/use-querystate/-/use-querystate-2.0.2.tgz#8f90392083bb92e083b3fe8cf9ed4f278922f3b7"
-  integrity sha512-6QkoOaOdey9BJO6R0rgRonKv/qvBJfCA7Wba1qJmSvze53LdLEyZWbYpkFh5mPDLcS5nycfpw6Ce05NlbleX0g==
+"@borvik/use-querystate@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@borvik/use-querystate/-/use-querystate-3.0.0.tgz#841cd96dfa4c918d6659a4c043092ff7d638386a"
+  integrity sha512-B1xzhVkt33mivVwXSAXkqPH9eWTfyI0Oab4Mc2fWnQCP0mf0DGLlqSG4cDH7G11RdNlwFLEOk2XOMf1joKix0w==
   dependencies:
-    "@borvik/querystring" "^2.0.1"
+    "@borvik/querystring" "^3.0.0"
 
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.3"
