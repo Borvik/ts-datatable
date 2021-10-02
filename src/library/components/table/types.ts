@@ -84,7 +84,7 @@ export interface DataTableProperties<T> {
   canGroupBy?: boolean
   groupsExpandedByDefault?: boolean
 
-  components?: CustomComponents
+  components?: CustomComponents<T>
 
   classNames?: CustomClasses
   labels?: CustomLabels
@@ -93,12 +93,12 @@ export interface DataTableProperties<T> {
   doNotUseHTML5Dialog?: boolean
 }
 
-export interface CustomComponents {
+export interface CustomComponents<T> {
   Paginate?: React.ElementType<PaginateRequiredProps>;
   SearchForm?: React.ElementType<SearchRequiredProps>;
   ActionButtons?: React.ElementType<TableActionButtonsProps>;
   Loading?: ReactRenderable;
-  RowCheckbox?: React.ElementType<RowSelectorCheckboxProps>;
+  RowCheckbox?: React.ElementType<RowSelectorCheckboxProps<T>>;
   Buttons?: {
     ColumnPicker?: React.ElementType<CustomColumnPickerButtonProps>
     Filter?: React.ElementType<CustomFilterButtonProps>

@@ -50,7 +50,7 @@ export interface ColumnContextInterface<T> {
   canSelectRow?: (row: T) => boolean;
   classNames?: CustomClasses
   labels?: CustomLabels
-  components?: CustomComponents
+  components?: CustomComponents<T>
   groupsExpandedByDefault: boolean
   doNotUseHTML5Dialog?: boolean
   getTableRowProps?: (row: T) => (DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement> | undefined)

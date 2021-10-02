@@ -63,7 +63,7 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
         </>}
       </td>}
       {canSelectRows && <td key={`sel`} className='fixed fixed-left row-selector'>
-        <RowSelector row={row} rowIndex={props.rowIndex} />
+        <RowSelector<T> row={row} rowIndex={props.rowIndex} />
       </td>}
       {columns.map((col, colIdx) => {
         if (!col.isVisible || col.isGrouped) return null;

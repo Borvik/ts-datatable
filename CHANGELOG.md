@@ -2,6 +2,7 @@
 
 ### Added
 - Ability to specify a default filter (thanks to the update to the underlying querystring libraries).
+- Passed current row down to custom row checkbox selectors so input/label `id` properties can be uniquely set.
 
 ## [1.3.4] - 2021-09-17
 ### Added

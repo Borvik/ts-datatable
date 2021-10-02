@@ -2,13 +2,13 @@ import React, { useContext } from 'react';
 import { ColumnContext } from '../table/contexts';
 import { getRowKey } from '../../utils/getRowKey';
 
-interface RowSelectorProps {
-  row: any;
+interface RowSelectorProps<T> {
+  row: T;
   rowIndex: number;
-  data?: any[]
+  data?: T[]
 }
 
-export const RowSelector: React.FC<RowSelectorProps> = function RowSelector({ row, rowIndex, ...props }) {
+export const RowSelector = function RowSelector<T>({ row, rowIndex, ...props }: RowSelectorProps<T>) {
   const {
     actualColumns: columns,
     canSelectRow,
@@ -50,6 +50,7 @@ export const RowSelector: React.FC<RowSelectorProps> = function RowSelector({ ro
 
   return <div>
     <Checkbox
+      row={row}
       checked={isSelected}
       indeterminate={false}
       onChange={() => setRowSelected(row, rowIndex)}
@@ -57,13 +58,14 @@ export const RowSelector: React.FC<RowSelectorProps> = function RowSelector({ ro
   </div>
 };
 
-export interface RowSelectorCheckboxProps {
+export interface RowSelectorCheckboxProps<T> {
   checked: boolean
   indeterminate: boolean
   onChange: React.InputHTMLAttributes<HTMLInputElement>['onChange']
+  row?: T
 }
 
-export const RowSelectorCheckbox: React.FC<RowSelectorCheckboxProps> = function RowSelectorCheckbox({ indeterminate, checked, onChange }) {
+export const RowSelectorCheckbox = function RowSelectorCheckbox<T>({ indeterminate, checked, onChange }: RowSelectorCheckboxProps<T>) {
   return <input
     type='checkbox'
     ref={(el) => el && (el.indeterminate = indeterminate)}
