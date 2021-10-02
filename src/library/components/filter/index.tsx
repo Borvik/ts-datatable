@@ -26,7 +26,7 @@ export const FilterButton: React.FC = function FilterButton() {
   function applyFilter(filterState: QueryFilterGroup) {
     batchedQSUpdate(() => {
       setFilter(filterState);
-      setPagination({ page: 1 });
+      setPagination(prev => ({ ...prev, page: 1 }));
     });
   }
 

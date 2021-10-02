@@ -10,9 +10,9 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@borvik/querystring": "^2.0.1",
+    "@borvik/querystring": "^3.0.0",
     "@borvik/use-dialog": "^1.1.2",
-    "@borvik/use-querystate": "^2.0.2",
+    "@borvik/use-querystate": "^3.0.0",
     "@fortawesome/fontawesome-free": "^5.13.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",

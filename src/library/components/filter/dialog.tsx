@@ -21,7 +21,7 @@ export const FilterDialog: React.FC = function FilterDialog() {
   return <Dialog doNotUseHTML5Dialog={doNotUseHTML5Dialog} className='filter-dialog' dialogRef={dialogEl} onSubmit={async (close) => {
     batchedQSUpdate(() => {
       setFilter(filterState);
-      setPagination({ page: 1 });
+      setPagination(prev => ({ ...prev, page: 1 }));
     });
     close();
   }}>
@@ -32,7 +32,8 @@ export const FilterDialog: React.FC = function FilterDialog() {
       <FilterEditor value={filterState} onChange={setFilterState} />
     </DialogBody>
     <DialogFooter>
-      <button type='button' className={btnCloseClass} onClick={() => { dialogEl.current?.close(); }}>{labels?.close ?? 'Close'}</button>
+      {/* TODO: remove "as any" when dialog type defs are fixed */}
+      <button type='button' className={btnCloseClass} onClick={() => { (dialogEl.current as any)?.close(); }}>{labels?.close ?? 'Close'}</button>
       <button type='submit' className={btnApplyClass}>{labels?.apply ?? 'Apply'}</button>
     </DialogFooter>
   </Dialog>;

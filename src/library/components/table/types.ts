@@ -16,6 +16,7 @@ import { CustomColumnPickerButtonProps } from '../column-picker/types';
 import { TableActionButtonsProps } from './actions';
 import { RowSelectorCheckboxProps } from '../row-selector';
 
+export type Pagination = { page: number; perPage: number };
 // export type EditFn<T> = (row: T, changes: Partial<T>) => Promise<boolean>;
 
 export interface DataFnResult<T> {
@@ -46,6 +47,7 @@ export interface DataTableProperties<T> {
   multiColumnSorts?: boolean;
   defaultSort?: ColumnSort[];
   defaultGroupBy?: ColumnSort[];
+  defaultFilter?: string | Record<string, any>;
 
   qs?: QueryStateOptions;
 
@@ -190,7 +192,7 @@ export type OnShowColumnPicker = (columns: DataColumn<any>[], setColumnConfig: S
 export type OnShowFilterEditor = (filter: QueryFilterGroup, applyFilter: (filter: QueryFilterGroup) => void, btnElement: HTMLButtonElement) => void | Promise<void>;
 
 export type SetFilterCb = (newState: QueryFilterGroup | ((state: QueryFilterGroup) => QueryFilterGroup)) => void;
-export type SetPaginationCb = (newState: Partial<{ page: number; perPage: number}> | ((state: { page: number; perPage: number}) => Partial<{page: number; perPage: number}>)) => void;
+export type SetPaginationCb = (newState: Pagination | ((state: Pagination) => Pagination)) => void;
 
 export type QuickEditFormData<T> = Record<PropertyKey, Partial<T>>;
 export type OnSaveQuickEdit<T> = (formData: QuickEditFormData<T>) => Promise<void>

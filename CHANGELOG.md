@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+### Added
+- Ability to specify a default filter (thanks to the update to the underlying querystring libraries).
+
 ## [1.3.4] - 2021-09-17
 ### Added
 - @BlairCurrey Added `getTableRowProps` and `getTableCellProps` to customize row/cell styles.
