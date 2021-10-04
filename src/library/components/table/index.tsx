@@ -11,8 +11,6 @@ import { TableBody } from './body';
 import { PageNav } from '../pagination';
 import { useDeepEffect } from '../../utils/useDeepEffect';
 import { SearchForm as SearchFormComponent } from '../search';
-import { useParsedQs } from '../../utils/useParsedQS';
-import { notEmpty } from '../../utils/comparators';
 import { ColumnPickerButton } from '../column-picker';
 import { FilterButton, FilterBar } from '../filter';
 import { convertFromQS, convertToQS, transformTableFiltersToColumns } from '../../utils/transformFilter';
@@ -21,8 +19,10 @@ import { TableActionButtons } from './actions';
 import { getRowKey } from '../../utils/getRowKey';
 import { update } from '../../utils/immutable';
 import { QueryString } from '@borvik/querystring';
-import { defaults } from 'lodash';
-import { DeepPartial } from '@borvik/use-querystate/dist/types';
+import { useGroupBy } from './hooks/useGroupBy';
+import { usePagination } from './hooks/usePagination';
+import { useFilter } from './hooks/useFilter';
+import { useColumnSort } from './hooks/useColumnSort';
 
 const primaryKeyWarned: {[x:string]: boolean} = {};
 const fixedLeftWarned: Record<string, boolean> = {};
@@ -50,36 +50,7 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
 
   const [columnOrder, setColumnOrder] = useLocalState<string[]>(`table.${props.id}.columnOrder`, [], [ props.id ]);
 
-  const [qsGroupBy, setGroupBy] = useParsedQs<GroupBy, QSGroupBy>(
-    { group: props.defaultGroupBy ?? [] },
-    (qsSort) => ({ // parse
-      group: (qsSort?.group ?? []).map(v => {
-        let parts = v!.split(' ').filter(a => !!a);
-        if (parts.length !== 2) return null;
-        return {
-          column: parts[0],
-          direction: (parts[1].toLowerCase() === 'desc' ? 'desc' : 'asc') as 'asc' | 'desc'
-        }
-      })
-      .filter(notEmpty)
-    }),
-    (state) => { // encode
-      if (!state.group.length && props.defaultGroupBy?.length) {
-        return { group: [''] };
-      }
-
-      return {
-        group: state.group.map(v => `${v.column} ${v.direction}`)
-      };
-    },
-    {
-      ...props.qs,
-      types: {
-        group: 'string[]'
-      }
-    }
-  );
-
+  const [qsGroupBy, setGroupBy] = useGroupBy(props.defaultGroupBy, props.qs);
   const groupBy = canGroupBy
     ? qsGroupBy.group
     : [];
@@ -172,17 +143,7 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   const [editFormData, setFormData] = useState<EditFormData>({});
   const [selectedRows, setSelectedRows] = useState<Record<string | number, T>>({});
 
-  const [pagination, setPagination] = useParsedQs<Pagination, DeepPartial<Pagination>>(
-    {page: 1, perPage: props.paginateOptions?.defaultPerPage ?? 10},
-    (qsPagination) => ({
-      page: qsPagination.page ?? 1,
-      perPage: qsPagination.perPage ?? props.paginateOptions?.defaultPerPage ?? 10,
-    }),
-    (state) => state,
-    {
-      ...props.qs
-    }
-  )
+  const [pagination, setPagination] = usePagination(props.paginateOptions?.defaultPerPage, props.qs);
 
   const [searchQuery, setSearchQuery] = useQueryState({query: ''}, {
     ...props.qs
@@ -218,42 +179,9 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
     filterToTypeDef: true,
   });
 
-  const [filter, setFilter] = useParsedQs<QueryFilterGroup, {filter?: any}>(
-    defaultConvertedFilter,
-    (qsFilter) => convertFromQS(qsFilter, filterColumns),
-    (state) => convertToQS(state, filterColumns),
-    {
-      ...props.qs,
-      types: {
-        filter: 'any'
-      },
-      filterToTypeDef: true,
-    }
-  )
+  const [filter, setFilter] = useFilter<T>(defaultConvertedFilter, filterColumns, props.qs);
 
-  const [columnSort, setColumnSort] = useParsedQs<ColumnSorts, QSColumnSorts>(
-    { sort: props.defaultSort ?? [] },
-    (qsSort) => ({ // parse
-      sort: (qsSort?.sort ?? []).map(v => {
-        let parts = v!.split(' ').filter(a => !!a);
-        if (parts.length !== 2) return null;
-        return {
-          column: parts[0],
-          direction: (parts[1].toLowerCase() === 'desc' ? 'desc' : 'asc') as 'asc' | 'desc'
-        }
-      })
-      .filter(notEmpty)
-    }),
-    (state) => ({ // encode
-      sort: state.sort.map(v => `${v.column} ${v.direction}`)
-    }),
-    {
-      ...props.qs,
-      types: {
-        sort: 'string[]'
-      }
-    }
-  );
+  const [columnSort, setColumnSort] = useColumnSort(props.defaultSort, props.qs);
 
   const [isEditing, setEditing] = useState(false);
   const [isSavingQuickEdit, setSaving] = useState(false);
@@ -263,14 +191,24 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   const [dataLoading, setLoading] = useState(true);
   const [dataLoaderEl, setDataLoaderEl] = useState<React.ReactElement<any> | null>(null);
   
-  function doSetDataList(data: T[] | DataFnResult<T[]>) {
+  const doSetDataList = useCallback((data: T[] | DataFnResult<T[]>) => {
     if (Array.isArray(data)) {
       setDataList({ data: data, total: data.length });
     } else {
       setDataList(data);
     }
     setLoading(false);
-  }
+  }, [ setDataList, setLoading ]);
+
+  const doSetSelectedRows = useCallback((selection: Record<string | number, T>) => {
+    if (typeof props.onSelectionChange === 'function') {
+      // raise
+      let keys = Object.keys(selection);
+      let values = Object.values(selection);
+      props.onSelectionChange(keys, values);
+    }
+    setSelectedRows(selection);
+  }, [ props.onSelectionChange, setSelectedRows ]);
 
   useDeepEffect(() => {
     async function getData() {
@@ -397,21 +335,12 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
     }
   }, [propOnSave]);
 
-  function doSetSelectedRows(selection: Record<string | number, T>) {
-    if (typeof props.onSelectionChange === 'function') {
-      // raise
-      let keys = Object.keys(selection);
-      let values = Object.values(selection);
-      props.onSelectionChange(keys, values);
-    }
-    setSelectedRows(selection);
-  }
+  const tableData = typeof props.data === 'function' ? stateDataList.data : props.data;
 
-  function setAllSelected(selectAll: boolean) {
-    let data = typeof props.data === 'function' ? stateDataList.data : props.data;
+  const setAllSelected = useCallback((selectAll: boolean) => {
     let newSelected: Record<string | number, T> = {};
     if (selectAll) {
-      data.map((row, idx) => {
+      tableData.map((row, idx) => {
         if (typeof props.canSelectRow === 'function' && !props.canSelectRow(row))
           return row;
         let rowKey = getRowKey(row, idx, columnData.actualColumns, props.getRowKey);
@@ -420,9 +349,9 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
       });
     }
     doSetSelectedRows(newSelected);
-  }
+  }, [ tableData, props.canSelectRow, columnData.actualColumns, props.getRowKey, doSetSelectedRows ]);
 
-  function setRowSelected(row: any, rowIndex: number) {
+  const setRowSelected = useCallback((row: any, rowIndex: number) => {
     let rowKey = getRowKey(row, rowIndex, columnData.actualColumns, props.getRowKey);
     let exists = typeof selectedRows[rowKey] !== 'undefined';
     
@@ -435,7 +364,7 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
         $unset: [rowKey]
       }));
     }
-  }
+  }, [ columnData.actualColumns, props.getRowKey, selectedRows ]);
 
   const searchFormOnSearch = useCallback((query: string) => {
     batchedQSUpdate(() => {
@@ -541,12 +470,12 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
           <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
             <TableHeader
               headRef={theadEl}
-              data={typeof props.data === 'function' ? stateDataList.data : props.data}
+              data={tableData}
             />
             <TableBody
               getRowKey={props.getRowKey}
               canEditRow={props.canEditRow}
-              data={typeof props.data === 'function' ? stateDataList.data : props.data}
+              data={tableData}
               loading={typeof props.data === 'function' ? dataLoading : (props.isLoading ?? false)}
               LoadingComponent={props.components?.Loading}
             />
