@@ -21,9 +21,10 @@ import { TableActionButtons } from './actions';
 import { getRowKey } from '../../utils/getRowKey';
 import { update } from '../../utils/immutable';
 import { QueryString } from '@borvik/querystring';
-import { defaults } from 'lodash';
 import { DeepPartial } from '@borvik/use-querystate/dist/types';
 
+const preMDR_RenderWarned: Record<string, boolean> = {};
+const preMDR_WidthWarned: Record<string, boolean> = {};
 const primaryKeyWarned: {[x:string]: boolean} = {};
 const fixedLeftWarned: Record<string, boolean> = {};
 const fixedRightWarned: Record<string, boolean> = {};
@@ -106,6 +107,7 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
    */
   const [columnData] = useDeepDerivedState(() => {
     // First Clean the columns - transforms "resolve | type" column properties
+    let preMDRColumn = props.preMDRColumn ? transformColumns(props.id, [props.preMDRColumn], columnVisibility, groupBy) : null;
     let visibleColumns = transformColumns(props.id, props.columns, columnVisibility, groupBy);
     let actualColumns = getFlattenedColumns(visibleColumns);
     let headerRows = generateHeaderRows(actualColumns, props.canReorderColumns ? columnOrder : []);
@@ -115,6 +117,18 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
         fixedRightCount: number = 0,
         hasEditor: boolean = false;
     
+    if (preMDRColumn?.[0]) {
+      if (!preMDR_RenderWarned[props.id] && typeof preMDRColumn[0].render !== 'function') {
+        console.warn(`Pre-MDR Column needs to have a render function defined`);
+        preMDR_RenderWarned[props.id] = true;
+      }
+
+      if (!preMDR_WidthWarned[props.id] && typeof preMDRColumn[0].preMDRColumnWidth !== 'number') {
+        console.warn(`Pre-MDR Column needs a width defined as a number`);
+        preMDR_WidthWarned[props.id] = true;
+      }
+    }
+
     if (!props.getRowKey) {
       for (let c of actualColumns) {
         if (c.isPrimaryKey) {
@@ -155,8 +169,9 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
       actualColumns,
       hasEditor,
       primaryKeyCount,
+      preMDRColumn: preMDRColumn?.[0]
     }
-  }, [ props.id, columnVisibility, props.columns, columnOrder, groupBy, props.canReorderColumns, canGroupBy ]);
+  }, [ props.id, columnVisibility, props.preMDRColumn, props.columns, columnOrder, groupBy, props.canReorderColumns, canGroupBy ]);
 
   const [filterColumns] = useDeepDerivedState(() => {
     let transformedFilters = transformTableFiltersToColumns<T>(props.filters ?? []);
@@ -324,6 +339,10 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   let wrapperStyle: any = {
     '--ts-dt-fixed-bg': props.fixedColBg ?? 'white'
   };
+
+  if (typeof columnData.preMDRColumn?.preMDRColumnWidth === 'number') {
+    wrapperStyle['--premdr-width'] = `${columnData.preMDRColumn.preMDRColumnWidth}px`;
+  }
 
   const topEl = useRef<HTMLDivElement>(null);
   const theadEl = useRef<HTMLTableSectionElement>(null);

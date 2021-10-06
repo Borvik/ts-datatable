@@ -115,6 +115,14 @@ export function FullFeaturedExample() {
       ActionButtons: CustomActionButtons,
       RowCheckbox: CustomCheckbox,
     }}
+
+    // preMDRColumn={{
+    //   accessor: '',
+    //   render: (_, _row) => {
+    //     return 'Qwerty'
+    //   },
+    //   preMDRColumnWidth: 15
+    // }}
   />
 }
 
@@ -161,7 +169,7 @@ export class CustomActionButtons extends React.Component<TableActionButtonsProps
   }
 }
 
-export class CustomCheckbox extends React.Component<RowSelectorCheckboxProps> {
+export class CustomCheckbox extends React.Component<RowSelectorCheckboxProps<any>> {
   
   render() {
     const { checked, indeterminate, onChange } = this.props;

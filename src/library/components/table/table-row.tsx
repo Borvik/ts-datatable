@@ -6,13 +6,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons/faChevronDown';
 import { RowSelector } from '../row-selector';
-import { DataGroup } from './types';
+import { DataGroup, isValidPreMDRColumn } from './types';
 import { DetailedHTMLProps, HTMLAttributes, TdHTMLAttributes } from 'react';
 
 interface TableRowProps<T> {
-  row: any;
+  row: T;
   rowIndex: number;
-  canEditRow?: (row: any) => boolean;
+  canEditRow?: (row: T) => boolean;
   group?: DataGroup<T>
 }
 
@@ -25,7 +25,8 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
     canRowShowDetail,
     canSelectRows,
     getTableRowProps,
-    getTableCellProps
+    getTableCellProps,
+    preMDRColumn,
   } = useContext(ColumnContext);
 
   let canEditRow = isEditing;
@@ -55,6 +56,9 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
   
   return <>
     <tr {...rowProps}>
+      {isValidPreMDRColumn(preMDRColumn) && <td key='premdr' className={`fixed fixed-left premdr-col ${preMDRColumn.className ?? ''}`.trim()}>
+        <div className='premdr-col-content'>{preMDRColumn.render?.(null, row, preMDRColumn) ?? ''}</div>
+      </td>}
       {hasDetailRenderer && <td key={`mdr`} className='fixed fixed-left mdr-control'>
         {detailRowAvailable && <>
           <button type='button' className='mdr-button' onClick={() => setExpanded(v => !v)}>
