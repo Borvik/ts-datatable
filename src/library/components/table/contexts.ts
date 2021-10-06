@@ -18,6 +18,7 @@ import {
 import { FilterSettings } from '../filter/types';
 
 export interface ColumnContextInterface<T> {
+  preMDRColumn?: DataColumn<T>;
   actualColumns: DataColumn<T>[]; // the flat list of columns (lowest level)
   filterColumns: DataColumn<T>[]; // contains actualColumns, but also faux columns defined by separate filters prop
   headerRows: DataColumn<T>[][];

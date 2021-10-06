@@ -3,7 +3,7 @@ import { doSetColumnSort } from '../../utils/setColumnSort';
 import { RowSelector } from '../row-selector';
 import { ColumnContext } from './contexts';
 import { HeaderSort } from './sortable';
-import { ColumnSort } from './types';
+import { ColumnSort, isValidPreMDRColumn } from './types';
 
 interface HeadProps {
   headRef: React.RefObject<HTMLTableSectionElement>
@@ -19,6 +19,7 @@ export const TableHeader: React.FC<HeadProps> = function TableHeader(props) {
     DetailRow,
     canSelectRows,
     groupBy,
+    preMDRColumn,
   } = useContext(ColumnContext);
 
   if (headerRows.length < 1) return null;
@@ -47,8 +48,8 @@ export const TableHeader: React.FC<HeadProps> = function TableHeader(props) {
 
             return (<React.Fragment key={`row-key-${colIdx}`}>
               {(colIdx === 0 && rowIdx === 0) && <>
-                {hasDetailRenderer && <th scope='col' style={indentStyle} key='mdr' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'>
-                </th>}
+                {isValidPreMDRColumn(preMDRColumn) && <th scope='col' style={indentStyle} key='premdr' rowSpan={headerRows.length} className={`fixed fixed-left premdr-col ${preMDRColumn.className ?? ''}`.trim()}></th>}
+                {hasDetailRenderer && <th scope='col' style={indentStyle} key='mdr' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'></th>}
                 {canSelectRows && <th scope='col' style={indentStyle} key='sel' rowSpan={headerRows.length} className='fixed fixed-left row-selector'>
                   <RowSelector
                     row={null}

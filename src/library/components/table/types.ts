@@ -43,6 +43,7 @@ export interface DataTableProperties<T> {
   data: DataFn<T[]> | T[];
   totalCount?: number;
   isLoading?: boolean;
+  preMDRColumn?: Partial<DataColumnProp<T>>;
 
   multiColumnSorts?: boolean;
   defaultSort?: ColumnSort[];
@@ -160,6 +161,7 @@ interface BaseColumnProps<T> {
   filter?: PartialColumnFilter; // defines the filter capabilities
   editor?: ColumnEditor<T>;
   canEdit?: (row: T, column: DataColumn<T>) => boolean;
+  preMDRColumnWidth?: number
 }
 
 /** Provides definition for columns as they are to be passed in */
@@ -206,10 +208,10 @@ export interface ColumnConfigurationWithGroup extends ColumnConfiguration {
   groupBy: ColumnSort[]
 }
 
-export interface TableBodyProps {
-  data: any[];
-  getRowKey?: (row: any) => string | number;
-  canEditRow?: (row: any) => boolean;
+export interface TableBodyProps<T> {
+  data: T[];
+  getRowKey?: (row: T) => string | number;
+  canEditRow?: (row: T) => boolean;
   loading: boolean;
   LoadingComponent?: ReactRenderable;
 }
@@ -245,34 +247,38 @@ export interface DataGroup<T> {
   level: number
   column: string
   value: any
-  children: DataGroup<T>[] | DataRow[]
+  children: DataGroup<T>[] | DataRow<T>[]
   firstRow: T
 }
 
-export interface DataRow {
+export interface DataRow<T> {
   key: string | number
   rowIndex: number
-  row: any
+  row: T
 }
 
-export function isDataGroup<T>(value?: DataGroup<T> | DataRow | null): value is DataGroup<T> {
+export function isDataGroup<T>(value?: DataGroup<T> | DataRow<T> | null): value is DataGroup<T> {
   if (!value) return false;
   return (typeof (value as any).column === 'string');
 }
 
-export function isDataRow<T>(value?: DataGroup<T> | DataRow | null): value is DataRow {
+export function isDataRow<T>(value?: DataGroup<T> | DataRow<T> | null): value is DataRow<T> {
   if (!value) return false;
   return (typeof (value as any).column === 'undefined');
 }
 
-export function isDataGroupArray<T>(value?: DataGroup<T>[] | DataRow[]): value is DataGroup<T>[] {
+export function isDataGroupArray<T>(value?: DataGroup<T>[] | DataRow<T>[]): value is DataGroup<T>[] {
   if (!value?.length) return false;
   return (typeof (value[0] as any).column === 'string');
 }
 
-export function isDataRowArray<T>(value?: DataGroup<T>[] | DataRow[]): value is DataRow[] {
+export function isDataRowArray<T>(value?: DataGroup<T>[] | DataRow<T>[]): value is DataRow<T>[] {
   if (!value?.length) return false;
   return (typeof (value[0] as any).column === 'undefined');
+}
+
+export function isValidPreMDRColumn<T>(col?: DataColumn<T>): col is DataColumn<T> {
+  return (!!col && typeof col.render === 'function' && typeof col.preMDRColumnWidth === 'number' && !Number.isNaN(col.preMDRColumnWidth) && Number.isFinite(col.preMDRColumnWidth));
 }
 
 /**

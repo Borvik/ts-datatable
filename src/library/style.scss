@@ -127,6 +127,25 @@
         &.fixed-left {
           left: 0;
 
+          &.premdr-col {
+            width: var(--premdr-width, 0px);
+            min-width: var(--premdr-width, 0px);
+            overflow: hidden;
+            white-space: nowrap;
+
+            .premdr-col-content {
+              position: absolute;
+              top: 0;
+              bottom: 0;
+              display: flex;
+              align-items: center;
+            }
+          }
+
+          &.premdr-col + .fixed-left {
+            left: calc(var(--indent) * var(--indent-width) + var(--premdr-width, 0px));
+          }
+
           &.mdr-control + .fixed-left {
             left: calc(var(--indent) * var(--indent-width) + 1.5em);
           }
@@ -137,6 +156,18 @@
 
           &.mdr-control + .row-selector + .fixed-left {
             left: calc(var(--indent) * var(--indent-width) + 1.5em + var(--ts-selector-width, 25px));
+          }
+
+          &.premdr-col + .mdr-control + .fixed-left {
+            left: calc(var(--indent) * var(--indent-width) + var(--premdr-width, 0px) + 1.5em);
+          }
+
+          &.premdr-col + .row-selector + .fixed-left {
+            left: calc(var(--indent) * var(--indent-width) + var(--premdr-width, 0px) + var(--ts-selector-width, 25px));
+          }
+
+          &.premdr-col + .mdr-control + .row-selector + .fixed-left {
+            left: calc(var(--indent) * var(--indent-width) + var(--premdr-width, 0px) + 1.5em + var(--ts-selector-width, 25px));
           }
         }
 

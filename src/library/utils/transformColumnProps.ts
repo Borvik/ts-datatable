@@ -47,6 +47,7 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       isPrimaryKey: column.isPrimaryKey,
       editor: column.editor,
       canEdit: column.canEdit,
+      preMDRColumnWidth: column.preMDRColumnWidth,
 
       header: resolve(column.header, ''),
       fixed: resolve(column.fixed, false),

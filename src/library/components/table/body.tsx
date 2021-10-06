@@ -10,13 +10,13 @@ import { getGroupKey, getGroupKeys, GroupKey } from '../../utils/getGroupKey';
 import { TableGroup } from './table-group';
 import { update } from '../../utils/immutable';
 
-export const TableBody = function TableBody<T>({ data, loading, canEditRow, LoadingComponent, ...props }: TableBodyProps) {
+export const TableBody = function TableBody<T>({ data, loading, canEditRow, LoadingComponent, ...props }: TableBodyProps<T>) {
   const { actualColumns: columns, groupBy } = useContext(ColumnContext);
   const tbodyRef = useRef<HTMLTableSectionElement>(null);
 
   let [groupedData] = useArrayDerivedState(() => {
     if (!groupBy.length) {
-      return data.map<DataRow>((row, rowIndex) => ({
+      return data.map<DataRow<T>>((row, rowIndex) => ({
         row,
         rowIndex,
         key: getRowKey(row, rowIndex, columns, props.getRowKey),
@@ -55,7 +55,7 @@ export const TableBody = function TableBody<T>({ data, loading, canEditRow, Load
         lastGroup = dgrp;
       }
 
-      (lastGroup!.children as DataRow[]).push({
+      (lastGroup!.children as DataRow<T>[]).push({
         row: data[i],
         rowIndex: i,
         key: getRowKey(data[i], i, columns, props.getRowKey),
