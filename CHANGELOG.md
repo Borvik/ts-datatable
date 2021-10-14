@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.4.2] - 2021-10-14
+### Added
+- Expose a `clearSelection` function via a ref handle. (originally released in a 1.4.0 - but subsequently lost)
+
 ## [1.4.1] - 2021-10-07
 ### Added
 - Ability to specify a default filter (thanks to the update to the underlying querystring libraries).

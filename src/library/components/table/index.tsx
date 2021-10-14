@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { PropsWithChildren, useState, useEffect, useRef, useCallback, useMemo, useImperativeHandle } from 'react';
 import ReactDOM from 'react-dom';
 import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData, QSGroupBy, GroupBy, ColumnSort, ColumnConfigurationWithGroup, Pagination } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
@@ -29,7 +29,7 @@ const primaryKeyWarned: {[x:string]: boolean} = {};
 const fixedLeftWarned: Record<string, boolean> = {};
 const fixedRightWarned: Record<string, boolean> = {};
 
-export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, defaultFilter, ...props}: PropsWithChildren<DataTableProperties<T>>) {
+export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, defaultFilter, methodRef, ...props}: PropsWithChildren<DataTableProperties<T>>) {
   const canGroupBy = !!props.canGroupBy && !!props.multiColumnSorts;
 
   /**
@@ -476,6 +476,12 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
       ...columnSort.sort.filter(s => (!groupBy.length || !groupBy.find(g => g.column === s.column))),
     ]
   }, [ groupBy, columnSort ]);
+
+  useImperativeHandle(methodRef, () => ({
+    clearSelection: () => {
+      doSetSelectedRows({});
+    }
+  }));
 
   /**
    * Finally we setup the contexts that will house all the data

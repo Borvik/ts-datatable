@@ -92,6 +92,11 @@ export interface DataTableProperties<T> {
 
   suppressFixedWarning?: boolean
   doNotUseHTML5Dialog?: boolean
+  methodRef?: React.Ref<RefMethods>
+}
+
+export interface RefMethods {
+  clearSelection: () => void;
 }
 
 export interface CustomComponents<T> {
