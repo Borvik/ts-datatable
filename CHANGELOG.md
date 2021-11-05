@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.4.3] - 2021-11-05
+### Fixed
+- Fixed cell `className` when `getTableCellProps` not supplied.
+
 ## [1.4.2] - 2021-10-14
 ### Added
 - Expose a `clearSelection` function via a ref handle. (originally released in a 1.4.0 - but subsequently lost)

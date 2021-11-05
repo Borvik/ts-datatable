@@ -102,8 +102,8 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
             classNames.push(cellProps.className)
           }
           classNames = classNames.filter(s => !!s);
-          cellProps.className = classNames.join(' ').trim();
         }
+        cellProps.className = classNames.join(' ').trim();
         
         return <td {...cellProps} key={colIdx}>{rendered}</td>;
       })}
