@@ -3,11 +3,12 @@ import { DataTable, RowSelectorCheckboxProps, TableActionButtonsProps } from '..
 import { CommonColumns } from '../columns';
 import { DataState, onQueryChange, Pokemon, query, sqliteParams } from '../db';
 
-export function FullFeaturedExample() {
+export function FullFeaturedExample({tableRef}) {
   const [staticData, setStaticData] = React.useState<DataState>({list: [], total: 0, loading: true});
   
   return <DataTable<Pokemon>
     id='pokemon'
+    methodRef={tableRef}
     filters={[
       {
         filterKey: 'who_knows',

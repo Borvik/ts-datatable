@@ -8,6 +8,7 @@ export type {
   DataColumnProp,
   DataColumn,
   RefMethods,
+  RefState,
 } from './components/table/types';
 export type {
   TableActionButtonsProps

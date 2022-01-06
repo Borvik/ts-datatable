@@ -480,8 +480,49 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   useImperativeHandle(methodRef, () => ({
     clearSelection: () => {
       doSetSelectedRows({});
-    }
-  }));
+    },
+    getState: () => {
+      return {
+        filter,
+        query: searchQuery.query,
+        sort: columnSort.sort,
+        columnConfig: {
+          columnOrder,
+          visibility: columnVisibility,
+          groupBy: qsGroupBy.group
+        }
+      };
+    },
+    setState: (value) => {
+      batchedQSUpdate(() => {
+        if (value.filter) {
+          setFilter(value.filter);
+        }
+        if (value.query) {
+          setSearchQuery({ query: value.query });
+        }
+        if (value.sort) {
+          setColumnSort({ sort: value.sort });
+        }
+        if (value.columnConfig) {
+          ReactDOM.unstable_batchedUpdates(() => {
+            setColumnVisibility(value.columnConfig!.visibility);
+            setColumnOrder(value.columnConfig!.columnOrder);
+            setGroupBy({ group: value.columnConfig!.groupBy });
+          });
+        }
+        setPagination(prev => ({ page: 1, perPage: prev.perPage }));
+      })
+    },
+  }), [
+    doSetSelectedRows,
+    filter, setFilter,
+    searchQuery, setSearchQuery,
+    columnSort, setColumnSort,
+    columnVisibility, setColumnVisibility,
+    columnOrder, setColumnOrder,
+    qsGroupBy, setGroupBy
+  ]);
 
   /**
    * Finally we setup the contexts that will house all the data

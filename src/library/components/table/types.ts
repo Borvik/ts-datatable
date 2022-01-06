@@ -95,8 +95,16 @@ export interface DataTableProperties<T> {
   methodRef?: React.Ref<RefMethods>
 }
 
+export interface RefState {
+  filter: QueryFilterGroup
+  query?: string | null
+  sort: ColumnSort[]
+  columnConfig: ColumnConfigurationWithGroup
+}
 export interface RefMethods {
   clearSelection: () => void;
+  getState: () => RefState;
+  setState: (value: Partial<RefState>) => void;
 }
 
 export interface CustomComponents<T> {

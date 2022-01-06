@@ -4,9 +4,10 @@ import { CommonColumns } from '../columns';
 import { Pokemon, query } from '../db';
 import { buildSQL } from '../sqlFilterBuilder';
 
-export function AsyncDataExample() {
+export function AsyncDataExample({tableRef}) {
   return <DataTable<Pokemon>
     id='pokemon'
+    methodRef={tableRef}
     fixedColBg='var(--dt-fixed-bg, white)'
     defaultSort={[
       {column: 'id', direction: 'asc'}
