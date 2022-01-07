@@ -93,4 +93,8 @@ code {
 
 .gold-border { border: 2px solid gold;}
 
+.btn-save.is-dirty {
+  color: red;
+}
+
 @import '../library/style.scss';

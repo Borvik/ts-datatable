@@ -8,6 +8,7 @@ export function FullFeaturedExample({tableRef}) {
   
   return <DataTable<Pokemon>
     id='pokemon'
+    editMode='show'
     methodRef={tableRef}
     filters={[
       {

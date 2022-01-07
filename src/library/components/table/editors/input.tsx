@@ -11,7 +11,14 @@ interface InputEditorProps extends EditorProps {
 }
 
 export const InputEditor: React.FC<InputEditorProps> = function InputEditor({row, column, value, type}) {
-  const { actualColumns: columns, editData, setFormData, getRowKey } = useContext(ColumnContext);
+  const {
+    actualColumns: columns,
+    editData,
+    setFormData,
+    getRowKey,
+    editMode,
+    onSaveQuickEdit,
+  } = useContext(ColumnContext);
   const [inputWidth, setWidth] = useState(null as string | null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -46,7 +53,20 @@ export const InputEditor: React.FC<InputEditorProps> = function InputEditor({row
     }));
   }
 
+  function onBlur(_e: React.FocusEvent<HTMLInputElement>) {
+    if (Object.keys(editData).length) {
+      onSaveQuickEdit(editData as any);
+    }
+  }
+
   return <span className='input-sizer' data-value={actualValue}>
-    <input style={{ '--width': inputWidth ?? undefined } as any} ref={inputRef} type={type} value={actualValue ?? ''} onChange={onChange} />
+    <input
+      style={{ '--width': inputWidth ?? undefined } as any}
+      ref={inputRef}
+      type={type}
+      value={actualValue ?? ''}
+      onChange={onChange}
+      onBlur={editMode === 'autosave' ? onBlur : undefined}
+    />
   </span>;
 }

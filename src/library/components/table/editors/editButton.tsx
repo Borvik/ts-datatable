@@ -13,6 +13,7 @@ interface ButtonProps {
 export const TableEditorButton: React.FC<ButtonProps> = function TableEditorButton({ setEditing, canEdit }) {
   const {
     isEditing,
+    editMode,
     setFormData,
     onSaveQuickEdit,
     editData,
@@ -21,7 +22,9 @@ export const TableEditorButton: React.FC<ButtonProps> = function TableEditorButt
     labels,
   } = useContext(ColumnContext);
 
-  if (!isEditing) {
+  if (editMode === 'autosave') return null;
+
+  if (!isEditing && editMode === 'default') {
     if (canEdit) {
       let btnEditClass: string | undefined;
       if (classNames?.actionButton || classNames?.actionButtonEdit)
@@ -43,6 +46,9 @@ export const TableEditorButton: React.FC<ButtonProps> = function TableEditorButt
   }
   if (classNames?.actionButton || classNames?.actionButtonSave) {
     btnSaveClass = `${classNames?.actionButton ?? ''} ${classNames?.actionButtonSave ?? ''}`.trim();
+  }
+  if (Object.keys(editData).length) {
+    btnSaveClass = `${btnSaveClass ?? ''} is-dirty`;
   }
 
   return <div className='quick-edit-btn-group editing'>

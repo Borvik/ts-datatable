@@ -71,6 +71,7 @@ export interface DataTableProperties<T, FooterData extends T = T> {
   onShowFilterEditor?: OnShowFilterEditor;
   onSaveQuickEdit?: OnSaveQuickEdit<T>;
   quickEditPosition?: 'top' | 'bottom' | 'both';
+  editMode?: EditModes;
 
   tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
@@ -110,6 +111,8 @@ export interface RefMethods {
   getState: () => RefState;
   setState: (value: Partial<RefState>) => void;
 }
+
+export type EditModes = 'default' | 'show' | 'autosave';
 
 export interface CustomComponents<T> {
   Paginate?: React.ElementType<PaginateRequiredProps>;
@@ -169,7 +172,7 @@ interface ResolvableColumnTypes {
 interface BaseColumnProps<T> {
   key: string;
   isPrimaryKey?: boolean;
-  render?: (value: any, row: T, column: DataColumn<T>) => ReactRenderable;
+  render?: (value: any, row: T, column: DataColumn<T>, rowIndex: number) => ReactRenderable;
   renderGroup?: (value: any, group: DataGroup<T>, column: DataColumn<T>) => ReactRenderable;
   renderFooter?: (value: any, row: T, column: DataColumn<T>) => ReactRenderable;
   accessor?: string | number;
@@ -180,6 +183,7 @@ interface BaseColumnProps<T> {
   editor?: ColumnEditor<T>;
   canEdit?: (row: T, column: DataColumn<T>) => boolean;
   preMDRColumnWidth?: number
+  EditorWrapper?: React.ElementType<EditorWrapperProps<T>>
 }
 
 /** Provides definition for columns as they are to be passed in */
@@ -458,8 +462,18 @@ export interface CustomEditorProps<T> {
   row: T;
   column: DataColumn<T>;
   setValue: (newValue: any) => void;
+  originalValue: any;
+  autoSave: () => void;
+  editMode: EditModes;
 }
 
 type ColumnEditor<T> = BasicColumnEditor | CustomColumnEditor<T>;
 
 export type InputType = 'text' | 'email' | 'date' | 'datetime-local' | 'month' | 'number' | 'range' | 'search' | 'tel' | 'url' | 'week' | 'password' | 'datetime' | 'time' | 'color';
+
+export interface EditorWrapperProps<T> {
+  value: any;
+  rawValue: any;
+  row: T;
+  column: DataColumn<T>;
+}

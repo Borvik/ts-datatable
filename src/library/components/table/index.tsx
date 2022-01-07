@@ -331,6 +331,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
 
     setLoading(true);
     doSetSelectedRows({});
+    // TODO: clear edit data (on filter/page/search)?
     getData();
   }, [ pagination, searchQuery.query, filter, columnSort, groupBy, editCount, canGroupBy ]);
 
@@ -546,6 +547,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
       isEditing,
       isSavingQuickEdit,
       editData: editFormData,
+      editMode: props.editMode ?? 'default',
       canSelectRows,
       selectedRows,
       setFormData: setFormData,

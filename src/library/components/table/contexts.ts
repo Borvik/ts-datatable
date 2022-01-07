@@ -14,6 +14,7 @@ import {
   SetPaginationCb,
   OnShowFilterEditor,
   ColumnConfigurationWithGroup,
+  EditModes,
 } from './types';
 import { FilterSettings } from '../filter/types';
 
@@ -30,6 +31,7 @@ export interface ColumnContextInterface<T> {
   isEditing: boolean;
   isSavingQuickEdit: boolean;
   editData: EditFormData;
+  editMode: EditModes;
   canSelectRows: boolean;
   canGroupBy: boolean;
   selectedRows: Record<string | number, T>;
@@ -69,6 +71,7 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   isEditing: false,
   isSavingQuickEdit: false,
   editData: {},
+  editMode: 'default',
   canSelectRows: false,
   selectedRows: {},
   setFormData: () => {},
