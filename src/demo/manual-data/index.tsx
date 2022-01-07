@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { DataProps, DataTable } from '../../library';
 import { ColumnSort } from '../../library/components/table/types';
 import { CommonColumns } from '../columns';
-import { DataState, onQueryChange, Pokemon } from '../db';
+import { DataState, FOOTER_DATA, onQueryChange, Pokemon } from '../db';
 
 const DEFAULT_SORT: ColumnSort[] = [
   {column: 'id', direction: 'asc'}
@@ -22,5 +22,6 @@ export function ManualDataExample({ tableRef }) {
     fixedColBg='var(--dt-fixed-bg, white)'
     defaultSort={DEFAULT_SORT}
     columns={CommonColumns}
+    footerData={FOOTER_DATA}
   />
 }

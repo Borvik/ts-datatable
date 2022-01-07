@@ -1,7 +1,7 @@
 import React from 'react';
 import { DataTable } from '../../library';
 import { CommonColumns } from '../columns';
-import { Pokemon, query } from '../db';
+import { FOOTER_DATA, Pokemon, query } from '../db';
 import { buildSQL } from '../sqlFilterBuilder';
 
 export function AsyncDataExample({tableRef}) {
@@ -63,6 +63,7 @@ export function AsyncDataExample({tableRef}) {
           resolve({
             total: countResult[0].total,
             data: fullResult,
+            footerData: FOOTER_DATA,
           });
         }, 750);
       });

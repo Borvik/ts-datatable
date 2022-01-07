@@ -14,6 +14,7 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
       parseAsType: 'number',
     },
     isPrimaryKey: true,
+    renderFooter: () => '',
   },
   {
     header: 'Num',
@@ -139,12 +140,14 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     header: 'Spawn Chance',
     accessor: 'spawn_chance',
     className: 'no-wrap',
-    render: (value: any) => `${(value * 100).toPrecision(3)}%`
+    render: (value: any) => `${(value * 100).toPrecision(3)}%`,
+    renderFooter: () => '',
   },
   {
     header: 'Avg. Spawns',
     accessor: 'avg_spawns',
     className: 'no-wrap',
+    renderFooter: () => '',
   },
   {
     header: 'Spawn Time',

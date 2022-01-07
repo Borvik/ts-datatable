@@ -39,6 +39,7 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       key,
       render: column.render,
       renderGroup: column.renderGroup,
+      renderFooter: column.renderFooter,
       accessor: column.accessor,
       getValue: column.getValue,
       className: column.className,

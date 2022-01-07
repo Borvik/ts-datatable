@@ -103,6 +103,7 @@ export function FullFeaturedExample({tableRef}) {
     columns={CommonColumns}
 
     onQueryChange={(queryProps) => onQueryChange(queryProps, setStaticData)} // Notifies of filter/pagination/search/sort changes
+    footerData={staticData.footerData}
     data={staticData.list} // Pass Data in directly
     totalCount={staticData.total} // Total count to enable pagination
     isLoading={staticData.loading} // Allows external to show loading indicator
