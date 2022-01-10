@@ -22,6 +22,7 @@ import { getRowKey } from '../../utils/getRowKey';
 import { update } from '../../utils/immutable';
 import { QueryString } from '@borvik/querystring';
 import { DeepPartial } from '@borvik/use-querystate/dist/types';
+import { TableFooter } from './footer';
 
 const preMDR_RenderWarned: Record<string, boolean> = {};
 const preMDR_WidthWarned: Record<string, boolean> = {};
@@ -29,7 +30,7 @@ const primaryKeyWarned: {[x:string]: boolean} = {};
 const fixedLeftWarned: Record<string, boolean> = {};
 const fixedRightWarned: Record<string, boolean> = {};
 
-export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, defaultFilter, methodRef, ...props}: PropsWithChildren<DataTableProperties<T>>) {
+export const DataTable = function DataTable<T, FooterData extends T = T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, defaultFilter, methodRef, ...props}: PropsWithChildren<DataTableProperties<T, FooterData>>) {
   const canGroupBy = !!props.canGroupBy && !!props.multiColumnSorts;
 
   /**
@@ -274,11 +275,11 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   const [isSavingQuickEdit, setSaving] = useState(false);
   const [editCount, setEditCount] = useState(0);
 
-  const [stateDataList, setDataList] = useState<DataFnResult<T[]>>({ data: [], total: 0 });
+  const [stateDataList, setDataList] = useState<DataFnResult<T[], FooterData[]>>({ data: [], total: 0 });
   const [dataLoading, setLoading] = useState(true);
   const [dataLoaderEl, setDataLoaderEl] = useState<React.ReactElement<any> | null>(null);
   
-  function doSetDataList(data: T[] | DataFnResult<T[]>) {
+  function doSetDataList(data: T[] | DataFnResult<T[], FooterData[]>) {
     if (Array.isArray(data)) {
       setDataList({ data: data, total: data.length });
     } else {
@@ -322,13 +323,15 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
           data: props.data,
           total: typeof props.totalCount === 'undefined'
             ? props.data.length
-            : props.totalCount
+            : props.totalCount,
+          footerData: props.footerData,
         });
       }
     }
 
     setLoading(true);
     doSetSelectedRows({});
+    // TODO: clear edit data (on filter/page/search)?
     getData();
   }, [ pagination, searchQuery.query, filter, columnSort, groupBy, editCount, canGroupBy ]);
 
@@ -480,8 +483,51 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
   useImperativeHandle(methodRef, () => ({
     clearSelection: () => {
       doSetSelectedRows({});
-    }
-  }));
+    },
+    getState: () => {
+      return {
+        filter,
+        query: searchQuery.query,
+        sort: columnSort.sort,
+        columnConfig: {
+          columnOrder,
+          visibility: columnVisibility,
+          groupBy: qsGroupBy.group
+        }
+      };
+    },
+    setState: (value) => {
+      batchedQSUpdate(() => {
+        if (value.filter) {
+          setFilter(value.filter);
+        }
+        if (value.query) {
+          setSearchQuery({ query: value.query });
+        }
+        if (value.sort) {
+          setColumnSort({ sort: value.sort });
+        }
+        if (value.columnConfig) {
+          ReactDOM.unstable_batchedUpdates(() => {
+            setColumnVisibility(value.columnConfig!.visibility);
+            setColumnOrder(value.columnConfig!.columnOrder);
+            setGroupBy({ group: value.columnConfig!.groupBy });
+          });
+        }
+        setPagination(prev => ({ page: 1, perPage: prev.perPage }));
+      })
+    },
+  }), [
+    doSetSelectedRows,
+    filter, setFilter,
+    searchQuery, setSearchQuery,
+    columnSort, setColumnSort,
+    columnVisibility, setColumnVisibility,
+    columnOrder, setColumnOrder,
+    qsGroupBy, setGroupBy
+  ]);
+
+  const footerData = typeof props.data === 'function' ? stateDataList.footerData : props.footerData;
 
   /**
    * Finally we setup the contexts that will house all the data
@@ -501,6 +547,7 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
       isEditing,
       isSavingQuickEdit,
       editData: editFormData,
+      editMode: props.editMode ?? 'default',
       canSelectRows,
       selectedRows,
       setFormData: setFormData,
@@ -575,6 +622,9 @@ export const DataTable = function DataTable<T>({paginate = 'both', quickEditPosi
               loading={typeof props.data === 'function' ? dataLoading : (props.isLoading ?? false)}
               LoadingComponent={props.components?.Loading}
             />
+            {footerData?.length && <TableFooter
+              data={footerData}
+            />}
           </table>
         </div>
         {(paginate === 'bottom' || paginate === 'both') &&

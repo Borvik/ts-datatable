@@ -10,6 +10,26 @@ type ThenArg<T> = T extends Promise<infer U> ? U : T;
 type SQL = ThenArg<ReturnType<typeof initSqlJs>>;
 export type SQLDatabase = InstanceType<SQL['Database']>;
 
+export const FOOTER_DATA: Pokemon[] = [
+  {
+    id: Number.NaN,
+    num: '',
+    name: '',
+    img: '',
+    type: [],
+    height: '',
+    weight: '450,000 kg',
+    candy: '',
+    egg: '',
+    spawn_chance: Number.NaN,
+    avg_spawns: Number.NaN,
+    spawn_time: '',
+    multipliers: null,
+    weaknesses: [],
+    collected: false,
+  }
+];
+
 export function sqliteParams(obj: any): any {
   let result: any = {};
   let keys = Object.keys(obj);
@@ -110,6 +130,7 @@ export interface DataState {
   list: Pokemon[]
   total: number
   loading: boolean
+  footerData?: Pokemon[]
 }
 
 export function query(sql: string, params?: any) {
@@ -183,6 +204,7 @@ export async function onQueryChange({ pagination, search, sorts, filters }: Data
         list: fullResult,
         total: countResult[0].total,
         loading: false,
+        footerData: FOOTER_DATA,
       });
       resolve();
     }, 750)

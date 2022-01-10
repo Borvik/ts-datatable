@@ -2,18 +2,19 @@ import React, { useCallback } from 'react';
 import { DataProps, DataTable } from '../../library';
 import { ColumnSort } from '../../library/components/table/types';
 import { CommonColumns } from '../columns';
-import { DataState, onQueryChange, Pokemon } from '../db';
+import { DataState, FOOTER_DATA, onQueryChange, Pokemon } from '../db';
 
 const DEFAULT_SORT: ColumnSort[] = [
   {column: 'id', direction: 'asc'}
 ];
 
-export function ManualDataExample() {
+export function ManualDataExample({ tableRef }) {
   const [staticData, setStaticData] = React.useState<DataState>({list: [], total: 0, loading: true});
   const onQueryChangeCB = useCallback((queryProps: DataProps) => onQueryChange(queryProps, setStaticData), [ setStaticData ]);
 
   return <DataTable<Pokemon>
     id='pokemon'
+    methodRef={tableRef}
     onQueryChange={onQueryChangeCB} // Notifies of filter/pagination/search/sort changes
     data={staticData.list} // Pass Data in directly
     totalCount={staticData.total} // Total count to enable pagination
@@ -21,5 +22,6 @@ export function ManualDataExample() {
     fixedColBg='var(--dt-fixed-bg, white)'
     defaultSort={DEFAULT_SORT}
     columns={CommonColumns}
+    footerData={FOOTER_DATA}
   />
 }

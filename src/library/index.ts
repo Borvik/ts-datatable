@@ -8,6 +8,8 @@ export type {
   DataColumnProp,
   DataColumn,
   RefMethods,
+  RefState,
+  EditorWrapperProps,
 } from './components/table/types';
 export type {
   TableActionButtonsProps

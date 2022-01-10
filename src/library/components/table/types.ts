@@ -19,8 +19,9 @@ import { RowSelectorCheckboxProps } from '../row-selector';
 export type Pagination = { page: number; perPage: number };
 // export type EditFn<T> = (row: T, changes: Partial<T>) => Promise<boolean>;
 
-export interface DataFnResult<T> {
+export interface DataFnResult<T, FooterData> {
   data: T;
+  footerData?: FooterData
   total: number;
 }
 
@@ -31,19 +32,22 @@ export interface DataProps {
   sorts: ColumnSort[];
 }
 
-type DataResultUnion<T> = T | DataFnResult<T>;
-type DataFnResultUnion<T> = DataResultUnion<T> | ReactElement<any>;
-export type DataFnCb<T> = (data: DataResultUnion<T>) => void;
-export type DataFn<T> = (props: DataProps, cb: DataFnCb<T>) => DataFnResultUnion<T> | Promise<DataFnResultUnion<T>>;
+type DataResultUnion<T, FooterData> = T | DataFnResult<T, FooterData>;
+type DataFnResultUnion<T, FooterData> = DataResultUnion<T, FooterData> | ReactElement<any>;
+export type DataFnCb<T, FooterData> = (data: DataResultUnion<T, FooterData>) => void;
+export type DataFn<T, FooterData> = (props: DataProps, cb: DataFnCb<T, FooterData>) => DataFnResultUnion<T, FooterData> | Promise<DataFnResultUnion<T, FooterData>>;
 
-export interface DataTableProperties<T> {
+// export type FooterDataFn<T> = (props: DataProps)
+
+export interface DataTableProperties<T, FooterData extends T = T> {
   id: string;
   columns: Partial<DataColumnProp<T>>[];
   filters?: ColumnFilter[];
-  data: DataFn<T[]> | T[];
+  data: DataFn<T[], FooterData[]> | T[];
   totalCount?: number;
   isLoading?: boolean;
   preMDRColumn?: Partial<DataColumnProp<T>>;
+  footerData?: FooterData[];
 
   multiColumnSorts?: boolean;
   defaultSort?: ColumnSort[];
@@ -67,6 +71,7 @@ export interface DataTableProperties<T> {
   onShowFilterEditor?: OnShowFilterEditor;
   onSaveQuickEdit?: OnSaveQuickEdit<T>;
   quickEditPosition?: 'top' | 'bottom' | 'both';
+  editMode?: EditModes;
 
   tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
@@ -95,9 +100,19 @@ export interface DataTableProperties<T> {
   methodRef?: React.Ref<RefMethods>
 }
 
+export interface RefState {
+  filter: QueryFilterGroup
+  query?: string | null
+  sort: ColumnSort[]
+  columnConfig: ColumnConfigurationWithGroup
+}
 export interface RefMethods {
   clearSelection: () => void;
+  getState: () => RefState;
+  setState: (value: Partial<RefState>) => void;
 }
+
+export type EditModes = 'default' | 'show' | 'autosave';
 
 export interface CustomComponents<T> {
   Paginate?: React.ElementType<PaginateRequiredProps>;
@@ -157,8 +172,9 @@ interface ResolvableColumnTypes {
 interface BaseColumnProps<T> {
   key: string;
   isPrimaryKey?: boolean;
-  render?: (value: any, row: T, column: DataColumn<T>) => ReactRenderable;
+  render?: (value: any, row: T, column: DataColumn<T>, rowIndex: number) => ReactRenderable;
   renderGroup?: (value: any, group: DataGroup<T>, column: DataColumn<T>) => ReactRenderable;
+  renderFooter?: (value: any, row: T, column: DataColumn<T>) => ReactRenderable;
   accessor?: string | number;
   getValue?: (row: T, column: DataColumn<T>) => any;
   className?: string;
@@ -167,6 +183,7 @@ interface BaseColumnProps<T> {
   editor?: ColumnEditor<T>;
   canEdit?: (row: T, column: DataColumn<T>) => boolean;
   preMDRColumnWidth?: number
+  EditorWrapper?: React.ElementType<EditorWrapperProps<T>>
 }
 
 /** Provides definition for columns as they are to be passed in */
@@ -219,6 +236,10 @@ export interface TableBodyProps<T> {
   canEditRow?: (row: T) => boolean;
   loading: boolean;
   LoadingComponent?: ReactRenderable;
+}
+
+export interface TableFooterProps<T> {
+  data: T[]
 }
 
 export interface ColumnSort {
@@ -441,8 +462,18 @@ export interface CustomEditorProps<T> {
   row: T;
   column: DataColumn<T>;
   setValue: (newValue: any) => void;
+  originalValue: any;
+  autoSave: () => void;
+  editMode: EditModes;
 }
 
 type ColumnEditor<T> = BasicColumnEditor | CustomColumnEditor<T>;
 
 export type InputType = 'text' | 'email' | 'date' | 'datetime-local' | 'month' | 'number' | 'range' | 'search' | 'tel' | 'url' | 'week' | 'password' | 'datetime' | 'time' | 'color';
+
+export interface EditorWrapperProps<T> {
+  value: any;
+  rawValue: any;
+  row: T;
+  column: DataColumn<T>;
+}

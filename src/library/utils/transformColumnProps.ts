@@ -39,6 +39,7 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       key,
       render: column.render,
       renderGroup: column.renderGroup,
+      renderFooter: column.renderFooter,
       accessor: column.accessor,
       getValue: column.getValue,
       className: column.className,
@@ -47,6 +48,7 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       isPrimaryKey: column.isPrimaryKey,
       editor: column.editor,
       canEdit: column.canEdit,
+      EditorWrapper: column.EditorWrapper,
       preMDRColumnWidth: column.preMDRColumnWidth,
 
       header: resolve(column.header, ''),

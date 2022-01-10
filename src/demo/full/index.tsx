@@ -3,11 +3,13 @@ import { DataTable, RowSelectorCheckboxProps, TableActionButtonsProps } from '..
 import { CommonColumns } from '../columns';
 import { DataState, onQueryChange, Pokemon, query, sqliteParams } from '../db';
 
-export function FullFeaturedExample() {
+export function FullFeaturedExample({tableRef}) {
   const [staticData, setStaticData] = React.useState<DataState>({list: [], total: 0, loading: true});
   
   return <DataTable<Pokemon>
     id='pokemon'
+    editMode='show'
+    methodRef={tableRef}
     filters={[
       {
         filterKey: 'who_knows',
@@ -102,6 +104,7 @@ export function FullFeaturedExample() {
     columns={CommonColumns}
 
     onQueryChange={(queryProps) => onQueryChange(queryProps, setStaticData)} // Notifies of filter/pagination/search/sort changes
+    footerData={staticData.footerData}
     data={staticData.list} // Pass Data in directly
     totalCount={staticData.total} // Total count to enable pagination
     isLoading={staticData.loading} // Allows external to show loading indicator

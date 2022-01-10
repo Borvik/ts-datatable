@@ -36,7 +36,7 @@ export const TableGroup = function TableGroup<T>({ group, canEditRow }: TableGro
     rendered = groupColumn.renderGroup(group.value, group, groupColumn);
   }
   else if (typeof groupColumn?.render === 'function') {
-    rendered = groupColumn.render(group.value, group.firstRow, groupColumn);
+    rendered = groupColumn.render(group.value, group.firstRow, groupColumn, -1);
   }
   else {
     rendered = group.value;

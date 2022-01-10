@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataColumnProp } from "../library";
-import { CustomTypeColumnEditor, CustomTypeSelectEditor } from "./custom-editors";
+import { CustomInputWrapper, CustomTypeColumnEditor, CustomTypeSelectEditor } from "./custom-editors";
 import { Pokemon } from "./db";
 
 export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
@@ -14,6 +14,7 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
       parseAsType: 'number',
     },
     isPrimaryKey: true,
+    renderFooter: () => '',
   },
   {
     header: 'Num',
@@ -36,6 +37,7 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     header: 'Name',
     accessor: 'name',
     editor: { type: 'text' },
+    EditorWrapper: CustomInputWrapper,
     canEdit: (row) => row.id !== 3,
     filter: {
       type: 'string',
@@ -139,12 +141,14 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     header: 'Spawn Chance',
     accessor: 'spawn_chance',
     className: 'no-wrap',
-    render: (value: any) => `${(value * 100).toPrecision(3)}%`
+    render: (value: any) => `${(value * 100).toPrecision(3)}%`,
+    renderFooter: () => '',
   },
   {
     header: 'Avg. Spawns',
     accessor: 'avg_spawns',
     className: 'no-wrap',
+    renderFooter: () => '',
   },
   {
     header: 'Spawn Time',

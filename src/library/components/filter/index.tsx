@@ -14,6 +14,7 @@ export const FilterButton: React.FC = function FilterButton() {
   const {
     filterColumns,
     isEditing,
+    editMode,
     classNames,
     labels,
     filter,
@@ -62,8 +63,8 @@ export const FilterButton: React.FC = function FilterButton() {
 
   return <>
     {dialog}
-    {!!CustomButton && <CustomButton disabled={isEditing} onClick={onButtonClick} />}
-    {!CustomButton && <button type='button' title={labels?.filter ?? 'Filter'} className={btnFilterClass} disabled={isEditing} onClick={onButtonClick}>
+    {!!CustomButton && <CustomButton disabled={isEditing && editMode === 'default'} onClick={onButtonClick} />}
+    {!CustomButton && <button type='button' title={labels?.filter ?? 'Filter'} className={btnFilterClass} disabled={isEditing && editMode === 'default'} onClick={onButtonClick}>
       <FontAwesomeIcon icon={faFilter} />
     </button>}
   </>;
