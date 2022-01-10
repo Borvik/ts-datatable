@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [1.5.0] - 2022-01-10
+### Added
+- Perma-edit modes enabling always on cell editors with save on change or save button capability
+- Table Footers (though still based on column)
+- Save/Restore functions for saving/loading the filter state
+
 ## [1.4.3] - 2021-11-05
 ### Fixed
 - Fixed cell `className` when `getTableCellProps` not supplied.
