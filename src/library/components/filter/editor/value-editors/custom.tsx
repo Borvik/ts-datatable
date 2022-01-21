@@ -66,5 +66,6 @@ export const CustomEditor: React.FC<CustomEditorProps> = function CustomEditor({
     allValues={allValues}
     setValue={customOnChange}
     onLoseFocus={onBlur}
+    editorOptions={filterDef.editorOptions}
   />;
 };
