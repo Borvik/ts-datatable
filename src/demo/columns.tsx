@@ -56,6 +56,7 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
       type: 'custom',
       toDisplay: (value: any) => value,
       Editor: CustomTypeSelectEditor,
+      editorOptions: {additionalOptions: [{name: "Dark"}, {name: "Steel"}]},
     },
     editor: {
       type: 'custom',

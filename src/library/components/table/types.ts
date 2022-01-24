@@ -348,6 +348,7 @@ export interface CustomColumnFilter extends BaseColumnFilter {
   defaultValue?: any;
   toDisplay: (value: any) => ReactRenderable;
   Editor: React.ElementType<CustomFilterEditorProps>;
+  editorOptions?: any;
 }
 
 export interface CustomFilterEditorProps {
@@ -357,6 +358,7 @@ export interface CustomFilterEditorProps {
   allValues: any;
   setValue: (newValue: any) => void;
   onLoseFocus: () => void;
+  editorOptions?: any;
 }
 
 export const StringOperators = ['eq', 'ieq', 'neq', 'gt', 'gte', 'lt', 'lte', 'bet', 'nbet', 'con', 'ncon', 'beg', 'end', 'nul', 'nnul', 'any', 'none'] as const;

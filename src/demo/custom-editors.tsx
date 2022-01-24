@@ -20,13 +20,15 @@ export class CustomTypeSelectEditor extends React.Component<CustomFilterEditorPr
     this.setState({ options: types });
   }
   render() {
-    const { inputRef, value, allValues, setValue, onLoseFocus } = this.props;
+    const { inputRef, value, allValues, setValue, onLoseFocus, editorOptions } = this.props;
     const { options } = this.state;
+
+    const allOptions = (editorOptions.additionalOptions ?? []).concat(options);
     
     let hideable = Array.isArray(allValues);
     return <select ref={(el) => inputRef.current = el} value={value ?? ''} onBlur={onLoseFocus} onChange={(e) => setValue(e.target.value)}>
       <option></option>
-      {options.map(t => {
+      {allOptions.map(t => {
         if (hideable && value !== t.name && allValues.includes(t.name))
           return null;
         return <option key={t.name} value={t.name}>{t.name}</option>
