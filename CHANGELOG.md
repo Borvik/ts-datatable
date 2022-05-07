@@ -2,7 +2,7 @@
 
 ## [1.5.1] - 2022-01-24
 ### Added
-- Editor Options provides a way to pass extra options down to a custom editor.  Courtesy BlairCurrey
+- Editor Options provides a way to pass extra options down to a custom editor.  Courtesy BlairCurrey.
 
 ## [1.5.0] - 2022-01-10
 ### Added
