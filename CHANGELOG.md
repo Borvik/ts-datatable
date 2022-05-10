@@ -24,7 +24,7 @@
 
 ## [1.4.1] - 2021-10-07
 ### Added
-- Ability to specify a default filter (thanks to the update to the underlying querystring libraries).
+- Ability to specify a default filter (thanks to the update to the underlying querystring libraries)
 - Passed current row down to custom row checkbox selectors so input/label `id` properties can be uniquely set.
 - Defineable pre-mdr column that is 100% always first (even before MDR row expander)
 
