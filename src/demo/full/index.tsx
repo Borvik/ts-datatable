@@ -15,6 +15,7 @@ export function FullFeaturedExample({tableRef}) {
         filterKey: 'who_knows',
         label: 'WhoKnows',
         type: 'string',
+        defaultOperator: 'bet',
       },
       {
         filterKey: 'who_cares',

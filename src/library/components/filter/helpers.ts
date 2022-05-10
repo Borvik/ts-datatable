@@ -23,7 +23,7 @@ export function getDefaultOperator(filter?: PartialColumnFilter): AllFilterOpera
   return filter?.defaultOperator ?? available?.[0] ?? 'eq';
 }
 
-export function getDefaultValue(filter?: PartialColumnFilter): any {
+export function getDefaultValue(op: AllFilterOperators, filter?: PartialColumnFilter): any {
   if (!filter) return null;
   if (filter.type === 'custom') {
     return filter.defaultValue ?? null;
@@ -32,11 +32,11 @@ export function getDefaultValue(filter?: PartialColumnFilter): any {
   switch (filter.type) {
     case 'string':
     case 'email':
-      return '';
+      return convertDefaultValueToArray(op, '');
     case 'number':
-      return Number.NaN;
+      return convertDefaultValueToArray(op, Number.NaN);
     case 'boolean':
-      return false;
+      return convertDefaultValueToArray(op, false);
   }
   return null;
 }
@@ -62,4 +62,12 @@ export function valueShouldBeArray(operator: AllFilterOperators): ValueCount {
     default:
       return ValueCount.SingleValue;
   }
+}
+
+function convertDefaultValueToArray(operator: AllFilterOperators, value: unknown): unknown {
+  const arrayType = valueShouldBeArray(operator);
+  if (arrayType === ValueCount.NoValue) return null;
+  else if (arrayType === ValueCount.ManyValue) return [null];
+  else if (arrayType === ValueCount.DualValue) return [null, null];
+  return value;
 }

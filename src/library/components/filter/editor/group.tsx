@@ -88,11 +88,12 @@ export const FilterGroupEditor: React.FC<Props> = function FilterGroupEditor({ v
       console.error('Failed to find available column to add as default condition');
       return;
     }
+    let defaultOp = getDefaultOperator(column.filter);
     setState(currentPath, {
       filters: {  $push: [{
         column: column.filter!.filterKey!,
-        value: getDefaultValue(column.filter),
-        operator: getDefaultOperator(column.filter)
+        value: getDefaultValue(defaultOp, column.filter),
+        operator: defaultOp,
       }] }
     });
   }

@@ -62,12 +62,13 @@ export const FilterFieldEditor: React.FC<Props> = function FilterFieldEditor({ c
   }
 
   function setColumn(col: DataColumn<any>) {
+    let defaultOp = getDefaultOperator(col.filter);
     setState(path, {
       filters: {
         [index]: {
           column: { $set: col.filter!.filterKey! },
-          operator: { $set: getDefaultOperator(col.filter) },
-          value: { $set: getDefaultValue(col.filter) },
+          operator: { $set: defaultOp },
+          value: { $set: getDefaultValue(defaultOp, col.filter) },
         }
       }
     });
