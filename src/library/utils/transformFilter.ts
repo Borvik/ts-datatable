@@ -17,7 +17,7 @@ export function transformTableFiltersToColumns<T>(filters: ColumnFilter[]): Data
     enabled: false,
     visibleByDefault: false,
     canToggleVisibility: false,
-    key: '',
+    key: filter.filterKey + '_filterOnly',
     filter
   }));
 }

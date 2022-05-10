@@ -15,6 +15,11 @@ export function FullFeaturedExample({tableRef}) {
         filterKey: 'who_knows',
         label: 'WhoKnows',
         type: 'string',
+      },
+      {
+        filterKey: 'who_cares',
+        label: 'WhoCares',
+        type: 'string',
       }
     ]}
     filterSettings={{

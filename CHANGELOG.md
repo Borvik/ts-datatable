@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+### Fixed
+- Fixed issue with filter editor column selector generating react errors due to missing key in array rendering. (#48)
+
 ## [1.5.1] - 2022-01-24
 ### Added
 - Editor Options provides a way to pass extra options down to a custom editor.  Courtesy BlairCurrey
