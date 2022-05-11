@@ -6,6 +6,7 @@
 ### Fixed
 - Fixed issue with filter editor column selector generating react errors due to missing key in array rendering (#48)
 - Fixed issue with filter default values for multi-valued operators (#43)
+- Fixed issue with detail row colspan not using the same number of columns as the main row (due to preMdrColumn)
 
 ### Changed
 - Switched from `yarn` to `npm` - yarn wasn't handling dependency like `"@types/react": "*"` appropriately.

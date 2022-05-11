@@ -119,6 +119,7 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
       })}
     </tr>
     {isExpanded && !!DetailRow && <tr>
+      {isValidPreMDRColumn(preMDRColumn) && <td key='premdr' className={`fixed fixed-left premdr-col ${preMDRColumn.className ?? ''}`.trim()}></td>}
       {hasDetailRenderer && <td className='fixed fixed-left mdr-control'></td>}
       {canSelectRows && <td className='fixed fixed-left row-selector'></td>}
       <td colSpan={columnCount}><DetailRowRenderer parentRow={row} /></td>
