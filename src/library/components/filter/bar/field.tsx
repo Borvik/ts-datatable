@@ -26,7 +26,7 @@ export const QuickFilterItem: React.FC<Props> = function QuickFilterItem({ filte
     }
     else {
       let metaDisplay = get(filter.meta, column.filter.metaToDisplay);
-      if (metaLabel) metaLabel = metaDisplay;
+      if (metaDisplay) metaLabel = metaDisplay;
     }
   }
 

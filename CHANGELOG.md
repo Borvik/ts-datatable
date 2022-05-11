@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.6.2] - 2022-01-24
+### Fixed
+- Fixed issue with displaying meta (subfields)
+
 ## [1.6.1] - 2022-01-24
 ### Fixed
 - Fixed issue with displaying meta in filter bar

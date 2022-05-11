@@ -167,7 +167,7 @@ export const FilterFieldEditor: React.FC<Props> = function FilterFieldEditor({ c
       }
       else {
         let display = get(filter.meta, column.filter.metaToDisplay);
-        if (metaLabel) metaLabel = display;
+        if (display) metaLabel = display;
       }
     }
   }
