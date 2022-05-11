@@ -188,6 +188,10 @@ function convertFilterItemFromQS<T>(filter: any, key: string, columns: DataColum
       : 'eq');
 
   let value: any = null;
+  let metadata: any = undefined;
+  if (filter.meta) {
+    metadata = filter.meta;
+  }
   try {
     if (['nul', 'nnul'].includes(operator)) {
       let nullValue = transformFilterValue(filter[key], 'boolean', 'eq');
@@ -217,6 +221,7 @@ function convertFilterItemFromQS<T>(filter: any, key: string, columns: DataColum
     column: key,
     value,
     operator,
+    meta: metadata,
   };
   return filterItem;
 }
@@ -234,7 +239,8 @@ export function convertToQS(filters: QueryFilterGroup, columns: DataColumn<any>[
 function convertFiltersToQS(filters: QueryFilterGroup['filters'], columns: DataColumn<any>[]) {
   let hasNestedQuery: boolean = false,
       allDefaultOperators: boolean = true,
-      columnListedMultiple: boolean = false;
+      columnListedMultiple: boolean = false,
+      columnHasMeta: boolean = false;
 
   let simpleColumnCheck: string[] = [];
   filters.every(f => {
@@ -242,6 +248,10 @@ function convertFiltersToQS(filters: QueryFilterGroup['filters'], columns: DataC
       hasNestedQuery = true;
       return false; // falsy exits `every`
     } else {
+      if (f.meta) {
+        columnHasMeta = true;
+        return false;
+      }
       if (simpleColumnCheck.includes(f.column)) {
         columnListedMultiple = true;
         return false;
@@ -257,7 +267,7 @@ function convertFiltersToQS(filters: QueryFilterGroup['filters'], columns: DataC
     return true;
   });
 
-  if (!hasNestedQuery && allDefaultOperators && !columnListedMultiple) {
+  if (!hasNestedQuery && !columnHasMeta && allDefaultOperators && !columnListedMultiple) {
     let simpleFilter: any = {};
     for (let f of filters) {
       let ff = f as QueryFilterItem;
@@ -287,8 +297,15 @@ function convertFiltersToQS(filters: QueryFilterGroup['filters'], columns: DataC
         usedOp = 'nul';
       }
 
-      if (f.operator === defaultOp)
+      if (f.operator === defaultOp) {
+        if (f.meta) {
+          return {[f.column]: filterValue, meta: f.meta};
+        }
         return {[f.column]: filterValue};
+      }
+      if (f.meta) {
+        return {[f.column]: filterValue, op: usedOp, meta: f.meta};
+      }
       return {[f.column]: filterValue, op: usedOp};
     }
   });

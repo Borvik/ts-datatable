@@ -13,6 +13,7 @@ import { useDerivedState } from '../../../utils/useDerivedState';
 import { closest } from '../../../utils/closest';
 import { FilterValueEditor } from './value-editors';
 import { getAvailableOperators, getDefaultOperator, valueShouldBeArray, ValueCount, getDefaultValue } from '../helpers';
+import get from 'lodash/get';
 
 interface Props {
   path: number[];
@@ -61,14 +62,28 @@ export const FilterFieldEditor: React.FC<Props> = function FilterFieldEditor({ c
     setState(path, { filters: { $splice: [[index, 1]] } });
   }
 
-  function setColumn(col: DataColumn<any>) {
+  async function setColumn(col: DataColumn<any>) {
     let defaultOp = getDefaultOperator(col.filter);
+    let defaultValue = getDefaultValue(defaultOp, col.filter);
+    let columnMeta: any = undefined;
+    if (typeof col.filter?.onChosen === 'function') {
+      let chosenResult = await col.filter.onChosen({ defaultOp, defaultValue, column: col });
+      if (chosenResult) {
+        if (typeof chosenResult.defaultOp !== 'undefined')
+          defaultOp = chosenResult.defaultOp;
+        if (typeof chosenResult.defaultValue !== 'undefined')
+          defaultValue = chosenResult.defaultValue;
+        if (typeof chosenResult.metadata !== 'undefined')
+          columnMeta = chosenResult.metadata;
+      }
+    }
     setState(path, {
       filters: {
         [index]: {
           column: { $set: col.filter!.filterKey! },
           operator: { $set: defaultOp },
-          value: { $set: getDefaultValue(defaultOp, col.filter) },
+          value: { $set: defaultValue },
+          meta: { $set: typeof columnMeta !== 'undefined' ? columnMeta : undefined },
         }
       }
     });
@@ -116,9 +131,26 @@ export const FilterFieldEditor: React.FC<Props> = function FilterFieldEditor({ c
     });
   }
 
+  let fieldLabel = undefined;
+  if (column) {
+    if (typeof column.filter?.displayAsMeta === 'string') {
+      if (!column.filter.displayAsMeta) {
+        // empty string - use root
+        if (filter.meta) fieldLabel = filter.meta;
+      }
+      else {
+        let metaLabel = get(filter.meta, column.filter.displayAsMeta);
+        if (metaLabel) fieldLabel = metaLabel;
+      }
+    }
+    if (!fieldLabel) {
+      fieldLabel = column?.filter?.label ?? column?.header;
+    }
+  }
+
   return <div ref={itemEl} className='filter-item-editor'>
     <MenuProvider event='onClick' id={`filter_column_menu_${currentPathAsString}`} className={`filter-column`}>
-      {column?.filter?.label ?? column?.header ?? <span className="no-column">Choose Column</span>}
+      {fieldLabel ?? <span className="no-column">Choose Column</span>}
     </MenuProvider>
     <Menu
       id={`filter_column_menu_${currentPathAsString}`}
