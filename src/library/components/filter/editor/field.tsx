@@ -13,6 +13,7 @@ import { useDerivedState } from '../../../utils/useDerivedState';
 import { closest } from '../../../utils/closest';
 import { FilterValueEditor } from './value-editors';
 import { getAvailableOperators, getDefaultOperator, valueShouldBeArray, ValueCount, getDefaultValue } from '../helpers';
+import get from 'lodash/get';
 
 interface Props {
   path: number[];
@@ -61,15 +62,56 @@ export const FilterFieldEditor: React.FC<Props> = function FilterFieldEditor({ c
     setState(path, { filters: { $splice: [[index, 1]] } });
   }
 
-  function setColumn(col: DataColumn<any>) {
+  async function setColumn(col: DataColumn<any>) {
     let defaultOp = getDefaultOperator(col.filter);
+    let defaultValue = getDefaultValue(defaultOp, col.filter);
+    let columnMeta: any = undefined;
+    if (typeof col.filter?.onChosen === 'function') {
+      let chosenResult = await col.filter.onChosen({ op: defaultOp, value: defaultValue, column: col, isEdit: false });
+      if (chosenResult) {
+        if (typeof chosenResult.op !== 'undefined')
+          defaultOp = chosenResult.op;
+        if (typeof chosenResult.value !== 'undefined')
+          defaultValue = chosenResult.value;
+        if (typeof chosenResult.metadata !== 'undefined')
+          columnMeta = chosenResult.metadata;
+      }
+    }
     setState(path, {
       filters: {
         [index]: {
           column: { $set: col.filter!.filterKey! },
           operator: { $set: defaultOp },
-          value: { $set: getDefaultValue(defaultOp, col.filter) },
+          value: { $set: defaultValue },
+          meta: { $set: typeof columnMeta !== 'undefined' ? columnMeta : undefined },
         }
+      }
+    });
+  }
+
+  async function setMetadata() {
+    if (typeof column?.filter?.onChosen !== 'function') {
+      return;
+    }
+
+    let chosenResult = await column.filter.onChosen({ op: filter.operator, value: filter.value, column, metadata: filter.meta, isEdit: true });
+    if (!chosenResult) {
+      return;
+    }
+
+    let filterSpec: any = { };
+    if (typeof chosenResult.op !== 'undefined')
+      filterSpec.operator = { $set: chosenResult.op };
+    if (typeof chosenResult.value !== 'undefined')
+      filterSpec.value = { $set: chosenResult.value };
+    if (typeof chosenResult.metadata !== 'undefined')
+      filterSpec.meta = { $set: chosenResult.metadata };
+
+    if (!Object.keys(filterSpec)) return;
+    
+    setState(path, {
+      filters: {
+        [index]: filterSpec
       }
     });
   }
@@ -116,6 +158,20 @@ export const FilterFieldEditor: React.FC<Props> = function FilterFieldEditor({ c
     });
   }
 
+  let metaLabel = undefined;
+  if (column) {
+    if (typeof column.filter?.metaToDisplay === 'string') {
+      if (!column.filter.metaToDisplay) {
+        // empty string - use root
+        if (filter.meta) metaLabel = filter.meta;
+      }
+      else {
+        let display = get(filter.meta, column.filter.metaToDisplay);
+        if (metaLabel) metaLabel = display;
+      }
+    }
+  }
+
   return <div ref={itemEl} className='filter-item-editor'>
     <MenuProvider event='onClick' id={`filter_column_menu_${currentPathAsString}`} className={`filter-column`}>
       {column?.filter?.label ?? column?.header ?? <span className="no-column">Choose Column</span>}
@@ -128,6 +184,8 @@ export const FilterFieldEditor: React.FC<Props> = function FilterFieldEditor({ c
     >
       {sortedColumns.map(c => <MenuItem key={c.key} onClick={() => setColumn(c)}>{c?.filter?.label ?? c?.header ?? ''}</MenuItem>)}
     </Menu>
+
+    {!!metaLabel && <span className='filter_column_meta_label' onClick={() => setMetadata()}>{metaLabel}</span>}
 
     <MenuProvider event='onClick' id={`filter_operator_menu_${currentPathAsString}`} className={`filter-operator`}>
       {filterSettings?.operatorLabels?.[filter.operator] ?? OperatorLabels[filter.operator]}

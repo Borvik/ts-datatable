@@ -317,10 +317,26 @@ export function isValidPreMDRColumn<T>(col?: DataColumn<T>): col is DataColumn<T
 type MandateProps<T extends {}, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
 type FKReq<T extends BaseColumnFilter> = MandateProps<T, 'filterKey' | 'label'>
 
+interface ChosenFilterColumnResult {
+  value?: any
+  op?: AllFilterOperators
+  metadata?: any
+}
+
+interface ChosenFilterColumnArgs {
+  value: any
+  op: AllFilterOperators
+  column: DataColumn<any>
+  metadata?: any
+  isEdit: boolean
+}
+
 interface BaseColumnFilter {
   parseAsType?: QueryStringFilterTypes
   filterKey?: string
   label?: ReactRenderable
+  metaToDisplay?: string; // path to metadata to display
+  onChosen?: (args: ChosenFilterColumnArgs) => Promise<ChosenFilterColumnResult | void | null | undefined>
 }
 
 interface StringColumnFilter extends BaseColumnFilter {
@@ -421,6 +437,7 @@ export interface QueryFilterItem {
   column: string;
   value: any;
   operator: AllFilterOperators;
+  meta?: unknown;
 }
 
 export type FilterCollection = (QueryFilterGroup | QueryFilterItem)[];

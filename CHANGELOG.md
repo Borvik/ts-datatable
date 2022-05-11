@@ -1,8 +1,15 @@
 ## [Unreleased]
 
+### Added
+- Added "meta" capabilities to column choice
+
 ### Fixed
 - Fixed issue with filter editor column selector generating react errors due to missing key in array rendering (#48)
 - Fixed issue with filter default values for multi-valued operators (#43)
+
+### Changed
+- Switched from `yarn` to `npm` - yarn wasn't handling dependency like `"@types/react": "*"` appropriately.
+- Updated packages to clear dependabot alerts
 
 ## [1.5.1] - 2022-01-24
 ### Added
