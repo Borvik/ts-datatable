@@ -18,15 +18,15 @@ export const QuickFilterItem: React.FC<Props> = function QuickFilterItem({ filte
   const { filterSettings } = useContext(ColumnContext);
   const { removeAtPath } = useContext(QuickBarContext);
 
-  let metaLabel = column?.filter?.label ?? column?.header;
+  let metaLabel: any = undefined;
   if (typeof column.filter?.metaToDisplay === 'string') {
     if (!column.filter.metaToDisplay) {
       // empty string - use root
-      if (filter.meta) metaLabel = <i>{filter.meta as any}</i>;
+      if (filter.meta) metaLabel = filter.meta;
     }
     else {
       let metaDisplay = get(filter.meta, column.filter.metaToDisplay);
-      if (metaLabel) metaLabel = <i>{metaDisplay}</i>;
+      if (metaLabel) metaLabel = metaDisplay;
     }
   }
 

@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.6.1] - 2022-01-24
+### Fixed
+- Fixed issue with displaying meta in filter bar
+
 ## [1.6.0] - 2022-01-24
 ### Added
 - Added "meta" capabilities to column choice
