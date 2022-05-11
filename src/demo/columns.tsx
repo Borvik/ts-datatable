@@ -41,15 +41,6 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     canEdit: (row) => row.id !== 3,
     filter: {
       type: 'string',
-      displayAsMeta: '',
-      onChosen: async ({ metadata }) => {
-        let chosenPath = window.prompt('Choose a path:', metadata?.path ?? '');
-        // to simulate better async
-        await new Promise((resolve) => {
-          setTimeout(resolve, 500);
-        });
-        return { metadata: chosenPath ? chosenPath : undefined };
-      }
     },
   },
   {

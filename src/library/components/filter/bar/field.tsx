@@ -18,15 +18,15 @@ export const QuickFilterItem: React.FC<Props> = function QuickFilterItem({ filte
   const { filterSettings } = useContext(ColumnContext);
   const { removeAtPath } = useContext(QuickBarContext);
 
-  let fieldLabel = column?.filter?.label ?? column?.header;
-  if (typeof column.filter?.displayAsMeta === 'string') {
-    if (!column.filter.displayAsMeta) {
+  let metaLabel = column?.filter?.label ?? column?.header;
+  if (typeof column.filter?.metaToDisplay === 'string') {
+    if (!column.filter.metaToDisplay) {
       // empty string - use root
-      if (filter.meta) fieldLabel = <i>{filter.meta as any}</i>;
+      if (filter.meta) metaLabel = <i>{filter.meta as any}</i>;
     }
     else {
-      let metaLabel = get(filter.meta, column.filter.displayAsMeta);
-      if (metaLabel) fieldLabel = <i>{metaLabel}</i>;
+      let metaDisplay = get(filter.meta, column.filter.metaToDisplay);
+      if (metaLabel) metaLabel = <i>{metaDisplay}</i>;
     }
   }
 
@@ -35,7 +35,9 @@ export const QuickFilterItem: React.FC<Props> = function QuickFilterItem({ filte
       <FontAwesomeIcon icon={faTimesCircle} />
     </button>}
     <span className='quick-filter-field'>
-      <span className='quick-filter-field-name'>{fieldLabel ?? <i>No column</i>}</span>
+      <span className='quick-filter-field-name'>{column?.filter?.label ?? column?.header ?? <i>No column</i>}{!!metaLabel && <>
+        [<i>{metaLabel}</i>]
+      </>}</span>
       <span className='quick-filter-field-operator'>
         {filterSettings?.quickOperatorLabels?.[filter.operator] ?? QuickOperatorLabels[filter.operator]}
       </span>

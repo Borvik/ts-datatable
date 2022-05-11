@@ -58,6 +58,18 @@
       .no-column {
         font-style: italic;
       }
+
+      + .filter_column_meta_label {
+        margin-left: -.75em;
+        margin-right: .75em;
+        font-style: italic;
+        font-size: .8em;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
 
     .filter-operator {

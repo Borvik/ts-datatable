@@ -318,23 +318,24 @@ type MandateProps<T extends {}, K extends keyof T> = Omit<T, K> & Required<Pick<
 type FKReq<T extends BaseColumnFilter> = MandateProps<T, 'filterKey' | 'label'>
 
 interface ChosenFilterColumnResult {
-  defaultValue?: any
-  defaultOp?: AllFilterOperators
+  value?: any
+  op?: AllFilterOperators
   metadata?: any
 }
 
 interface ChosenFilterColumnArgs {
-  defaultValue: any
-  defaultOp: AllFilterOperators
+  value: any
+  op: AllFilterOperators
   column: DataColumn<any>
   metadata?: any
+  isEdit: boolean
 }
 
 interface BaseColumnFilter {
   parseAsType?: QueryStringFilterTypes
   filterKey?: string
   label?: ReactRenderable
-  displayAsMeta?: string; // path to metadata that might _replace_ the label (if it exists)
+  metaToDisplay?: string; // path to metadata to display
   onChosen?: (args: ChosenFilterColumnArgs) => Promise<ChosenFilterColumnResult | void | null | undefined>
 }
 

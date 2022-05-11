@@ -67,12 +67,12 @@ export const FilterFieldEditor: React.FC<Props> = function FilterFieldEditor({ c
     let defaultValue = getDefaultValue(defaultOp, col.filter);
     let columnMeta: any = undefined;
     if (typeof col.filter?.onChosen === 'function') {
-      let chosenResult = await col.filter.onChosen({ defaultOp, defaultValue, column: col });
+      let chosenResult = await col.filter.onChosen({ op: defaultOp, value: defaultValue, column: col, isEdit: false });
       if (chosenResult) {
-        if (typeof chosenResult.defaultOp !== 'undefined')
-          defaultOp = chosenResult.defaultOp;
-        if (typeof chosenResult.defaultValue !== 'undefined')
-          defaultValue = chosenResult.defaultValue;
+        if (typeof chosenResult.op !== 'undefined')
+          defaultOp = chosenResult.op;
+        if (typeof chosenResult.value !== 'undefined')
+          defaultValue = chosenResult.value;
         if (typeof chosenResult.metadata !== 'undefined')
           columnMeta = chosenResult.metadata;
       }
@@ -85,6 +85,33 @@ export const FilterFieldEditor: React.FC<Props> = function FilterFieldEditor({ c
           value: { $set: defaultValue },
           meta: { $set: typeof columnMeta !== 'undefined' ? columnMeta : undefined },
         }
+      }
+    });
+  }
+
+  async function setMetadata() {
+    if (typeof column?.filter?.onChosen !== 'function') {
+      return;
+    }
+
+    let chosenResult = await column.filter.onChosen({ op: filter.operator, value: filter.value, column, metadata: filter.meta, isEdit: true });
+    if (!chosenResult) {
+      return;
+    }
+
+    let filterSpec: any = { };
+    if (typeof chosenResult.op !== 'undefined')
+      filterSpec.operator = { $set: chosenResult.op };
+    if (typeof chosenResult.value !== 'undefined')
+      filterSpec.value = { $set: chosenResult.value };
+    if (typeof chosenResult.metadata !== 'undefined')
+      filterSpec.meta = { $set: chosenResult.metadata };
+
+    if (!Object.keys(filterSpec)) return;
+    
+    setState(path, {
+      filters: {
+        [index]: filterSpec
       }
     });
   }
@@ -131,26 +158,23 @@ export const FilterFieldEditor: React.FC<Props> = function FilterFieldEditor({ c
     });
   }
 
-  let fieldLabel = undefined;
+  let metaLabel = undefined;
   if (column) {
-    if (typeof column.filter?.displayAsMeta === 'string') {
-      if (!column.filter.displayAsMeta) {
+    if (typeof column.filter?.metaToDisplay === 'string') {
+      if (!column.filter.metaToDisplay) {
         // empty string - use root
-        if (filter.meta) fieldLabel = filter.meta;
+        if (filter.meta) metaLabel = filter.meta;
       }
       else {
-        let metaLabel = get(filter.meta, column.filter.displayAsMeta);
-        if (metaLabel) fieldLabel = metaLabel;
+        let display = get(filter.meta, column.filter.metaToDisplay);
+        if (metaLabel) metaLabel = display;
       }
-    }
-    if (!fieldLabel) {
-      fieldLabel = column?.filter?.label ?? column?.header;
     }
   }
 
   return <div ref={itemEl} className='filter-item-editor'>
     <MenuProvider event='onClick' id={`filter_column_menu_${currentPathAsString}`} className={`filter-column`}>
-      {fieldLabel ?? <span className="no-column">Choose Column</span>}
+      {column?.filter?.label ?? column?.header ?? <span className="no-column">Choose Column</span>}
     </MenuProvider>
     <Menu
       id={`filter_column_menu_${currentPathAsString}`}
@@ -160,6 +184,8 @@ export const FilterFieldEditor: React.FC<Props> = function FilterFieldEditor({ c
     >
       {sortedColumns.map(c => <MenuItem key={c.key} onClick={() => setColumn(c)}>{c?.filter?.label ?? c?.header ?? ''}</MenuItem>)}
     </Menu>
+
+    {!!metaLabel && <span className='filter_column_meta_label' onClick={() => setMetadata()}>{metaLabel}</span>}
 
     <MenuProvider event='onClick' id={`filter_operator_menu_${currentPathAsString}`} className={`filter-operator`}>
       {filterSettings?.operatorLabels?.[filter.operator] ?? OperatorLabels[filter.operator]}
