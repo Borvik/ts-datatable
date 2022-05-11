@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+## [1.6.0] - 2022-01-24
 ### Added
 - Added "meta" capabilities to column choice
 
