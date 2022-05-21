@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.6.3] - 2022-05-21
+### Updated
+- Update `use-dialog` library to avoid dialogs submitting other forms accidentally.
+
 ## [1.6.2] - 2022-01-24
 ### Fixed
 - Fixed issue with displaying meta (subfields)
