@@ -369,10 +369,8 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
   }, []);
 
   // On page change - ensure scrolled to top (if enabled)
-  let scrollToTopEnabled = !(props.paginateOptions?.disableScrollToTop);
+  const scrollToTopEnabled = useRef(false);
   useEffect(() => {
-    if (!scrollToTopEnabled) return;
-    
     /**
      * Need both of these depending on the UI styling.
      * 
@@ -395,8 +393,11 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
      * If we did it the other way - then it _might_ scroll back down
      * and hide part of topEl.
      */
-    theadEl.current?.scrollIntoView();
-    topEl.current?.scrollIntoView();
+    if (scrollToTopEnabled.current) {
+      theadEl.current?.scrollIntoView();
+      topEl.current?.scrollIntoView();
+    }
+    scrollToTopEnabled.current = !(props.paginateOptions?.disableScrollToTop);
   }, [ pagination, scrollToTopEnabled ]);
 
 
