@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.6.4] - 2022-07-28
+### Fixed
+- Initial load should not trigger scrollIntoView - only pagination changes (thanks @AlexWaller100)
+
 ## [1.6.3] - 2022-05-21
 ### Updated
 - Update `use-dialog` library to avoid dialogs submitting other forms accidentally.
