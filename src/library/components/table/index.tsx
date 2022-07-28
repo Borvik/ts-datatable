@@ -369,7 +369,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
   }, []);
 
   // On page change - ensure scrolled to top (if enabled)
-  let scrollToTopEnabled = !(props.paginateOptions?.disableScrollToTop)
+  let scrollToTopEnabled = !(props.paginateOptions?.disableScrollToTop);
   let scrollToTopLoaded = useRef(false);
   useEffect(() => {
     /**
@@ -398,7 +398,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
       theadEl.current?.scrollIntoView();
       topEl.current?.scrollIntoView();
     }
-    scrollToTopLoaded.current = !(props.paginateOptions?.disableScrollToTop);
+    scrollToTopLoaded.current = true;
   }, [ pagination, scrollToTopEnabled, scrollToTopLoaded ]);
 
 
