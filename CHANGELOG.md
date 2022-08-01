@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## [1.6.5] - 2022-08-01
 ### Added
 - Added `visibleColumns` to the `data` function so queries _could_ take advantage of visible columns and potentially optimize them (depends on new `passColumnsToQuery` property to opt-in to the feature).
 - Added `originalData` to `onSaveQuickEdit` event parameters.
