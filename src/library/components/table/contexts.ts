@@ -56,8 +56,8 @@ export interface ColumnContextInterface<T> {
   components?: CustomComponents<T>
   groupsExpandedByDefault: boolean
   doNotUseHTML5Dialog?: boolean
-  getTableRowProps?: (row: T) => (DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement> | undefined)
-  getTableCellProps?: (value: any, row: T, column: DataColumn<T>) => (DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement> | undefined)
+  getTableRowProps?: (row: T) => (DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement> | null | undefined)
+  getTableCellProps?: (value: any, row: T, column: DataColumn<T>) => (DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement> | null | undefined)
 }
 
 export const ColumnContext = createContext<ColumnContextInterface<any>>({

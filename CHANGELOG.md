@@ -1,4 +1,10 @@
 ## [Unreleased]
+### Added
+- Added `visibleColumns` to the `data` function so queries _could_ take advantage of visible columns and potentially optimize them (depends on new `passColumnsToQuery` property to opt-in to the feature).
+- Added `originalData` to `onSaveQuickEdit` event parameters.
+
+### Fixed
+- Updated peerDependencies to allow newer versions of `react`, `react-dom`, and `react-router-dom`.
 
 ## [1.6.4] - 2022-07-28
 ### Fixed

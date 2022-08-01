@@ -18,6 +18,7 @@ import { RowSelectorCheckboxProps } from '../row-selector';
 
 export type Pagination = { page: number; perPage: number };
 // export type EditFn<T> = (row: T, changes: Partial<T>) => Promise<boolean>;
+type Unarray<T> = T extends Array<infer U> ? U : T;
 
 export interface DataFnResult<T, FooterData> {
   data: T;
@@ -25,17 +26,18 @@ export interface DataFnResult<T, FooterData> {
   total: number;
 }
 
-export interface DataProps {
+export interface DataProps<T> {
   pagination: PageChange;
   search?: string;
   filters?: QueryFilterGroup;
   sorts: ColumnSort[];
+  visibleColumns: DataColumn<T>[];
 }
 
 type DataResultUnion<T, FooterData> = T | DataFnResult<T, FooterData>;
 type DataFnResultUnion<T, FooterData> = DataResultUnion<T, FooterData> | ReactElement<any>;
 export type DataFnCb<T, FooterData> = (data: DataResultUnion<T, FooterData>) => void;
-export type DataFn<T, FooterData> = (props: DataProps, cb: DataFnCb<T, FooterData>) => DataFnResultUnion<T, FooterData> | Promise<DataFnResultUnion<T, FooterData>>;
+export type DataFn<T, FooterData> = (props: DataProps<Unarray<T>>, cb: DataFnCb<T, FooterData>) => DataFnResultUnion<T, FooterData> | Promise<DataFnResultUnion<T, FooterData>>;
 
 // export type FooterDataFn<T> = (props: DataProps)
 
@@ -48,6 +50,7 @@ export interface DataTableProperties<T, FooterData extends T = T> {
   isLoading?: boolean;
   preMDRColumn?: Partial<DataColumnProp<T>>;
   footerData?: FooterData[];
+  passColumnsToQuery?: boolean
 
   multiColumnSorts?: boolean;
   defaultSort?: ColumnSort[];
@@ -66,7 +69,7 @@ export interface DataTableProperties<T, FooterData extends T = T> {
 
   getRowKey?: (row: T) => string | number;
   canEditRow?: (row: T) => boolean;
-  onQueryChange?: (props: DataProps) => void;
+  onQueryChange?: (props: DataProps<T>) => void;
   onShowColumnPicker?: OnShowColumnPicker;
   onShowFilterEditor?: OnShowFilterEditor;
   onSaveQuickEdit?: OnSaveQuickEdit<T>;
@@ -76,8 +79,8 @@ export interface DataTableProperties<T, FooterData extends T = T> {
   tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableProps?: DetailedHTMLProps<TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>;
-  getTableRowProps?: (row: T) => DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement>;
-  getTableCellProps?: (value: any, row: T, column: DataColumn<T>) => DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement>;
+  getTableRowProps?: (row: T) => null | undefined | DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement>;
+  getTableCellProps?: (value: any, row: T, column: DataColumn<T>) => null | undefined | DetailedHTMLProps<TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement>;
 
   fixedColBg?: string;
 
@@ -219,7 +222,7 @@ export type SetFilterCb = (newState: QueryFilterGroup | ((state: QueryFilterGrou
 export type SetPaginationCb = (newState: Pagination | ((state: Pagination) => Pagination)) => void;
 
 export type QuickEditFormData<T> = Record<PropertyKey, Partial<T>>;
-export type OnSaveQuickEdit<T> = (formData: QuickEditFormData<T>) => Promise<void>
+export type OnSaveQuickEdit<T> = (formData: QuickEditFormData<T>, originalData: QuickEditFormData<T>) => Promise<void>
 
 export interface ColumnConfiguration {
   visibility: ColumnVisibilityStorage

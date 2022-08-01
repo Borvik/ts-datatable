@@ -18,7 +18,7 @@ import { FilterButton, FilterBar } from '../filter';
 import { convertFromQS, convertToQS, transformTableFiltersToColumns } from '../../utils/transformFilter';
 import { TableEditorButton } from './editors/editButton';
 import { TableActionButtons } from './actions';
-import { getRowKey } from '../../utils/getRowKey';
+import { getRowKey, getRowValue } from '../../utils/getRowKey';
 import { update } from '../../utils/immutable';
 import { QueryString } from '@borvik/querystring';
 import { DeepPartial } from '@borvik/use-querystate/dist/types';
@@ -30,7 +30,7 @@ const primaryKeyWarned: {[x:string]: boolean} = {};
 const fixedLeftWarned: Record<string, boolean> = {};
 const fixedRightWarned: Record<string, boolean> = {};
 
-export const DataTable = function DataTable<T, FooterData extends T = T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, defaultFilter, methodRef, ...props}: PropsWithChildren<DataTableProperties<T, FooterData>>) {
+export const DataTable = function DataTable<T, FooterData extends T = T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, defaultFilter, methodRef, passColumnsToQuery, ...props}: PropsWithChildren<DataTableProperties<T, FooterData>>) {
   const canGroupBy = !!props.canGroupBy && !!props.multiColumnSorts;
 
   /**
@@ -174,13 +174,14 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
     }
   }, [ props.id, columnVisibility, props.preMDRColumn, props.columns, columnOrder, groupBy, props.canReorderColumns, canGroupBy ]);
 
+  const actualColumnsComparator = columnData.actualColumns;
   const [filterColumns] = useDeepDerivedState(() => {
     let transformedFilters = transformTableFiltersToColumns<T>(props.filters ?? []);
     return [
       ...columnData.actualColumns,
       ...transformedFilters
     ]
-  }, [props.filters, columnData.actualColumns])
+  }, [props.filters, actualColumnsComparator])
 
   const canEdit = typeof props.onSaveQuickEdit === 'function' && columnData.hasEditor && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
   const canSelectRows = !!props.canSelectRows && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
@@ -288,6 +289,8 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
     setLoading(false);
   }
 
+  const visibleColumnComparator = passColumnsToQuery ? actualColumnsComparator : false;
+
   useDeepEffect(() => {
     async function getData() {
       let fullSort: ColumnSort[] = [
@@ -301,6 +304,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
           search: hideSearchForm ? '' : (searchQuery.query ?? ''),
           sorts: fullSort,
           filters: filter.filters.length ? filter : undefined,
+          visibleColumns: columnData.actualColumns.filter(c => c.isVisible),
         });
       }
 
@@ -310,6 +314,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
           search: hideSearchForm ? '' : (searchQuery.query ?? ''),
           sorts: fullSort,
           filters: filter.filters.length ? filter : undefined,
+          visibleColumns: columnData.actualColumns.filter(c => c.isVisible),
         }, doSetDataList);
 
         if (React.isValidElement(returnedData)) {
@@ -333,7 +338,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
     doSetSelectedRows({});
     // TODO: clear edit data (on filter/page/search)?
     getData();
-  }, [ pagination, searchQuery.query, filter, columnSort, groupBy, editCount, canGroupBy ]);
+  }, [ pagination, searchQuery.query, filter, columnSort, groupBy, editCount, canGroupBy, visibleColumnComparator ]);
 
   const Paginate = props.components?.Paginate ?? PageNav;
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
@@ -403,11 +408,25 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
 
 
   let propOnSave = props.onSaveQuickEdit;
+  let propGetRowKey = props.getRowKey;
+  let currentData = typeof props.data === 'function' ? stateDataList.data : props.data;
   const onSaveQuickEdit = useCallback(async (data: QuickEditFormData<T>) => {
     try {
       if (!!propOnSave && Object.keys(data).length) {
         setSaving(true)
-        await propOnSave(data);
+        let rowsToSave = Object.keys(data);
+        let primaryColumn = columnData.actualColumns.find(c => c.isPrimaryKey)!;
+        let originalData: QuickEditFormData<T> = {};
+        let rowKeyFn = typeof propGetRowKey === 'function'
+          ? propGetRowKey
+          : getRowValue;
+
+        for (let id of rowsToSave) {
+          let rowData = currentData.find(r => rowKeyFn(r, primaryColumn) == id)!;
+          originalData[id] = rowData;
+        }
+
+        await propOnSave(data, originalData);
         setFormData({});
         setEditCount(c => c + 1);
       }
@@ -419,7 +438,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
     finally {
       setSaving(false);
     }
-  }, [propOnSave]);
+  }, [propOnSave, currentData, actualColumnsComparator, propGetRowKey]);
 
   function doSetSelectedRows(selection: Record<string | number, T>) {
     if (typeof props.onSelectionChange === 'function') {
