@@ -550,6 +550,10 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
 
   const footerData = typeof props.data === 'function' ? stateDataList.footerData : props.footerData;
 
+  let tableContainerClasses: string[] = ['ts-datatable', 'ts-datatable-container'];
+  if (props.tableContainerProps?.className) tableContainerClasses.push(props.tableContainerProps?.className);
+  if ((props.fixedHeaders ?? true)) tableContainerClasses.push('fixed-headers');
+
   /**
    * Finally we setup the contexts that will house all the data
    * and pass it to all the subcomponents for eventual display.
@@ -595,7 +599,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
       getTableRowProps: props.getTableRowProps,
       getTableCellProps: props.getTableCellProps
     }}>
-      <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={`ts-datatable ts-datatable-container ${props.tableContainerProps?.className ?? ''}`}>
+      <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={tableContainerClasses.join(' ')}>
         <div ref={topEl} className={`ts-datatable-top`}>
           <div className='ts-datatable-search-filters'>
             {!hideSearchForm && <SearchForm

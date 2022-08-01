@@ -62,6 +62,16 @@
     align-items: flex-end;
   }
 
+  &.fixed-headers {
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background-clip: padding-box;
+      background-color: var(--ts-dt-fixed-bg, white);
+    }
+  }
+
   .ts-datatable-table {
     border-collapse: collapse;
     width: 100%;
@@ -215,15 +225,22 @@
   thead {
     .ts-datatable-header-row {
       th {
+        padding: 0;
         vertical-align: bottom;
 
         &[scope=colgroup] {
           text-align: center;
-          border-bottom: 1px solid;
+          .ts-datatable-header-cell {
+            padding: 1px;
+            border-bottom: 1px solid;
+          }
         }
 
         &[scope=col] {
-          border-bottom: 2px solid;
+          .ts-datatable-header-cell {
+            padding: 1px;
+            border-bottom: 2px solid;
+          }
         }
 
         .ts-datatable-header-cell {

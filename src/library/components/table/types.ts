@@ -51,6 +51,7 @@ export interface DataTableProperties<T, FooterData extends T = T> {
   preMDRColumn?: Partial<DataColumnProp<T>>;
   footerData?: FooterData[];
   passColumnsToQuery?: boolean
+  fixedHeaders?: boolean
 
   multiColumnSorts?: boolean;
   defaultSort?: ColumnSort[];
