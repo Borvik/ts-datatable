@@ -228,6 +228,11 @@
         padding: 0;
         vertical-align: bottom;
 
+        &:first-child.mdr-control, &.mdr-control {
+          padding-left: 0;
+          padding-right: 0;
+        }
+
         &[scope=colgroup] {
           text-align: center;
           .ts-datatable-header-cell {

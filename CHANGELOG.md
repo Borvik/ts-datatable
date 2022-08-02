@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.6.7] - 2022-08-02
+### Fixed
+- Bugfix for fixed headers - fixing borders for premdr, mdr, and row-selector headers
+
 ## [1.6.6] - 2022-08-01
 ### Added
 - Fixed headers! Can disable this by turning off the prop.

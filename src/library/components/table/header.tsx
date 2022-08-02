@@ -48,14 +48,16 @@ export const TableHeader: React.FC<HeadProps> = function TableHeader(props) {
 
             return (<React.Fragment key={`row-key-${colIdx}`}>
               {(colIdx === 0 && rowIdx === 0) && <>
-                {isValidPreMDRColumn(preMDRColumn) && <th scope='col' style={indentStyle} key='premdr' rowSpan={headerRows.length} className={`fixed fixed-left premdr-col ${preMDRColumn.className ?? ''}`.trim()}></th>}
-                {hasDetailRenderer && <th scope='col' style={indentStyle} key='mdr' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'></th>}
+                {isValidPreMDRColumn(preMDRColumn) && <th scope='col' style={indentStyle} key='premdr' rowSpan={headerRows.length} className={`fixed fixed-left premdr-col ${preMDRColumn.className ?? ''}`.trim()}><span className='ts-datatable-header-cell'></span></th>}
+                {hasDetailRenderer && <th scope='col' style={indentStyle} key='mdr' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'><span className='ts-datatable-header-cell'></span></th>}
                 {canSelectRows && <th scope='col' style={indentStyle} key='sel' rowSpan={headerRows.length} className='fixed fixed-left row-selector'>
-                  <RowSelector
-                    row={null}
-                    rowIndex={-1}
-                    data={props.data}
-                  />
+                  <span className='ts-datatable-header-cell'>
+                    <RowSelector
+                      row={null}
+                      rowIndex={-1}
+                      data={props.data}
+                    />
+                  </span>
                 </th>}
               </>}
               <th key={colIdx} style={colIdx === 0 ? indentStyle : undefined} className={`${col.className ?? ''} ${col.fixed ? `fixed fixed-${col.fixed}` : ''}`.trim()} colSpan={col.colSpan > 1 ? col.colSpan : undefined} rowSpan={col.rowSpan > 1 ? col.rowSpan : undefined} scope={colScope}>
