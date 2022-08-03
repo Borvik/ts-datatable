@@ -1,4 +1,5 @@
-import { createContext, DetailedHTMLProps, TdHTMLAttributes, HTMLAttributes } from 'react';
+import { createContext as createSelContext } from '@borvik/react-selector-context';
+import React, { createContext, DetailedHTMLProps, TdHTMLAttributes, HTMLAttributes } from 'react';
 import {
   DataColumn,
   ColumnSorts,
@@ -17,6 +18,7 @@ import {
   EditModes,
 } from './types';
 import { FilterSettings } from '../filter/types';
+import { useStateRef } from '../../utils/useStateRef';
 
 export interface ColumnContextInterface<T> {
   preMDRColumn?: DataColumn<T>;
@@ -28,10 +30,7 @@ export interface ColumnContextInterface<T> {
   filter: QueryFilterGroup,
   filterSettings?: FilterSettings,
   multiColumnSorts: boolean;
-  isEditing: boolean;
-  isSavingQuickEdit: boolean;
-  editData: EditFormData;
-  editMode: EditModes;
+  
   canSelectRows: boolean;
   canGroupBy: boolean;
   selectedRows: Record<string | number, T>;
@@ -68,10 +67,8 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   groupBy: [],
   filter: {groupOperator: 'and', filters: []},
   multiColumnSorts: false,
-  isEditing: false,
-  isSavingQuickEdit: false,
-  editData: {},
-  editMode: 'default',
+  
+  
   canSelectRows: false,
   selectedRows: {},
   setFormData: () => {},
@@ -99,3 +96,55 @@ export const GroupCollapseContext = createContext<GroupCollapseContextInterface>
   setExpanded: () => {},
   collapsedState: {}
 });
+
+export interface TableContextInterface<T> {
+  isEditing: React.MutableRefObject<boolean>;
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>,
+
+  isSavingQuickEdit: React.MutableRefObject<boolean>;
+  setSaving: React.Dispatch<React.SetStateAction<boolean>>,
+
+  editData: EditFormData;
+  editMode: EditModes;
+}
+
+function initRef<T>(initValue: T): {current: T} {
+  return { current: initValue };
+}
+
+export const TableContext = createSelContext<TableContextInterface<any>>({
+  isEditing: initRef(false),
+  setIsEditing: () => {},
+
+  isSavingQuickEdit: initRef(false),
+  setSaving: () => {},
+
+  editData: {},
+  editMode: 'default',
+});
+
+interface TableContextProviderProps {
+  editMode: EditModes
+}
+
+export const useTableSelector = TableContext.useSelector;
+export const TableContextProvider: React.FC<TableContextProviderProps> = ({ editMode, children }) => {
+  const [isEditing, setIsEditing] = useStateRef(false);
+  const [isSavingQuickEdit, setSaving] = useStateRef(false);
+
+  return (
+    <TableContext.Provider value={{
+      isEditing,
+      setIsEditing,
+
+      isSavingQuickEdit,
+      setSaving,
+
+      editData: {},
+      editMode,
+    }}
+    >
+      {children}
+    </TableContext.Provider>
+  )
+}

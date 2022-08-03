@@ -23,6 +23,7 @@ import { update } from '../../utils/immutable';
 import { QueryString } from '@borvik/querystring';
 import { DeepPartial } from '@borvik/use-querystate/dist/types';
 import { TableFooter } from './footer';
+import { TableContextProvider, useTableSelector } from './contexts';
 
 const preMDR_RenderWarned: Record<string, boolean> = {};
 const preMDR_WidthWarned: Record<string, boolean> = {};
@@ -30,7 +31,7 @@ const primaryKeyWarned: {[x:string]: boolean} = {};
 const fixedLeftWarned: Record<string, boolean> = {};
 const fixedRightWarned: Record<string, boolean> = {};
 
-export const DataTable = function DataTable<T, FooterData extends T = T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, defaultFilter, methodRef, passColumnsToQuery, ...props}: PropsWithChildren<DataTableProperties<T, FooterData>>) {
+const DataTableCore = function DataTableCore<T, FooterData extends T = T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, defaultFilter, methodRef, passColumnsToQuery, ...props}: PropsWithChildren<DataTableProperties<T, FooterData>>) {
   const canGroupBy = !!props.canGroupBy && !!props.multiColumnSorts;
 
   /**
@@ -186,7 +187,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
   const canEdit = typeof props.onSaveQuickEdit === 'function' && columnData.hasEditor && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
   const canSelectRows = !!props.canSelectRows && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
 
-  const [editFormData, setFormData] = useState<EditFormData>({});
+  // const [editFormData, setFormData] = useState<EditFormData>({});
   const [selectedRows, setSelectedRows] = useState<Record<string | number, T>>({});
 
   const [pagination, setPagination] = useParsedQs<Pagination, DeepPartial<Pagination>>(
@@ -272,8 +273,10 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
     }
   );
 
-  const [isEditing, setEditing] = useState(false);
-  const [isSavingQuickEdit, setSaving] = useState(false);
+  const { setSaving, setIsEditing } = useTableSelector(({ setSaving, setIsEditing }) => ({
+    setSaving,
+    setIsEditing,
+  }));
   const [editCount, setEditCount] = useState(0);
 
   const [stateDataList, setDataList] = useState<DataFnResult<T[], FooterData[]>>({ data: [], total: 0 });
@@ -430,7 +433,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
         setFormData({});
         setEditCount(c => c + 1);
       }
-      setEditing(false);
+      setIsEditing(false);
     }
     catch {
       // avoid unhandled exception
@@ -569,10 +572,6 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
       multiColumnSorts: props.multiColumnSorts ?? false,
       filter,
       filterSettings: props.filterSettings,
-      isEditing,
-      isSavingQuickEdit,
-      editData: editFormData,
-      editMode: props.editMode ?? 'default',
       canSelectRows,
       selectedRows,
       setFormData: setFormData,
@@ -617,7 +616,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
                 quickEditPosition={quickEditPosition}
                 buttons={{
                   quickEdit: <TableEditorButton
-                    setEditing={setEditing}
+                    setEditing={setIsEditing}
                     canEdit={canEdit}
                   />,
                   filter: <FilterButton />,
@@ -667,7 +666,7 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
             quickEditPosition={quickEditPosition}
             buttons={{
               quickEdit: <TableEditorButton
-                setEditing={setEditing}
+                setEditing={setIsEditing}
                 canEdit={canEdit}
               />,
               filter: <FilterButton />,
@@ -699,3 +698,11 @@ export const DataTable = function DataTable<T, FooterData extends T = T>({pagina
  *    <section>
  *      <pages>
  */
+
+export const DataTable = function DataTable<T, FooterData extends T = T>({editMode, ...props}: PropsWithChildren<DataTableProperties<T, FooterData>>) {
+  return (
+    <TableContextProvider editMode={editMode ?? 'default'}>
+      <DataTableCore {...props} />
+    </TableContextProvider>
+  );
+};
