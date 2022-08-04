@@ -38,7 +38,11 @@ export const BooleanEditor: React.FC<EditorProps> = function BooleanEditor({row,
     let fieldValue: any = e.target.checked;
 
     if (editMode === 'autosave') {
-      onSaveQuickEdit({ [column.key]: fieldValue });
+      onSaveQuickEdit({
+        [keyValue]: {
+          [column.key]: fieldValue
+        }
+      });
     } else {
       setCtxData(data => update(data, {
         editData: {
