@@ -1,5 +1,5 @@
-import { createContext as createSelContext } from '@borvik/react-selector-context';
-import React, { createContext, DetailedHTMLProps, TdHTMLAttributes, HTMLAttributes } from 'react';
+import { createContext as createSelContext } from '../../utils/updater-context';
+import React, { createContext, DetailedHTMLProps, TdHTMLAttributes, HTMLAttributes, useState } from 'react';
 import {
   DataColumn,
   ColumnSorts,
@@ -97,13 +97,9 @@ export const GroupCollapseContext = createContext<GroupCollapseContextInterface>
   collapsedState: {}
 });
 
-export interface TableContextInterface<T> {
-  isEditing: React.MutableRefObject<boolean>;
-  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>,
-
-  isSavingQuickEdit: React.MutableRefObject<boolean>;
-  setSaving: React.Dispatch<React.SetStateAction<boolean>>,
-
+export interface TableContextInterface {
+  isEditing: boolean;
+  isSavingQuickEdit: boolean;
   editData: EditFormData;
   editMode: EditModes;
 }
@@ -112,13 +108,9 @@ function initRef<T>(initValue: T): {current: T} {
   return { current: initValue };
 }
 
-export const TableContext = createSelContext<TableContextInterface<any>>({
-  isEditing: initRef(false),
-  setIsEditing: () => {},
-
-  isSavingQuickEdit: initRef(false),
-  setSaving: () => {},
-
+export const TableContext = createSelContext<TableContextInterface>({
+  isEditing: false,
+  isSavingQuickEdit: false,
   editData: {},
   editMode: 'default',
 });
@@ -129,22 +121,9 @@ interface TableContextProviderProps {
 
 export const useTableSelector = TableContext.useSelector;
 export const TableContextProvider: React.FC<TableContextProviderProps> = ({ editMode, children }) => {
-  const [isEditing, setIsEditing] = useStateRef(false);
-  const [isSavingQuickEdit, setSaving] = useStateRef(false);
-
   return (
-    <TableContext.Provider value={{
-      isEditing,
-      setIsEditing,
-
-      isSavingQuickEdit,
-      setSaving,
-
-      editData: {},
-      editMode,
-    }}
-    >
+    <TableContext.Provider>
       {children}
     </TableContext.Provider>
-  )
+  );
 }

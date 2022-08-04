@@ -273,10 +273,11 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     }
   );
 
-  const { setSaving, setIsEditing } = useTableSelector(({ setSaving, setIsEditing }) => ({
-    setSaving,
-    setIsEditing,
-  }));
+  // const { setSaving, setIsEditing } = useTableSelector(({ setSaving, setIsEditing }) => ({
+  //   setSaving,
+  //   setIsEditing,
+  // }));
+  const [, setCtxData] = useTableSelector(() => ({}));
   const [editCount, setEditCount] = useState(0);
 
   const [stateDataList, setDataList] = useState<DataFnResult<T[], FooterData[]>>({ data: [], total: 0 });
@@ -416,7 +417,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   const onSaveQuickEdit = useCallback(async (data: QuickEditFormData<T>) => {
     try {
       if (!!propOnSave && Object.keys(data).length) {
-        setSaving(true)
+        setCtxData({ isSavingQuickEdit: true });
         let rowsToSave = Object.keys(data);
         let primaryColumn = columnData.actualColumns.find(c => c.isPrimaryKey)!;
         let originalData: QuickEditFormData<T> = {};
@@ -430,16 +431,16 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
         }
 
         await propOnSave(data, originalData);
-        setFormData({});
+        setCtxData({ editData: {} });
         setEditCount(c => c + 1);
       }
-      setIsEditing(false);
+      setCtxData({ isEditing: false });
     }
     catch {
       // avoid unhandled exception
     }
     finally {
-      setSaving(false);
+      setCtxData({ isSavingQuickEdit: false });
     }
   }, [propOnSave, currentData, actualColumnsComparator, propGetRowKey]);
 
@@ -574,7 +575,6 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
       filterSettings: props.filterSettings,
       canSelectRows,
       selectedRows,
-      setFormData: setFormData,
       setFilter,
       setColumnSort,
       setAllSelected,
