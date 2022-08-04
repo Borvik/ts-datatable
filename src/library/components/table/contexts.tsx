@@ -1,4 +1,5 @@
-import { createContext, DetailedHTMLProps, TdHTMLAttributes, HTMLAttributes } from 'react';
+import { createContext as createSelContext } from '../../utils/updater-context';
+import React, { createContext, DetailedHTMLProps, TdHTMLAttributes, HTMLAttributes, useState } from 'react';
 import {
   DataColumn,
   ColumnSorts,
@@ -28,14 +29,9 @@ export interface ColumnContextInterface<T> {
   filter: QueryFilterGroup,
   filterSettings?: FilterSettings,
   multiColumnSorts: boolean;
-  isEditing: boolean;
-  isSavingQuickEdit: boolean;
-  editData: EditFormData;
-  editMode: EditModes;
+  
   canSelectRows: boolean;
   canGroupBy: boolean;
-  selectedRows: Record<string | number, T>;
-  setFormData: React.Dispatch<React.SetStateAction<EditFormData>>;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
   setAllSelected: (selectAll: boolean) => void;
   setRowSelected: (row: T, rowIndex: number) => void;
@@ -68,13 +64,9 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   groupBy: [],
   filter: {groupOperator: 'and', filters: []},
   multiColumnSorts: false,
-  isEditing: false,
-  isSavingQuickEdit: false,
-  editData: {},
-  editMode: 'default',
+  
+  
   canSelectRows: false,
-  selectedRows: {},
-  setFormData: () => {},
   setColumnSort: () => {},
   setAllSelected: () => {},
   setRowSelected: () => {},
@@ -99,3 +91,34 @@ export const GroupCollapseContext = createContext<GroupCollapseContextInterface>
   setExpanded: () => {},
   collapsedState: {}
 });
+
+export interface TableContextInterface<T> {
+  isEditing: boolean;
+  isSavingQuickEdit: boolean;
+  editData: EditFormData;
+  editMode: EditModes;
+  selectedRows: Record<string | number, T>;
+}
+
+export const TableContext = createSelContext<TableContextInterface<any>>({
+  isEditing: false,
+  isSavingQuickEdit: false,
+  editData: {},
+  editMode: 'default',
+  selectedRows: {},
+});
+
+interface TableContextProviderProps {
+  editMode: EditModes
+}
+
+export const useTableSelector = TableContext.useSelector;
+export const TableContextProvider: React.FC<TableContextProviderProps> = ({ editMode, children }) => {
+  return (
+    <TableContext.Provider initialValue={{
+      editMode,
+    }}>
+      {children}
+    </TableContext.Provider>
+  );
+}

@@ -1,18 +1,16 @@
 import React, { useContext } from 'react';
 import { EditorProps } from './types';
 import { CustomColumnEditor } from '../types';
-import { ColumnContext } from '../contexts';
+import { ColumnContext, useTableSelector } from '../contexts';
 import { getRowValue } from '../../../utils/getRowKey';
 import { update } from '../../../utils/immutable';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 
 export const CustomEditor: React.FC<EditorProps> = function CustomEditor({row, column, value}) {
   const {
     actualColumns: columns,
-    editData,
-    setFormData,
     getRowKey,
-    editMode,
     onSaveQuickEdit,
   } = useContext(ColumnContext);
   const Editor = (column.editor as CustomColumnEditor<any>).Editor;
@@ -25,20 +23,35 @@ export const CustomEditor: React.FC<EditorProps> = function CustomEditor({row, c
     ? getRowKey(row)
     : getRowValue(row, primaryColumn!);
 
-  let columnPath = `${keyValue}.${column.key}`;
-  let actualValue = get(editData, columnPath, value);
+  const [{
+    rowData,
+    editMode,
+  }, setCtxData] = useTableSelector(c => {
+    let rowData = get(c.editData, keyValue, {});
+    if (keyValue == '69') {
+      console.log('rowData:', rowData);
+    }
+    return {
+      rowData,
+      editMode: c.editMode,
+    };
+  }, isEqual);
+
+  let actualValue = get(rowData, column.key, value);
 
   function onChange(newValue: any) {
-    setFormData(form => update(form, {
-      [keyValue]: { $auto: {
-        [column.key]: { $set: newValue }
-      } }
-    }));
+    setCtxData(data => update(data, {
+      editData: {
+        [keyValue]: { $auto: {
+          [column.key]: { $set: newValue }
+        } }
+      }
+    }))
   }
 
   function autoSave() {
-    if (Object.keys(editData).length)
-      onSaveQuickEdit(editData as any);
+    if (Object.keys(rowData as object).length)
+      onSaveQuickEdit({[keyValue]: rowData as any});
   }
 
   return <Editor

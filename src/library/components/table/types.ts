@@ -14,7 +14,7 @@ import { SearchRequiredProps } from '../search/types';
 import { CustomFilterButtonProps, FilterSettings } from '../filter/types';
 import { CustomColumnPickerButtonProps } from '../column-picker/types';
 import { TableActionButtonsProps } from './actions';
-import { RowSelectorCheckboxProps } from '../row-selector';
+import { RowSelectorCheckboxProps } from '../row-selector/checkbox';
 
 export type Pagination = { page: number; perPage: number };
 // export type EditFn<T> = (row: T, changes: Partial<T>) => Promise<boolean>;

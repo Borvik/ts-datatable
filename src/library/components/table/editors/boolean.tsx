@@ -1,17 +1,15 @@
 import React, { useContext } from 'react';
 import { EditorProps } from './types';
-import { ColumnContext } from '../contexts';
+import { ColumnContext, useTableSelector } from '../contexts';
 import { getRowValue } from '../../../utils/getRowKey';
 import { update } from '../../../utils/immutable';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 
 export const BooleanEditor: React.FC<EditorProps> = function BooleanEditor({row, column, value}) {
   const {
     actualColumns: columns,
-    editData,
-    setFormData,
     getRowKey,
-    editMode,
     onSaveQuickEdit
   } = useContext(ColumnContext);
 
@@ -23,19 +21,35 @@ export const BooleanEditor: React.FC<EditorProps> = function BooleanEditor({row,
     ? getRowKey(row)
     : getRowValue(row, primaryColumn!);
 
-  let columnPath = `${keyValue}.${column.key}`;
-  let actualValue = get(editData, columnPath, value);
+  const [{
+    rowData,
+    editMode,
+  }, setCtxData] = useTableSelector(c => {
+    let rowData = get(c.editData, keyValue, {});
+    return {
+      rowData,
+      editMode: c.editMode,
+    };
+  }, isEqual);
+
+  let actualValue = get(rowData, column.key, value);
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     let fieldValue: any = e.target.checked;
 
     if (editMode === 'autosave') {
-      onSaveQuickEdit({ [column.key]: fieldValue });
+      onSaveQuickEdit({
+        [keyValue]: {
+          [column.key]: fieldValue
+        }
+      });
     } else {
-      setFormData(form => update(form, {
-        [keyValue]: { $auto: {
-          [column.key]: { $set: fieldValue }
-        } }
+      setCtxData(data => update(data, {
+        editData: {
+          [keyValue]: { $auto: {
+            [column.key]: { $set: fieldValue }
+          } }
+        }
       }));
     }
   }

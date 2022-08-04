@@ -1,4 +1,6 @@
 ## [Unreleased]
+### Fixed
+- Quick editor and row selector render performance improvements
 
 ## [1.6.7] - 2022-08-02
 ### Fixed

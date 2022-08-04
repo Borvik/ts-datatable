@@ -6,7 +6,8 @@ import { faCaretLeft } from '@fortawesome/free-solid-svg-icons/faCaretLeft';
 import { faCaretRight } from '@fortawesome/free-solid-svg-icons/faCaretRight';
 import { faWindowMinimize } from '@fortawesome/free-solid-svg-icons/faWindowMinimize';
 import { useDerivedState } from '../../utils/useDerivedState';
-import { ColumnContext } from '../table/contexts';
+import { ColumnContext, useTableSelector } from '../table/contexts';
+import isEqual from 'lodash/isEqual';
 
 /**
  * Guidelines
@@ -21,7 +22,14 @@ export const PageNav: React.FC<PaginateProps> = function PageNav({buttonPosition
   const [id] = useState(uniqueId('pageSelect_'));
   const [editing, setEditing] = useState(false);
   const [pageNum, setPageNum] = useDerivedState(() => props.page, [props.page, editing]);
-  const { isEditing, editMode, labels } = useContext(ColumnContext);
+  const { labels } = useContext(ColumnContext);
+  const [{
+    isEditing,
+    editMode,
+  }] = useTableSelector(c => ({
+    isEditing: c.isEditing,
+    editMode: c.editMode,
+  }), isEqual);
 
   let totalPages: number = 0;
   if (typeof props.total !== 'undefined') {
@@ -115,7 +123,14 @@ const PaginateButtons: React.FC<PaginateButtonProps> = function PaginateButtons(
   page,
   changePage,
 }) {
-  const { isEditing, editMode, labels } = useContext(ColumnContext);
+  const { labels } = useContext(ColumnContext);
+  const [{
+    isEditing,
+    editMode,
+  }] = useTableSelector(c => ({
+    isEditing: c.isEditing,
+    editMode: c.editMode,
+  }), isEqual);
   const displayBefore = useMemo(() => (
     ((
       position === 'before' &&
@@ -180,7 +195,14 @@ const PaginateButtons: React.FC<PaginateButtonProps> = function PaginateButtons(
 };
 
 const PerPageLimitSelect: React.FC<PaginateLimitSelectProps> = function PerPageLimitSelect({ page, total, totalPages, perPage, perPageOptions, changePage }) {
-  const { isEditing, editMode, labels } = useContext(ColumnContext);
+  const { labels } = useContext(ColumnContext);
+  const [{
+    isEditing,
+    editMode,
+  }] = useTableSelector(c => ({
+    isEditing: c.isEditing,
+    editMode: c.editMode,
+  }), isEqual);
   const [pageLimit, setPageLimit] = useDerivedState(() => perPage, [ perPage ]);
   const pageOptions = useMemo(() => {
     if (perPageOptions === 'any') return [];

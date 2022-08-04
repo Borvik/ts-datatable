@@ -1,6 +1,9 @@
 import React, { useContext } from 'react';
-import { ColumnContext } from '../table/contexts';
+import { ColumnContext, useTableSelector } from '../table/contexts';
 import { getRowKey } from '../../utils/getRowKey';
+import isEqual from 'lodash/isEqual';
+import { RowSelectorCheckbox } from './checkbox';
+import { AllRowsSelector } from './select-all';
 
 interface RowSelectorProps<T> {
   row: T;
@@ -13,9 +16,7 @@ export const RowSelector = function RowSelector<T>({ row, rowIndex, ...props }: 
     actualColumns: columns,
     canSelectRow,
     getRowKey: propsGetRowKey,
-    selectedRows,
     setRowSelected,
-    setAllSelected,
     components,
   } = useContext(ColumnContext);
 
@@ -23,22 +24,7 @@ export const RowSelector = function RowSelector<T>({ row, rowIndex, ...props }: 
 
   if (rowIndex < 0) {
     // Select ALL
-    const rowData = props.data ?? [];
-    const filteredRowData = rowData.filter(rw => (typeof canSelectRow !== 'function' || canSelectRow(rw)));
-    const selectedKeys = Object.keys(selectedRows);
-
-    const isChecked = (!!filteredRowData.length && selectedKeys.length === filteredRowData.length);
-    const isIndeterminite = (!!filteredRowData.length && !!selectedKeys.length && filteredRowData.length !== selectedKeys.length);
-    return <div>
-      <Checkbox
-        checked={isChecked}
-        indeterminate={isIndeterminite}
-        onChange={() => {
-          if (!filteredRowData.length) return;
-          setAllSelected(!!filteredRowData.length && selectedKeys.length !== filteredRowData.length)
-        }}
-      />
-    </div>;
+    return <AllRowsSelector data={props.data} />;
   }
 
   if (typeof canSelectRow === 'function' && !canSelectRow(row)) {
@@ -46,7 +32,9 @@ export const RowSelector = function RowSelector<T>({ row, rowIndex, ...props }: 
   }
 
   const rowKey = getRowKey(row, rowIndex, columns, propsGetRowKey)
-  const isSelected = typeof selectedRows[rowKey] !== 'undefined';
+  const [{ isSelected }] = useTableSelector(c => ({
+    isSelected: typeof c.selectedRows[rowKey] !== 'undefined'
+  }), isEqual);
 
   return <div>
     <Checkbox
@@ -57,19 +45,3 @@ export const RowSelector = function RowSelector<T>({ row, rowIndex, ...props }: 
     />
   </div>
 };
-
-export interface RowSelectorCheckboxProps<T> {
-  checked: boolean
-  indeterminate: boolean
-  onChange: React.InputHTMLAttributes<HTMLInputElement>['onChange']
-  row?: T
-}
-
-export const RowSelectorCheckbox = function RowSelectorCheckbox<T>({ indeterminate, checked, onChange }: RowSelectorCheckboxProps<T>) {
-  return <input
-    type='checkbox'
-    ref={(el) => el && (el.indeterminate = indeterminate)}
-    checked={checked}
-    onChange={onChange}
-  />;
-}

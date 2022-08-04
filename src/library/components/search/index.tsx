@@ -3,11 +3,19 @@ import { SearchProps } from './types';
 import { useDerivedState } from '../../utils/useDerivedState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
-import { ColumnContext } from '../table/contexts';
+import { ColumnContext, useTableSelector } from '../table/contexts';
+import isEqual from 'lodash/isEqual';
 
 export const SearchForm: React.FC<SearchProps> = function SearchForm(props) {
-  const { isEditing, editMode, labels } = useContext(ColumnContext);
+  const { labels } = useContext(ColumnContext);
   const [searchQuery, setSearchQuery] = useDerivedState(() => props.searchQuery, [props.searchQuery]);
+  const [{
+    isEditing,
+    editMode,
+  }] = useTableSelector(c => ({
+    isEditing: c.isEditing,
+    editMode: c.editMode,
+  }), isEqual);
 
   return (
     <form className='ts-datatable-search-form' onSubmit={ isEditing && editMode === 'default' ? undefined : (e) => {
