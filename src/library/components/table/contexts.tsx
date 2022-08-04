@@ -18,7 +18,6 @@ import {
   EditModes,
 } from './types';
 import { FilterSettings } from '../filter/types';
-import { useStateRef } from '../../utils/useStateRef';
 
 export interface ColumnContextInterface<T> {
   preMDRColumn?: DataColumn<T>;

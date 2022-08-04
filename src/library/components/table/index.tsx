@@ -188,9 +188,6 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   const canEdit = typeof props.onSaveQuickEdit === 'function' && columnData.hasEditor && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
   const canSelectRows = !!props.canSelectRows && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
 
-  // const [editFormData, setFormData] = useState<EditFormData>({});
-  // const [selectedRows, setSelectedRows] = useState<Record<string | number, T>>({});
-
   const [pagination, setPagination] = useParsedQs<Pagination, DeepPartial<Pagination>>(
     {page: 1, perPage: props.paginateOptions?.defaultPerPage ?? 10},
     (qsPagination) => ({
@@ -274,10 +271,6 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     }
   );
 
-  // const { setSaving, setIsEditing } = useTableSelector(({ setSaving, setIsEditing }) => ({
-  //   setSaving,
-  //   setIsEditing,
-  // }));
   const [, setCtxData] = useTableSelector(() => ({}), isEqual);
   const [editCount, setEditCount] = useState(0);
 

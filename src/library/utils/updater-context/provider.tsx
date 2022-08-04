@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useCallback, useMemo, useRef } from 'react';
-import { ProviderProps, SelectorInternalContext, SubscriberCallback, UnsubscribeCallback } from './types';
+import { ProviderProps, SelectorInternalContext, SubscriberCallback, UnsubscribeCallback, UpdaterCallback } from './types';
 
 export function createProvider<T extends object>(Context: React.Context<SelectorInternalContext<T> | null>, initialState: T) {
   return function Provider({ children, initialValue }: PropsWithChildren<ProviderProps<T>>): JSX.Element {
@@ -8,8 +8,9 @@ export function createProvider<T extends object>(Context: React.Context<Selector
       ...initialValue
     });
     const subscribersRef = useRef<SubscriberCallback[]>([]);
+    const updaterRef = useRef<UpdaterCallback<T>>();
   
-    const updater = useCallback(
+    updaterRef.current = useCallback(
       (newState: (Partial<T> | ((state: T) => Partial<T>))) => {
         const publicState = typeof newState === 'function'
           ? (newState as any)(storeRef.current) as T
@@ -33,8 +34,8 @@ export function createProvider<T extends object>(Context: React.Context<Selector
         }
       },
       getState: () => storeRef.current,
-      getUpdater: () => updater,
-    }), [updater]);
+      getUpdater: () => updaterRef.current!,
+    }), []);
   
     return <Context.Provider value={contextValue}>{children}</Context.Provider>
   }

@@ -9,10 +9,7 @@ import isEqual from 'lodash/isEqual';
 export const BooleanEditor: React.FC<EditorProps> = function BooleanEditor({row, column, value}) {
   const {
     actualColumns: columns,
-    // editData,
-    // setFormData,
     getRowKey,
-    // editMode,
     onSaveQuickEdit
   } = useContext(ColumnContext);
 

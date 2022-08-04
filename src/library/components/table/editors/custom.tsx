@@ -10,10 +10,7 @@ import isEqual from 'lodash/isEqual';
 export const CustomEditor: React.FC<EditorProps> = function CustomEditor({row, column, value}) {
   const {
     actualColumns: columns,
-    // editData,
-    // setFormData,
     getRowKey,
-    // editMode,
     onSaveQuickEdit,
   } = useContext(ColumnContext);
   const Editor = (column.editor as CustomColumnEditor<any>).Editor;
