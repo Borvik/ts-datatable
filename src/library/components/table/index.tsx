@@ -24,6 +24,7 @@ import { QueryString } from '@borvik/querystring';
 import { DeepPartial } from '@borvik/use-querystate/dist/types';
 import { TableFooter } from './footer';
 import { TableContextProvider, useTableSelector } from './contexts';
+import isEqual from 'lodash/isEqual';
 
 const preMDR_RenderWarned: Record<string, boolean> = {};
 const preMDR_WidthWarned: Record<string, boolean> = {};
@@ -188,7 +189,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   const canSelectRows = !!props.canSelectRows && (columnData.primaryKeyCount === 1 || typeof props.getRowKey === 'function');
 
   // const [editFormData, setFormData] = useState<EditFormData>({});
-  const [selectedRows, setSelectedRows] = useState<Record<string | number, T>>({});
+  // const [selectedRows, setSelectedRows] = useState<Record<string | number, T>>({});
 
   const [pagination, setPagination] = useParsedQs<Pagination, DeepPartial<Pagination>>(
     {page: 1, perPage: props.paginateOptions?.defaultPerPage ?? 10},
@@ -277,7 +278,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   //   setSaving,
   //   setIsEditing,
   // }));
-  const [, setCtxData] = useTableSelector(() => ({}));
+  const [, setCtxData] = useTableSelector(() => ({}), isEqual);
   const [editCount, setEditCount] = useState(0);
 
   const [stateDataList, setDataList] = useState<DataFnResult<T[], FooterData[]>>({ data: [], total: 0 });
@@ -451,7 +452,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
       let values = Object.values(selection);
       props.onSelectionChange(keys, values);
     }
-    setSelectedRows(selection);
+    setCtxData({ selectedRows: selection });
   }
 
   function setAllSelected(selectAll: boolean) {
@@ -471,17 +472,33 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
 
   function setRowSelected(row: any, rowIndex: number) {
     let rowKey = getRowKey(row, rowIndex, columnData.actualColumns, props.getRowKey);
-    let exists = typeof selectedRows[rowKey] !== 'undefined';
+    setCtxData(prev => {
+      const exists = typeof prev.selectedRows[rowKey] !== 'undefined';
+      let newState = prev;
+      if (!exists) {
+        newState = update(prev, {
+          selectedRows: {
+            [rowKey]: { $set: row },
+          }
+        });
+      } else {
+        newState = update(prev, {
+          selectedRows: {
+            $unset: [rowKey]
+          }
+        });
+      }
+
+      if (typeof props.onSelectionChange === 'function') {
+        // raise
+        let keys = Object.keys(newState.selectedRows);
+        let values = Object.values(newState.selectedRows);
+        props.onSelectionChange(keys, values);
+      }
+      return newState;
+    });
     
-    if (!exists) {
-      doSetSelectedRows(update(selectedRows, {
-        [rowKey]: { $set: row },
-      }));
-    } else {
-      doSetSelectedRows(update(selectedRows, {
-        $unset: [rowKey]
-      }));
-    }
+    
   }
 
   const searchFormOnSearch = useCallback((query: string) => {
@@ -574,7 +591,6 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
       filter,
       filterSettings: props.filterSettings,
       canSelectRows,
-      selectedRows,
       setFilter,
       setColumnSort,
       setAllSelected,
@@ -616,7 +632,6 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
                 quickEditPosition={quickEditPosition}
                 buttons={{
                   quickEdit: <TableEditorButton
-                    setEditing={setIsEditing}
                     canEdit={canEdit}
                   />,
                   filter: <FilterButton />,
@@ -666,7 +681,6 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
             quickEditPosition={quickEditPosition}
             buttons={{
               quickEdit: <TableEditorButton
-                setEditing={setIsEditing}
                 canEdit={canEdit}
               />,
               filter: <FilterButton />,

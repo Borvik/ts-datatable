@@ -1,26 +1,35 @@
 import React, { useContext } from 'react';
-import { ColumnContext } from '../contexts';
+import { ColumnContext, useTableSelector } from '../contexts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencilAlt } from '@fortawesome/free-solid-svg-icons/faPencilAlt';
 import { faBan } from '@fortawesome/free-solid-svg-icons/faBan';
 import { faSave } from '@fortawesome/free-solid-svg-icons/faSave';
+import isEqual from 'lodash/isEqual';
 
 interface ButtonProps {
-  setEditing: (value: React.SetStateAction<boolean>) => void
   canEdit: boolean
 }
 
-export const TableEditorButton: React.FC<ButtonProps> = function TableEditorButton({ setEditing, canEdit }) {
+export const TableEditorButton: React.FC<ButtonProps> = function TableEditorButton({ canEdit }) {
   const {
-    isEditing,
-    editMode,
-    setFormData,
     onSaveQuickEdit,
-    editData,
-    isSavingQuickEdit,
     classNames,
     labels,
   } = useContext(ColumnContext);
+  const [
+    {
+      isEditing,
+      editMode,
+      editData,
+      isSavingQuickEdit,
+    },
+    setCtxData
+  ] = useTableSelector(c => ({
+    isEditing: c.isEditing,
+    editMode: c.editMode,
+    editData: c.editData,
+    isSavingQuickEdit: c.isSavingQuickEdit,
+  }), isEqual);
 
   if (editMode === 'autosave') return null;
 
@@ -31,7 +40,7 @@ export const TableEditorButton: React.FC<ButtonProps> = function TableEditorButt
         btnEditClass = `${classNames?.actionButton ?? ''} ${classNames?.actionButtonEdit ?? ''}`.trim();
       
       return <div className='quick-edit-btn-group'>
-        <button type='button' className={btnEditClass} onClick={() => setEditing(true)} title={labels?.quickEdit ?? 'Quick Edit'}>
+        <button type='button' className={btnEditClass} onClick={() => setCtxData({ isEditing: true })} title={labels?.quickEdit ?? 'Quick Edit'}>
           <FontAwesomeIcon icon={faPencilAlt} />
         </button>
       </div>;
@@ -59,8 +68,10 @@ export const TableEditorButton: React.FC<ButtonProps> = function TableEditorButt
       <FontAwesomeIcon icon={faSave} />
     </button>
     <button type='button' className={btnDiscardClass} title={labels?.discardChanges ?? 'Discard Changes'} disabled={isSavingQuickEdit} onClick={() => {
-      setFormData({});
-      setEditing(false)
+      setCtxData({
+        editData: {},
+        isEditing: false
+      });
     }}>
       <FontAwesomeIcon icon={faBan} />
     </button>

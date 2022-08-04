@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { ColumnContext } from './contexts';
+import { ColumnContext, useTableSelector } from './contexts';
 import { getRowValue } from '../../utils/getRowKey';
 import { CellEditor } from './editors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,6 +8,7 @@ import { faChevronDown } from '@fortawesome/free-solid-svg-icons/faChevronDown';
 import { RowSelector } from '../row-selector';
 import { DataGroup, isValidPreMDRColumn } from './types';
 import { DetailedHTMLProps, HTMLAttributes, TdHTMLAttributes } from 'react';
+import isEqual from 'lodash/isEqual';
 
 interface TableRowProps<T> {
   row: T;
@@ -20,8 +21,6 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
   const [ isExpanded, setExpanded ] = useState(false);
   const {
     actualColumns: columns,
-    isEditing,
-    editMode,
     DetailRow,
     canRowShowDetail,
     canSelectRows,
@@ -29,6 +28,14 @@ export const TableRow = function TableRow<T>({ row, group, ...props }: TableRowP
     getTableCellProps,
     preMDRColumn,
   } = useContext(ColumnContext);
+
+  const [{
+    isEditing,
+    editMode,
+  }] = useTableSelector(c => ({
+    isEditing: c.isEditing,
+    editMode: c.editMode,
+  }), isEqual);
 
   let canEditRow = (isEditing || editMode !== 'default');
   if (canEditRow && typeof props.canEditRow === 'function')

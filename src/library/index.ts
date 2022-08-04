@@ -16,5 +16,5 @@ export type {
 } from './components/table/actions';
 export type {
   RowSelectorCheckboxProps
-} from './components/row-selector';
+} from './components/row-selector/checkbox';
 export type { ColumnContext } from './components/table/contexts';

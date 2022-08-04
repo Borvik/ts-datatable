@@ -33,8 +33,6 @@ export interface ColumnContextInterface<T> {
   
   canSelectRows: boolean;
   canGroupBy: boolean;
-  selectedRows: Record<string | number, T>;
-  setFormData: React.Dispatch<React.SetStateAction<EditFormData>>;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
   setAllSelected: (selectAll: boolean) => void;
   setRowSelected: (row: T, rowIndex: number) => void;
@@ -70,8 +68,6 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   
   
   canSelectRows: false,
-  selectedRows: {},
-  setFormData: () => {},
   setColumnSort: () => {},
   setAllSelected: () => {},
   setRowSelected: () => {},
@@ -97,22 +93,20 @@ export const GroupCollapseContext = createContext<GroupCollapseContextInterface>
   collapsedState: {}
 });
 
-export interface TableContextInterface {
+export interface TableContextInterface<T> {
   isEditing: boolean;
   isSavingQuickEdit: boolean;
   editData: EditFormData;
   editMode: EditModes;
+  selectedRows: Record<string | number, T>;
 }
 
-function initRef<T>(initValue: T): {current: T} {
-  return { current: initValue };
-}
-
-export const TableContext = createSelContext<TableContextInterface>({
+export const TableContext = createSelContext<TableContextInterface<any>>({
   isEditing: false,
   isSavingQuickEdit: false,
   editData: {},
   editMode: 'default',
+  selectedRows: {},
 });
 
 interface TableContextProviderProps {
@@ -122,7 +116,9 @@ interface TableContextProviderProps {
 export const useTableSelector = TableContext.useSelector;
 export const TableContextProvider: React.FC<TableContextProviderProps> = ({ editMode, children }) => {
   return (
-    <TableContext.Provider>
+    <TableContext.Provider initialValue={{
+      editMode,
+    }}>
       {children}
     </TableContext.Provider>
   );

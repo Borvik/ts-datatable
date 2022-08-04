@@ -31,6 +31,10 @@ export function createUseSelector<T>(Context: React.Context<SelectorInternalCont
 
       const isEqual = equalityFn(selStateRef.current.value, newState);
       if (!isEqual) {
+        console.log('missed equal check:', {
+          current: selStateRef.current.value,
+          setto: newState,
+        });
         selStateRef.current = { init: true, value: newState }
         forceRender(v => 0 - v);
       }

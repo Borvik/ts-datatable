@@ -3,9 +3,10 @@ import { useDialog } from '@borvik/use-dialog';
 import { FilterDialog } from './dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons/faFilter';
-import { ColumnContext } from '../table/contexts';
+import { ColumnContext, useTableSelector } from '../table/contexts';
 import { batchedQSUpdate } from '@borvik/use-querystate';
 import { QueryFilterGroup } from '../table/types';
+import isEqual from 'lodash/isEqual';
 
 export { FilterBar } from './bar';
 
@@ -13,8 +14,6 @@ export const FilterButton: React.FC = function FilterButton() {
   const { dialog, showDialog } = useDialog(<FilterDialog />);
   const {
     filterColumns,
-    isEditing,
-    editMode,
     classNames,
     labels,
     filter,
@@ -23,6 +22,14 @@ export const FilterButton: React.FC = function FilterButton() {
     setPagination,
     onShowFilterEditor,
   } = useContext(ColumnContext);
+
+  const [{
+    isEditing,
+    editMode,
+  }] = useTableSelector(c => ({
+    isEditing: c.isEditing,
+    editMode: c.editMode,
+  }), isEqual);
 
   function applyFilter(filterState: QueryFilterGroup) {
     batchedQSUpdate(() => {
