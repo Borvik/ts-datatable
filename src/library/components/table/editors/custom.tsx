@@ -28,9 +28,6 @@ export const CustomEditor: React.FC<EditorProps> = function CustomEditor({row, c
     editMode,
   }, setCtxData] = useTableSelector(c => {
     let rowData = get(c.editData, keyValue, {});
-    if (keyValue == '69') {
-      console.log('rowData:', rowData);
-    }
     return {
       rowData,
       editMode: c.editMode,

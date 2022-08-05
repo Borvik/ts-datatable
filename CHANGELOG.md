@@ -1,4 +1,10 @@
 ## [Unreleased]
+
+## [1.6.9]
+### Fixed
+- Removed some console.logs
+
+## [1.6.8]
 ### Fixed
 - Quick editor and row selector render performance improvements
 
