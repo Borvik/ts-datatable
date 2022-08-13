@@ -60,7 +60,7 @@ export const TableHeader: React.FC<HeadProps> = function TableHeader(props) {
                   </span>
                 </th>}
               </>}
-              <th key={colIdx} style={colIdx === 0 ? indentStyle : undefined} className={`${col.className ?? ''} ${col.fixed ? `fixed fixed-${col.fixed}` : ''}`.trim()} colSpan={col.colSpan > 1 ? col.colSpan : undefined} rowSpan={col.rowSpan > 1 ? col.rowSpan : undefined} scope={colScope}>
+              <th key={colIdx} style={colIdx === 0 && col.fixed ? indentStyle : undefined} className={`${col.className ?? ''} ${col.fixed ? `fixed fixed-${col.fixed}` : ''}`.trim()} colSpan={col.colSpan > 1 ? col.colSpan : undefined} rowSpan={col.rowSpan > 1 ? col.rowSpan : undefined} scope={colScope}>
                 <span className={`ts-datatable-header-cell ${isSortable ? 'sortable' : ''}`.trim()} onClick={isSortable ? onClick : undefined} onMouseDown={isSortable ? (e) => { if (e.shiftKey) { e.preventDefault() } } : undefined}>
                   <span className='ts-datatable-header-content'>{col.header}</span>
                   <HeaderSort column={col} sort={sort} />

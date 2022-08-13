@@ -5,6 +5,7 @@
 
 ### Fixed
 - Scroll to top on page change with fixed headers
+- Some styling changes with headers due to fixed headers change
 
 ## [1.6.9]
 ### Fixed
