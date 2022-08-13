@@ -1,4 +1,10 @@
 ## [Unreleased]
+### Added
+- Pass row edit data to custom cell editors - allows altering other editors based on changes to other cells.
+- `setValues` function to custom editors to allow updating multiple columns at once (ex. side effect changes).
+
+### Fixed
+- Scroll to top on page change with fixed headers
 
 ## [1.6.9]
 ### Fixed

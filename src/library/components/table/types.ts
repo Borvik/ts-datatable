@@ -481,10 +481,21 @@ export interface CustomColumnEditor<T> {
 }
 
 export interface CustomEditorProps<T> {
+  /**
+   * The current value of the cell
+   */
   value: any;
+  /**
+   * An object containing the original data for the row this editor is in
+   */
   row: T;
+  /**
+   * An object containing the all the edit data for the current row
+   */
+  editData: Partial<T>
   column: DataColumn<T>;
   setValue: (newValue: any) => void;
+  setValues: (data: Partial<T>) => void;
   originalValue: any;
   autoSave: () => void;
   editMode: EditModes;

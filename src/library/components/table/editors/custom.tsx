@@ -46,6 +46,23 @@ export const CustomEditor: React.FC<EditorProps> = function CustomEditor({row, c
     }))
   }
 
+  function setValues(data: any) {
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('Invalid data format for setting data');
+    }
+
+    let keys = Object.keys(data);
+    let updateSpec: any = {};
+    for (let key of keys) {
+      updateSpec[key] = { $set: data[key] };
+    }
+    setCtxData(data => update(data, {
+      editData: {
+        [keyValue]: { $auto: updateSpec }
+      }
+    }));
+  }
+
   function autoSave() {
     if (Object.keys(rowData as object).length)
       onSaveQuickEdit({[keyValue]: rowData as any});
@@ -57,7 +74,9 @@ export const CustomEditor: React.FC<EditorProps> = function CustomEditor({row, c
     row={row}
     column={column}
     setValue={onChange}
+    setValues={setValues}
     autoSave={autoSave}
     editMode={editMode}
+    editData={rowData as any}
   />;
 }
