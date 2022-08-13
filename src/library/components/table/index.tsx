@@ -352,6 +352,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
 
   const topEl = useRef<HTMLDivElement>(null);
   const theadEl = useRef<HTMLTableSectionElement>(null);
+  const tableWrapperEl = useRef<HTMLDivElement>(null);
 
   // The resize here is to check if the top area is to small and should wrap
   // page/action buttons vs. search/filter bar
@@ -372,6 +373,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   }, []);
 
   // On page change - ensure scrolled to top (if enabled)
+  let fixedHeaders = props.fixedHeaders;
   let scrollToTopEnabled = !(props.paginateOptions?.disableScrollToTop);
   let scrollToTopLoaded = useRef(false);
   useEffect(() => {
@@ -398,11 +400,17 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
      * and hide part of topEl.
      */
     if (scrollToTopLoaded.current && scrollToTopEnabled) {
-      theadEl.current?.scrollIntoView();
-      topEl.current?.scrollIntoView();
+      if (fixedHeaders ?? true) {
+        // headers are fixed, it's likely they are in view already - just scroll the wrapper
+        tableWrapperEl.current?.scrollTo({ top: 0 });
+      } else {
+        // headers are not fixed we should scroll them into view
+        theadEl.current?.scrollIntoView();
+        topEl.current?.scrollIntoView();
+      }
     }
     scrollToTopLoaded.current = true;
-  }, [ pagination, scrollToTopEnabled, scrollToTopLoaded ]);
+  }, [ pagination, scrollToTopEnabled, scrollToTopLoaded, fixedHeaders ]);
 
 
   let propOnSave = props.onSaveQuickEdit;
@@ -641,7 +649,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
             />}
           </div>
         </div>
-        <div {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
+        <div ref={tableWrapperEl} {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
           <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
             <TableHeader
               headRef={theadEl}
