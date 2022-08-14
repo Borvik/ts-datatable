@@ -368,6 +368,7 @@ export interface CustomColumnFilter extends BaseColumnFilter {
   defaultValue?: any;
   toDisplay: (value: any) => ReactRenderable;
   Editor: React.ElementType<CustomFilterEditorProps>;
+  MultiEditor?: React.ElementType<CustomFilterEditorProps>;
   editorOptions?: any;
 }
 
@@ -436,6 +437,10 @@ export const QuickOperatorLabels: OperatorMap<AllFilterOperators> = {
 
 export type PartialColumnFilter = StringColumnFilter | NumberColumnFilter | BooleanColumnFilter | CustomColumnFilter;
 export type ColumnFilter = FKReq<StringColumnFilter> | FKReq<NumberColumnFilter> | FKReq<BooleanColumnFilter> | FKReq<CustomColumnFilter>;
+
+export function isCustomFilter(value?: PartialColumnFilter): value is CustomColumnFilter {
+  return value?.type === 'custom';
+}
 
 export interface QueryFilterItem {
   column: string;
