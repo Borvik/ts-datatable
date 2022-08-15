@@ -13,7 +13,9 @@ export const CustomEditor: React.FC<EditorProps> = function CustomEditor({row, c
     getRowKey,
     onSaveQuickEdit,
   } = useContext(ColumnContext);
-  const Editor = (column.editor as CustomColumnEditor<any>).Editor;
+
+  const editorDef = column.editor as CustomColumnEditor<any>;
+  const Editor = editorDef.Editor;
 
   // yes we should be able to count on this
   // earlier validation assures editing only if either
@@ -78,5 +80,6 @@ export const CustomEditor: React.FC<EditorProps> = function CustomEditor({row, c
     autoSave={autoSave}
     editMode={editMode}
     editData={rowData as any}
+    editorOptions={editorDef.editorOptions}
   />;
 }

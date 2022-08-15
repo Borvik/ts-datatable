@@ -483,6 +483,7 @@ interface BasicColumnEditor {
 export interface CustomColumnEditor<T> {
   type: 'custom'
   Editor: React.ElementType<CustomEditorProps<T>>
+  editorOptions?: any
 }
 
 export interface CustomEditorProps<T> {
@@ -504,6 +505,7 @@ export interface CustomEditorProps<T> {
   originalValue: any;
   autoSave: () => void;
   editMode: EditModes;
+  editorOptions?: any
 }
 
 type ColumnEditor<T> = BasicColumnEditor | CustomColumnEditor<T>;

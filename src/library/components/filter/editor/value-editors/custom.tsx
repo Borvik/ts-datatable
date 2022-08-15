@@ -87,7 +87,7 @@ export const CustomEditor: React.FC<CustomEditorProps> = function CustomEditor({
           }));
         });
       }
-      return <>
+      return <>(
         {displayValue.map((val, idx, arr) => {
           return <span className='multi-value-editor' key={keyBase[idx] + '_' + idx}>
             <span className='filter-editor-value' tabIndex={0} onKeyDown={onKey} onClick={() => setEditing(true)}>{val}</span>
@@ -95,7 +95,7 @@ export const CustomEditor: React.FC<CustomEditorProps> = function CustomEditor({
               <FontAwesomeIcon icon={faTimesCircle} />
             </button>}
           </span>
-        })}
+        })})
       </>
     }
 
