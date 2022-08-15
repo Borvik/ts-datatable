@@ -368,6 +368,7 @@ export interface CustomColumnFilter extends BaseColumnFilter {
   defaultValue?: any;
   toDisplay: (value: any) => ReactRenderable;
   Editor: React.ElementType<CustomFilterEditorProps>;
+  MultiEditor?: React.ElementType<CustomFilterEditorProps>;
   editorOptions?: any;
 }
 
@@ -437,6 +438,10 @@ export const QuickOperatorLabels: OperatorMap<AllFilterOperators> = {
 export type PartialColumnFilter = StringColumnFilter | NumberColumnFilter | BooleanColumnFilter | CustomColumnFilter;
 export type ColumnFilter = FKReq<StringColumnFilter> | FKReq<NumberColumnFilter> | FKReq<BooleanColumnFilter> | FKReq<CustomColumnFilter>;
 
+export function isCustomFilter(value?: PartialColumnFilter): value is CustomColumnFilter {
+  return value?.type === 'custom';
+}
+
 export interface QueryFilterItem {
   column: string;
   value: any;
@@ -478,16 +483,29 @@ interface BasicColumnEditor {
 export interface CustomColumnEditor<T> {
   type: 'custom'
   Editor: React.ElementType<CustomEditorProps<T>>
+  editorOptions?: any
 }
 
 export interface CustomEditorProps<T> {
+  /**
+   * The current value of the cell
+   */
   value: any;
+  /**
+   * An object containing the original data for the row this editor is in
+   */
   row: T;
+  /**
+   * An object containing the all the edit data for the current row
+   */
+  editData: Partial<T>
   column: DataColumn<T>;
   setValue: (newValue: any) => void;
+  setValues: (data: Partial<T>) => void;
   originalValue: any;
   autoSave: () => void;
   editMode: EditModes;
+  editorOptions?: any
 }
 
 type ColumnEditor<T> = BasicColumnEditor | CustomColumnEditor<T>;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryFilterItem, DataColumn, CustomColumnFilter } from '../../../table/types';
+import { QueryFilterItem, DataColumn, CustomColumnFilter, isCustomFilter } from '../../../table/types';
 import { SetEditorStateFn } from '../../types';
 import { InputEditor } from './input';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -98,6 +98,10 @@ const MultiValueEditor: React.FC<Props> = function MultiValueEditor({ column, fi
     path: rest.path,
     idx: rest.index,
   });
+  
+  if (isCustomFilter(column.filter) && !!column.filter.MultiEditor) {
+    return <CustomEditor useMulti filterDef={column.filter as CustomColumnFilter} setState={setState} filter={filter} type={column.filter!.type} valuePath={null} {...rest} />
+  }
   
   return <>({values.map((_value, index, arr) => (
     <span className='multi-value-editor' key={valueKeyBase + '_' + index}>

@@ -235,6 +235,8 @@
 
         &[scope=colgroup] {
           text-align: center;
+          border-bottom: 1px solid var(--ts-dt-fixed-bg, white);
+
           .ts-datatable-header-cell {
             padding: 1px;
             border-bottom: 1px solid;
@@ -242,6 +244,8 @@
         }
 
         &[scope=col] {
+          border-bottom: 2px solid var(--ts-dt-fixed-bg, white);
+
           .ts-datatable-header-cell {
             padding: 1px;
             border-bottom: 2px solid;

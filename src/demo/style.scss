@@ -98,4 +98,117 @@ code {
   color: red;
 }
 
+/**
+ * Multi-select dropdown
+ */
+.multiselect-dropdown {
+  display: inline-block;
+  padding: 2px 20px 0px 5px;
+  border-radius: 4px;
+  border: solid 1px #ced4da;
+  background-color: var(--dt-fixed-bg);
+  position: relative;
+  // 
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23535b61' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right .45rem center;
+  background-size: 16px 12px;
+
+  span.optext, span.placeholder {
+    margin-right:0.5em; 
+    margin-bottom:2px;
+    padding:1px 0; 
+    border-radius: 4px; 
+    display:inline-block;
+  }
+
+  span.optext {
+    background-color:lightgray;
+    padding:1px 0.75em;
+
+    .optdel {
+      float: right;
+      margin: 0 -6px 1px 5px;
+      font-size: 0.7em;
+      margin-top: 2px;
+      cursor: pointer;
+      color: #666;
+
+      &:hover { color: #c66;}
+    }
+
+    .dark & {
+      background-color: #535b61;
+
+      .optdel {
+        color: var(--text-color);
+      }
+    }
+  }
+
+  span.placeholder {
+    color:#ced4da;
+  }
+
+  
+}
+
+.multiselect-dropdown-list-wrapper {
+  box-shadow: gray 0 3px 8px;
+  z-index: 100;
+  padding:2px;
+  border-radius: 4px;
+  border: solid 1px #ced4da;
+  display: none;
+  position: fixed;
+  background: var(--dt-fixed-bg);
+
+  /*
+  --text-color: #282c34;
+  --app-bg: white;
+  --dt-fixed-bg: white;
+  */
+
+  .multiselect-dropdown-search{
+    margin-bottom: 5px;
+    border-width: 1px;
+    width: calc(100% - 6px);
+  }
+}
+
+.multiselect-dropdown-list{
+  padding:2px;
+  overflow-y:auto;
+  overflow-x: hidden;
+  width: 100%;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #bec4ca;
+    border-radius:3px;
+  }
+
+  div{
+    padding: 5px;
+
+    &:hover{
+      background-color: #ced4da;
+    }
+  }
+
+  input{
+    height: 1rem;
+    width: 1rem;
+    margin-right: 0.35rem;  
+  }
+}
+
+.multiselect-dropdown span.maxselected {width:100%;}
+.multiselect-dropdown-all-selector {border-bottom:solid 1px #999;}
+
+/**
+ * Table library
+ */
 @import '../library/style.scss';
