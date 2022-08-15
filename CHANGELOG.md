@@ -3,6 +3,7 @@
 - Pass row edit data to custom cell editors - allows altering other editors based on changes to other cells.
 - `setValues` function to custom editors to allow updating multiple columns at once (ex. side effect changes).
 - Filter editor support for custom single field multi value entries (multi-select dropdowns)
+- Expanded `editorOptions` to custom row editors not just filter editors
 
 ### Fixed
 - Scroll to top on page change with fixed headers
