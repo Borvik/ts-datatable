@@ -52,11 +52,6 @@ export class CustomMultiTypeFilterEditor extends React.Component<CustomFilterEdi
   }
 
   changeRef(el: HTMLSelectElement | null) {
-    console.log({
-      prev: this.prevEl,
-      curr: this.el,
-      next: el
-    });
     if (this.el !== el) {
       // unload prev
       this.clearMultiselect();

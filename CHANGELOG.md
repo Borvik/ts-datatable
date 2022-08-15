@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## [1.7.0]
 ### Added
 - Pass row edit data to custom cell editors - allows altering other editors based on changes to other cells.
 - `setValues` function to custom editors to allow updating multiple columns at once (ex. side effect changes).
