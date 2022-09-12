@@ -16,11 +16,13 @@ export function createProvider<T extends object>(Context: React.Context<Selector
           ? (newState as any)(storeRef.current) as T
           : newState;
 
-          storeRef.current = {
+        // TODO: Check for differences
+        storeRef.current = {
           ...storeRef.current,
           ...publicState,
         };
 
+        // TODO: Only notify if we detect differences
         // Notify all subscribers...
         subscribersRef.current.forEach(sub => sub());
       }, [storeRef, subscribersRef]

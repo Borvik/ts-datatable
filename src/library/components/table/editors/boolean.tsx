@@ -5,13 +5,14 @@ import { getRowValue } from '../../../utils/getRowKey';
 import { update } from '../../../utils/immutable';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
+import { useSaveQuickEdit } from '../useSaveQuickEdit';
 
 export const BooleanEditor: React.FC<EditorProps> = function BooleanEditor({row, column, value}) {
   const {
     actualColumns: columns,
     getRowKey,
-    onSaveQuickEdit
   } = useContext(ColumnContext);
+  const onSaveQuickEdit = useSaveQuickEdit();
 
   // yes we should be able to count on this
   // earlier validation assures editing only if either

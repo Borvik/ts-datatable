@@ -82,3 +82,7 @@ export interface PaginateButtonProps extends PaginateProps {
   buttonPosition: ButtonPosition | 'split';
   totalPages: number;
 }
+
+export interface PaginateWrapperProps extends Omit<PaginateProps, 'total'> {
+  PaginateComponent?: React.ElementType<PaginateRequiredProps>
+}

@@ -8,7 +8,6 @@ import { AllRowsSelector } from './select-all';
 interface RowSelectorProps<T> {
   row: T;
   rowIndex: number;
-  data?: T[]
 }
 
 export const RowSelector = function RowSelector<T>({ row, rowIndex, ...props }: RowSelectorProps<T>) {
@@ -24,7 +23,7 @@ export const RowSelector = function RowSelector<T>({ row, rowIndex, ...props }: 
 
   if (rowIndex < 0) {
     // Select ALL
-    return <AllRowsSelector data={props.data} />;
+    return <AllRowsSelector />;
   }
 
   if (typeof canSelectRow === 'function' && !canSelectRow(row)) {

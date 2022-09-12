@@ -5,14 +5,15 @@ import { faPencilAlt } from '@fortawesome/free-solid-svg-icons/faPencilAlt';
 import { faBan } from '@fortawesome/free-solid-svg-icons/faBan';
 import { faSave } from '@fortawesome/free-solid-svg-icons/faSave';
 import isEqual from 'lodash/isEqual';
+import { useSaveQuickEdit } from '../useSaveQuickEdit';
 
 interface ButtonProps {
   canEdit: boolean
 }
 
 export const TableEditorButton: React.FC<ButtonProps> = function TableEditorButton({ canEdit }) {
+  const onSaveQuickEdit = useSaveQuickEdit();
   const {
-    onSaveQuickEdit,
     classNames,
     labels,
   } = useContext(ColumnContext);

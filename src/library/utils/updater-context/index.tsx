@@ -4,6 +4,7 @@ import { createHOCFunction } from './hoc';
 import { createUseSelector } from './hook';
 import { createProvider } from './provider';
 import { SelectorContext, SelectorInternalContext } from './types';
+import { createContextSetter } from './useContextSetter';
 
 export function createContext<T extends object>(initialState: T): SelectorContext<T> {
   const ReactUpdaterContext = React.createContext<SelectorInternalContext<T> | null>(null);
@@ -16,11 +17,13 @@ export function createContext<T extends object>(initialState: T): SelectorContex
   const useSelector = createUseSelector(ReactUpdaterContext);
   const Consumer = createConsumer(useSelector);
   const withSelector = createHOCFunction(Consumer);
+  const useContextSetter = createContextSetter(ReactUpdaterContext);
 
   return {
     Provider,
     Consumer,
     useSelector,
     withSelector,
+    useContextSetter,
   };
 }

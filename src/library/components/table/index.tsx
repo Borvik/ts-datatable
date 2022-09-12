@@ -8,7 +8,7 @@ import { useLocalState } from '../../utils/useLocalState';
 import { ColumnContext } from './contexts';
 import { TableHeader } from './header';
 import { TableBody } from './body';
-import { PageNav } from '../pagination';
+import { Paginate } from '../pagination';
 import { useDeepEffect } from '../../utils/useDeepEffect';
 import { SearchForm as SearchFormComponent } from '../search';
 import { useParsedQs } from '../../utils/useParsedQS';
@@ -17,7 +17,7 @@ import { ColumnPickerButton } from '../column-picker';
 import { FilterButton, FilterBar } from '../filter';
 import { convertFromQS, convertToQS, transformTableFiltersToColumns } from '../../utils/transformFilter';
 import { TableEditorButton } from './editors/editButton';
-import { TableActionButtons } from './actions';
+import { TableActionButtons, TableRefreshButton } from './actions';
 import { getRowKey, getRowValue } from '../../utils/getRowKey';
 import { update } from '../../utils/immutable';
 import { QueryString } from '@borvik/querystring';
@@ -25,6 +25,7 @@ import { DeepPartial } from '@borvik/use-querystate/dist/types';
 import { TableFooter } from './footer';
 import { TableContextProvider, useTableSelector } from './contexts';
 import isEqual from 'lodash/isEqual';
+import { DataProviderContent, TableDataProvider as DefaultDataProvider, TableDataProvider } from './data-provider';
 
 const preMDR_RenderWarned: Record<string, boolean> = {};
 const preMDR_WidthWarned: Record<string, boolean> = {};
@@ -274,73 +275,74 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   const [, setCtxData] = useTableSelector(() => ({}), isEqual);
   const [editCount, setEditCount] = useState(0);
 
-  const [stateDataList, setDataList] = useState<DataFnResult<T[], FooterData[]>>({ data: [], total: 0 });
-  const [dataLoading, setLoading] = useState(true);
-  const [dataLoaderEl, setDataLoaderEl] = useState<React.ReactElement<any> | null>(null);
+  // const [stateDataList, setDataList] = useState<DataFnResult<T[], FooterData[]>>({ data: [], total: 0 });
+  // const [dataLoading, setLoading] = useState(true);
+  // const [dataLoaderEl, setDataLoaderEl] = useState<React.ReactElement<any> | null>(null);
   
-  function doSetDataList(data: T[] | DataFnResult<T[], FooterData[]>) {
-    if (Array.isArray(data)) {
-      setDataList({ data: data, total: data.length });
-    } else {
-      setDataList(data);
-    }
-    setLoading(false);
-  }
+  // function doSetDataList(data: T[] | DataFnResult<T[], FooterData[]>) {
+  //   if (Array.isArray(data)) {
+  //     setDataList({ data: data, total: data.length });
+  //   } else {
+  //     setDataList(data);
+  //   }
+  //   setLoading(false);
+  // }
 
-  const visibleColumnComparator = passColumnsToQuery ? actualColumnsComparator : false;
+  // const visibleColumnComparator = passColumnsToQuery ? actualColumnsComparator : false;
 
-  useDeepEffect(() => {
-    async function getData() {
-      let fullSort: ColumnSort[] = [
-        ...groupBy,
-        ...columnSort.sort.filter(s => (!groupBy.length || !groupBy.find(g => g.column === s.column))),
-      ];
+  // useDeepEffect(() => {
+  //   async function getData() {
+  //     let fullSort: ColumnSort[] = [
+  //       ...groupBy,
+  //       ...columnSort.sort.filter(s => (!groupBy.length || !groupBy.find(g => g.column === s.column))),
+  //     ];
 
-      if (typeof props.onQueryChange === 'function') {
-        props.onQueryChange({
-          pagination,
-          search: hideSearchForm ? '' : (searchQuery.query ?? ''),
-          sorts: fullSort,
-          filters: filter.filters.length ? filter : undefined,
-          visibleColumns: columnData.actualColumns.filter(c => c.isVisible),
-        });
-      }
+  //     if (typeof props.onQueryChange === 'function') {
+  //       props.onQueryChange({
+  //         pagination,
+  //         search: hideSearchForm ? '' : (searchQuery.query ?? ''),
+  //         sorts: fullSort,
+  //         filters: filter.filters.length ? filter : undefined,
+  //         visibleColumns: columnData.actualColumns.filter(c => c.isVisible),
+  //       });
+  //     }
 
-      if (typeof props.data === 'function') {
-        let returnedData = await props.data({
-          pagination,
-          search: hideSearchForm ? '' : (searchQuery.query ?? ''),
-          sorts: fullSort,
-          filters: filter.filters.length ? filter : undefined,
-          visibleColumns: columnData.actualColumns.filter(c => c.isVisible),
-        }, doSetDataList);
+  //     if (typeof props.data === 'function') {
+  //       let returnedData = await props.data({
+  //         pagination,
+  //         search: hideSearchForm ? '' : (searchQuery.query ?? ''),
+  //         sorts: fullSort,
+  //         filters: filter.filters.length ? filter : undefined,
+  //         visibleColumns: columnData.actualColumns.filter(c => c.isVisible),
+  //       }, doSetDataList);
 
-        if (React.isValidElement(returnedData)) {
-          setDataLoaderEl(returnedData);
-        }
-        else {
-          doSetDataList(returnedData);
-        }
-      } else {
-        doSetDataList({
-          data: props.data,
-          total: typeof props.totalCount === 'undefined'
-            ? props.data.length
-            : props.totalCount,
-          footerData: props.footerData,
-        });
-      }
-    }
+  //       if (React.isValidElement(returnedData)) {
+  //         setDataLoaderEl(returnedData);
+  //       }
+  //       else {
+  //         doSetDataList(returnedData);
+  //       }
+  //     } else {
+  //       doSetDataList({
+  //         data: props.data,
+  //         total: typeof props.totalCount === 'undefined'
+  //           ? props.data.length
+  //           : props.totalCount,
+  //         footerData: props.footerData,
+  //       });
+  //     }
+  //   }
 
-    setLoading(true);
-    doSetSelectedRows({});
-    // TODO: clear edit data (on filter/page/search)?
-    getData();
-  }, [ pagination, searchQuery.query, filter, columnSort, groupBy, editCount, canGroupBy, visibleColumnComparator ]);
+  //   setLoading(true);
+  //   doSetSelectedRows({});
+  //   // TODO: clear edit data (on filter/page/search)?
+  //   getData();
+  // }, [ pagination, searchQuery.query, filter, columnSort, groupBy, editCount, canGroupBy, visibleColumnComparator ]);
 
-  const Paginate = props.components?.Paginate ?? PageNav;
+  // const Paginate = props.components?.Paginate ?? PageNav;
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
   const ActionButtons = props.components?.ActionButtons ?? TableActionButtons;
+  const DataProvider = props.components?.DataProvider ?? DefaultDataProvider;
 
   let wrapperStyle: any = {
     '--ts-dt-fixed-bg': props.fixedColBg ?? 'white'
@@ -413,39 +415,6 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   }, [ pagination, scrollToTopEnabled, scrollToTopLoaded, fixedHeaders ]);
 
 
-  let propOnSave = props.onSaveQuickEdit;
-  let propGetRowKey = props.getRowKey;
-  let currentData = typeof props.data === 'function' ? stateDataList.data : props.data;
-  const onSaveQuickEdit = useCallback(async (data: QuickEditFormData<T>) => {
-    try {
-      if (!!propOnSave && Object.keys(data).length) {
-        setCtxData({ isSavingQuickEdit: true });
-        let rowsToSave = Object.keys(data);
-        let primaryColumn = columnData.actualColumns.find(c => c.isPrimaryKey)!;
-        let originalData: QuickEditFormData<T> = {};
-        let rowKeyFn = typeof propGetRowKey === 'function'
-          ? propGetRowKey
-          : getRowValue;
-
-        for (let id of rowsToSave) {
-          let rowData = currentData.find(r => rowKeyFn(r, primaryColumn) == id)!;
-          originalData[id] = rowData;
-        }
-
-        await propOnSave(data, originalData);
-        setCtxData({ editData: {} });
-        setEditCount(c => c + 1);
-      }
-      setCtxData({ isEditing: false });
-    }
-    catch {
-      // avoid unhandled exception
-    }
-    finally {
-      setCtxData({ isSavingQuickEdit: false });
-    }
-  }, [propOnSave, currentData, actualColumnsComparator, propGetRowKey]);
-
   function doSetSelectedRows(selection: Record<string | number, T>) {
     if (typeof props.onSelectionChange === 'function') {
       // raise
@@ -456,13 +425,10 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     setCtxData({ selectedRows: selection });
   }
 
-  function setAllSelected(selectAll: boolean) {
-    let data = typeof props.data === 'function' ? stateDataList.data : props.data;
+  function setAllSelected(selectAll: boolean, data: T[]) {
     let newSelected: Record<string | number, T> = {};
     if (selectAll) {
       data.map((row, idx) => {
-        if (typeof props.canSelectRow === 'function' && !props.canSelectRow(row))
-          return row;
         let rowKey = getRowKey(row, idx, columnData.actualColumns, props.getRowKey);
         newSelected[rowKey] = row;
         return row;
@@ -570,7 +536,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     qsGroupBy, setGroupBy
   ]);
 
-  const footerData = typeof props.data === 'function' ? stateDataList.footerData : props.footerData;
+  // const footerData = typeof props.data === 'function' ? stateDataList.footerData : props.footerData;
 
   let tableContainerClasses: string[] = ['ts-datatable', 'ts-datatable-container'];
   if (props.tableContainerProps?.className) tableContainerClasses.push(props.tableContainerProps?.className);
@@ -581,7 +547,6 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
    * and pass it to all the subcomponents for eventual display.
    */
   return (<>
-    {dataLoaderEl}
     <ColumnContext.Provider value={{
       ...columnData,
       filterColumns,
@@ -600,7 +565,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
       onShowFilterEditor: props.onShowFilterEditor,
       setPagination,
       getRowKey: props.getRowKey,
-      onSaveQuickEdit,
+      propOnSaveQuickEdit: props.onSaveQuickEdit,
       DetailRow: props.DetailRow,
       canRowShowDetail: props.canRowShowDetail,
       columnOrder,
@@ -615,81 +580,91 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
       getTableRowProps: props.getTableRowProps,
       getTableCellProps: props.getTableCellProps
     }}>
-      <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={tableContainerClasses.join(' ')}>
-        <div ref={topEl} className={`ts-datatable-top`}>
-          <div className='ts-datatable-search-filters'>
-            {!hideSearchForm && <SearchForm
-              searchQuery={searchQuery.query ?? ''}
-              filter={rawFilter.filter}
-              onSearch={searchFormOnSearch}
-              applyFilter={searchFormApplyFilter}
-            />}
-            <FilterBar />
-          </div>
-          <div className='ts-datatable-page-actions'>
-            <div className="ts-datatable-actions">
-              <ActionButtons
-                position='top'
-                quickEditPosition={quickEditPosition}
-                buttons={{
-                  quickEdit: <TableEditorButton
-                    canEdit={canEdit}
-                  />,
-                  filter: <FilterButton />,
-                  columnPicker: <ColumnPickerButton />,
-                }}
-              />
+      <DataProvider
+        TableBody={DataProviderContent}
+        passColumnsToQuery={passColumnsToQuery}
+        pagination={pagination}
+        hideSearchForm={hideSearchForm}
+        searchQuery={searchQuery.query}
+        onQueryChange={props.onQueryChange}
+        data={props.data}
+        totalCount={props.totalCount}
+        isLoading={props.isLoading}
+        footerData={props.footerData}
+        refetch={props.refetch}
+        canGroupBy={canGroupBy}
+      >
+        <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={tableContainerClasses.join(' ')}>
+          <div ref={topEl} className={`ts-datatable-top`}>
+            <div className='ts-datatable-search-filters'>
+              {!hideSearchForm && <SearchForm
+                searchQuery={searchQuery.query ?? ''}
+                filter={rawFilter.filter}
+                onSearch={searchFormOnSearch}
+                applyFilter={searchFormApplyFilter}
+              />}
+              <FilterBar />
             </div>
-            {(paginate === 'top' || paginate === 'both') &&
+            <div className='ts-datatable-page-actions'>
+              <div className="ts-datatable-actions">
+                <ActionButtons
+                  position='top'
+                  quickEditPosition={quickEditPosition}
+                  buttons={{
+                    quickEdit: <TableEditorButton
+                      canEdit={canEdit}
+                    />,
+                    filter: <FilterButton />,
+                    columnPicker: <ColumnPickerButton />,
+                    refresh: <TableRefreshButton hideRefetch={props.hideRefetch} />,
+                  }}
+                />
+              </div>
+              {(paginate === 'top' || paginate === 'both') &&
+                <Paginate
+                  {...props.paginateOptions}
+                  {...pagination}
+                  changePage={(page) => setPagination(prev => ({ ...prev, ...page }))}
+                  PaginateComponent={props.components?.Paginate}
+              />}
+            </div>
+          </div>
+          <div ref={tableWrapperEl} {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
+            <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
+              <TableHeader headRef={theadEl} />
+              <TableBody
+                getRowKey={props.getRowKey}
+                canEditRow={props.canEditRow}
+                LoadingComponent={props.components?.Loading}
+              />
+              <TableFooter />
+            </table>
+          </div>
+          {(paginate === 'bottom' || paginate === 'both') &&
+            <div className='ts-datatable-bottom-page'>
               <Paginate
                 {...props.paginateOptions}
                 {...pagination}
                 changePage={(page) => setPagination(prev => ({ ...prev, ...page }))}
-                total={typeof props.data === 'function' ? stateDataList.total : props.totalCount}
-            />}
+                PaginateComponent={props.components?.Paginate}
+              />
+            </div>}
+          <div className="ts-datatable-bottom-actions">
+            <ActionButtons
+              position='bottom'
+              quickEditPosition={quickEditPosition}
+              buttons={{
+                quickEdit: <TableEditorButton
+                  canEdit={canEdit}
+                />,
+                filter: <FilterButton />,
+                columnPicker: <ColumnPickerButton />,
+                refresh: <TableRefreshButton hideRefetch={props.hideRefetch} />,
+              }}
+            />
           </div>
         </div>
-        <div ref={tableWrapperEl} {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
-          <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
-            <TableHeader
-              headRef={theadEl}
-              data={typeof props.data === 'function' ? stateDataList.data : props.data}
-            />
-            <TableBody
-              getRowKey={props.getRowKey}
-              canEditRow={props.canEditRow}
-              data={typeof props.data === 'function' ? stateDataList.data : props.data}
-              loading={typeof props.data === 'function' ? dataLoading : (props.isLoading ?? false)}
-              LoadingComponent={props.components?.Loading}
-            />
-            {footerData?.length && <TableFooter
-              data={footerData}
-            />}
-          </table>
-        </div>
-        {(paginate === 'bottom' || paginate === 'both') &&
-          <div className='ts-datatable-bottom-page'>
-            <Paginate
-              {...props.paginateOptions}
-              {...pagination}
-              changePage={(page) => setPagination(prev => ({ ...prev, ...page }))}
-              total={typeof props.data === 'function' ? stateDataList.total : props.totalCount}
-            />
-          </div>}
-        <div className="ts-datatable-bottom-actions">
-          <ActionButtons
-            position='bottom'
-            quickEditPosition={quickEditPosition}
-            buttons={{
-              quickEdit: <TableEditorButton
-                canEdit={canEdit}
-              />,
-              filter: <FilterButton />,
-              columnPicker: <ColumnPickerButton />,
-            }}
-          />
-        </div>
-      </div>
+      </DataProvider>
     </ColumnContext.Provider>
   </>);
 };

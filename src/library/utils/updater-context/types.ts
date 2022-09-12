@@ -36,4 +36,5 @@ export interface SelectorContext<T> {
   Consumer: ConsumerType<T>
   useSelector: UseSelectorHookDef<T>
   withSelector: SelectorHOC<T>
+  useContextSetter: () => UpdaterCallback<T>
 }

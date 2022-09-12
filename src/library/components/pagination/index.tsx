@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useContext } from 'react';
-import { PaginateProps, PaginateButtonProps, PaginateLimitSelectProps, PageChange } from './types';
+import { PaginateProps, PaginateButtonProps, PaginateLimitSelectProps, PageChange, PaginateWrapperProps } from './types';
 import uniqueId from 'lodash/uniqueId';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft } from '@fortawesome/free-solid-svg-icons/faCaretLeft';
@@ -8,6 +8,17 @@ import { faWindowMinimize } from '@fortawesome/free-solid-svg-icons/faWindowMini
 import { useDerivedState } from '../../utils/useDerivedState';
 import { ColumnContext, useTableSelector } from '../table/contexts';
 import isEqual from 'lodash/isEqual';
+import { TableDataContext } from '../table/data-provider';
+
+export const Paginate: React.FC<PaginateWrapperProps> = function Paginate({
+  PaginateComponent,
+  ...props
+}) {
+  const { total } = useContext(TableDataContext);
+  const NavigationComponent = PaginateComponent ?? PageNav;
+  
+  return <NavigationComponent {...props} total={total} />
+}
 
 /**
  * Guidelines
@@ -18,7 +29,7 @@ import isEqual from 'lodash/isEqual';
  * Edit in place - no reliance on bootstrap popovers
  *    - button triggers edit form, styled in place so it doesn't move (too much anyway)
  */
-export const PageNav: React.FC<PaginateProps> = function PageNav({buttonPosition = 'split', perPageOptions = 'default', perPageLoc = 'before', ...props}) {
+const PageNav: React.FC<PaginateProps> = function PageNav({buttonPosition = 'split', perPageOptions = 'default', perPageLoc = 'before', ...props}) {
   const [id] = useState(uniqueId('pageSelect_'));
   const [editing, setEditing] = useState(false);
   const [pageNum, setPageNum] = useDerivedState(() => props.page, [props.page, editing]);

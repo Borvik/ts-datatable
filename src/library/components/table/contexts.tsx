@@ -16,6 +16,7 @@ import {
   OnShowFilterEditor,
   ColumnConfigurationWithGroup,
   EditModes,
+  OnSaveQuickEdit,
 } from './types';
 import { FilterSettings } from '../filter/types';
 
@@ -33,14 +34,14 @@ export interface ColumnContextInterface<T> {
   canSelectRows: boolean;
   canGroupBy: boolean;
   setColumnSort: (newState: ColumnSorts | ((state: ColumnSorts) => ColumnSorts)) => void;
-  setAllSelected: (selectAll: boolean) => void;
+  setAllSelected: (selectAll: boolean, data: T[]) => void;
   setRowSelected: (row: T, rowIndex: number) => void;
   onShowColumnPicker?: OnShowColumnPicker;
   onShowFilterEditor?: OnShowFilterEditor;
   setFilter: SetFilterCb;
   setPagination: SetPaginationCb;
   getRowKey?: (row: T) => string | number
-  onSaveQuickEdit: (data: QuickEditFormData<T>) => Promise<void>
+  propOnSaveQuickEdit?: OnSaveQuickEdit<T>
   DetailRow?: React.ElementType<{parentRow: T}>
   canRowShowDetail?: (row: T) => boolean
   columnOrder: string[]
@@ -72,7 +73,6 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   setRowSelected: () => {},
   setFilter: () => {},
   setPagination: () => {},
-  onSaveQuickEdit: async () => {},
   columnOrder: [],
   setColumnConfig: () => {},
   canReorderColumns: false,
@@ -112,6 +112,7 @@ interface TableContextProviderProps {
   editMode: EditModes
 }
 
+export const useTableContexSetter = TableContext.useContextSetter;
 export const useTableSelector = TableContext.useSelector;
 export const TableContextProvider: React.FC<TableContextProviderProps> = ({ editMode, children }) => {
   return (

@@ -2,6 +2,7 @@ import React, { DetailedHTMLProps, TdHTMLAttributes, useContext } from 'react';
 import { getRowValue } from '../../utils/getRowKey';
 import { useArrayDerivedState } from '../../utils/useDerivedState';
 import { ColumnContext } from './contexts';
+import { TableDataContext } from './data-provider';
 import { isValidPreMDRColumn, TableFooterProps } from './types';
 
 interface TableFooterRowProps<T> {
@@ -51,7 +52,13 @@ const TableFooterRow = function TableFooterRow<T>({ row }: TableFooterRowProps<T
   </>;
 };
 
-export const TableFooter = function TableFooter<T>({ data }: TableFooterProps<T>) {
+export const TableFooter = function TableFooter({}) {
+  const { footerData } = useContext(TableDataContext);
+  if (!footerData?.length) return null;
+  return <TFooter data={footerData} />
+}
+
+const TFooter = function TFooter<T>({ data }: TableFooterProps<T>) {
   const { actualColumns: columns, groupBy } = useContext(ColumnContext);
   
   let [footerData] = useArrayDerivedState(() => {
@@ -71,4 +78,3 @@ export const TableFooter = function TableFooter<T>({ data }: TableFooterProps<T>
     </tfoot>
   )
 }
-
