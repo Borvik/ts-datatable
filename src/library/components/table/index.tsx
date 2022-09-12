@@ -1,6 +1,6 @@
-import React, { PropsWithChildren, useState, useEffect, useRef, useCallback, useMemo, useImperativeHandle } from 'react';
+import React, { PropsWithChildren, useEffect, useRef, useCallback, useMemo, useImperativeHandle } from 'react';
 import ReactDOM from 'react-dom';
-import { DataTableProperties, ColumnVisibilityStorage, DataFnResult, ColumnSorts, QSColumnSorts, QueryFilterGroup, EditFormData, QuickEditFormData, QSGroupBy, GroupBy, ColumnSort, ColumnConfigurationWithGroup, Pagination } from './types';
+import { DataTableProperties, ColumnVisibilityStorage, ColumnSorts, QSColumnSorts, QueryFilterGroup, QSGroupBy, GroupBy, ColumnConfigurationWithGroup, Pagination } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { useQueryState, batchedQSUpdate } from '@borvik/use-querystate';
 import { transformColumns, getFlattenedColumns, generateHeaderRows } from '../../utils/transformColumnProps';
@@ -9,7 +9,6 @@ import { ColumnContext } from './contexts';
 import { TableHeader } from './header';
 import { TableBody } from './body';
 import { Paginate } from '../pagination';
-import { useDeepEffect } from '../../utils/useDeepEffect';
 import { SearchForm as SearchFormComponent } from '../search';
 import { useParsedQs } from '../../utils/useParsedQS';
 import { notEmpty } from '../../utils/comparators';
@@ -18,14 +17,14 @@ import { FilterButton, FilterBar } from '../filter';
 import { convertFromQS, convertToQS, transformTableFiltersToColumns } from '../../utils/transformFilter';
 import { TableEditorButton } from './editors/editButton';
 import { TableActionButtons, TableRefreshButton } from './actions';
-import { getRowKey, getRowValue } from '../../utils/getRowKey';
+import { getRowKey } from '../../utils/getRowKey';
 import { update } from '../../utils/immutable';
 import { QueryString } from '@borvik/querystring';
 import { DeepPartial } from '@borvik/use-querystate/dist/types';
 import { TableFooter } from './footer';
 import { TableContextProvider, useTableSelector } from './contexts';
 import isEqual from 'lodash/isEqual';
-import { DataProviderContent, TableDataProvider as DefaultDataProvider, TableDataProvider } from './data-provider';
+import { DataProviderContent, TableDataProvider as DefaultDataProvider } from './data-provider';
 
 const preMDR_RenderWarned: Record<string, boolean> = {};
 const preMDR_WidthWarned: Record<string, boolean> = {};
@@ -273,7 +272,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   );
 
   const [, setCtxData] = useTableSelector(() => ({}), isEqual);
-  const [editCount, setEditCount] = useState(0);
+  // const [editCount, setEditCount] = useState(0);
 
   // const [stateDataList, setDataList] = useState<DataFnResult<T[], FooterData[]>>({ data: [], total: 0 });
   // const [dataLoading, setLoading] = useState(true);
@@ -584,8 +583,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
         TableBody={DataProviderContent}
         passColumnsToQuery={passColumnsToQuery}
         pagination={pagination}
-        hideSearchForm={hideSearchForm}
-        searchQuery={searchQuery.query}
+        searchQuery={hideSearchForm ? '' : (searchQuery.query ?? '')}
         onQueryChange={props.onQueryChange}
         data={props.data}
         totalCount={props.totalCount}
@@ -593,6 +591,8 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
         footerData={props.footerData}
         refetch={props.refetch}
         canGroupBy={canGroupBy}
+        filters={filter}
+        sorts={actualColumnSorts}
       >
         <div id={props.id} style={wrapperStyle} {...(props.tableContainerProps ?? {})} className={tableContainerClasses.join(' ')}>
           <div ref={topEl} className={`ts-datatable-top`}>

@@ -3,7 +3,9 @@ import { useDeepEffect } from '../../utils/useDeepEffect';
 import { useDeepMemo } from '../../utils/useDeepMemo';
 import { useDerivedState } from '../../utils/useDerivedState';
 import { ColumnContext } from './contexts';
-import { DataFn, DataFnResult, DataProps, Pagination } from './types';
+import { ColumnSort, DataFn, DataFnResult, DataProps, Pagination, QueryFilterGroup } from './types';
+
+const EMPTY_ARRAY = [] as any[];
 
 export interface TableDataContextInterface {
   loading: boolean
@@ -100,7 +102,6 @@ export const DataProviderContent: React.FC<TableDataContextInterface> = ({
 interface TableDataArgs<T = any, FooterData = any> {
   passColumnsToQuery?: boolean
   pagination: Pagination
-  hideSearchForm: boolean
   searchQuery?: null | string
   onQueryChange?: (props: DataProps<T>) => void;
   data: DataFn<T[], FooterData[]> | T[];
@@ -109,10 +110,13 @@ interface TableDataArgs<T = any, FooterData = any> {
   footerData?: FooterData[];
   refetch?: () => void;
   canGroupBy: boolean
+  filters: QueryFilterGroup
+  sorts: ColumnSort[]
 }
 
 export interface TableDataProviderProps extends TableDataArgs {
   TableBody: React.ElementType<TableDataContextInterface>
+  children: React.ReactNode
 }
 
 export const TableDataProvider: React.FC<TableDataProviderProps> = ({
@@ -137,7 +141,6 @@ interface TableDataResult extends TableDataContextInterface {
 function useTableData<T, FooterData>({
   passColumnsToQuery,
   pagination,
-  hideSearchForm,
   searchQuery,
   onQueryChange,
   data: propData,
@@ -146,23 +149,23 @@ function useTableData<T, FooterData>({
   footerData,
   refetch: propRefetch,
   canGroupBy,
+  filters,
+  sorts,
 }: TableDataArgs): TableDataResult {
   const {
     actualColumns,
-    columnSorts,
-    filter,
     setAllSelected,
   } = useContext(ColumnContext);
 
-
   const needsLoader = (typeof propData === 'function');
+  const propDataComparator = typeof propData === 'function' ? 'function' : propData;
 
   const [data, setData] = useDerivedState<DataFnResult<T[], FooterData[]>>(() => ({
-    data: (typeof propData === 'function') ? [] : propData,
+    data: (typeof propData === 'function') ? EMPTY_ARRAY : propData,
     total: ((typeof propData === 'function') ? undefined : totalCount ?? propData.length) ?? 0,
     footerData,
     refetch: (typeof propData === 'function') ? undefined : propRefetch,
-  }), [totalCount, propRefetch, footerData, propData]);
+  }), [totalCount, propRefetch, footerData, propDataComparator]);
   const [isLoading, setIsLoading] = useDerivedState(() => needsLoader ? true : (propIsLoading ?? false), [needsLoader, propIsLoading]);
   const [loaderElement, setLoaderElement] = useState<React.ReactElement<any> | null>(null);
   const [rerenderCount, forceRender] = useState(1);
@@ -183,9 +186,9 @@ function useTableData<T, FooterData>({
       if (typeof onQueryChange === 'function') {
         onQueryChange({
           pagination,
-          search: hideSearchForm ? '' : (searchQuery ?? ''),
-          sorts: columnSorts,
-          filters: filter.filters.length ? filter : undefined,
+          search: searchQuery ?? '',
+          sorts,
+          filters: filters.filters.length ? filters : undefined,
           visibleColumns: actualColumns.filter(c => c.isVisible),
         });
       }
@@ -193,9 +196,9 @@ function useTableData<T, FooterData>({
       if (typeof propData === 'function') {
         let returnedData = await propData({
           pagination,
-          search: hideSearchForm ? '' : (searchQuery ?? ''),
-          sorts: columnSorts,
-          filters: filter.filters.length ? filter : undefined,
+          search: searchQuery ?? '',
+          sorts,
+          filters: filters.filters.length ? filters : undefined,
           visibleColumns: actualColumns.filter(c => c.isVisible),
         }, doSetData);
 
@@ -212,7 +215,7 @@ function useTableData<T, FooterData>({
     setAllSelected(false, []);
     // TODO: clear edit data (on filter/page/search)?
     getData();
-  }, [rerenderCount, canGroupBy, pagination, searchQuery, columnSorts, filter, propData, hideSearchForm, visibleColumnComparator]);
+  }, [rerenderCount, canGroupBy, pagination, searchQuery, sorts, filters, propDataComparator, visibleColumnComparator]);
 
 
   /**
