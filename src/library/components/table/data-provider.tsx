@@ -13,6 +13,7 @@ export interface TableDataContextInterface {
   footerData?: any[]
   total?: number;
   refetch?: () => void;
+  dataError?: string
 }
 
 export const TableDataContext = createContext<TableDataContextInterface>({
@@ -28,11 +29,8 @@ data: async () => [] -> result of call should rerender, no total/footerData - bu
 data: async () => {data,footer,total} -> similar to previous, but has total/footerData
 data: async () => React.Element -> must render element - which should call setData to trigger re-renders
 
-new method - wrapper - more challenging
-
-should wrap the provider
-
-
+components.DataProvider: React.Element
+used like
 <DataTable
   components={{
     DataProvider - default provider does above
@@ -76,6 +74,7 @@ the provider is given a BODY component and the table children which is itself th
 
 export const DataProviderContent: React.FC<TableDataContextInterface> = ({
   loading,
+  dataError,
   data,
   footerData,
   total,
@@ -87,12 +86,13 @@ export const DataProviderContent: React.FC<TableDataContextInterface> = ({
   const value = useDeepMemo((): TableDataContextInterface => {
     return {
       data,
+      dataError,
       footerData,
       total,
       loading,
       refetch,
     };
-  }, [loading, total, refetch, footerData, data]);
+  }, [loading, total, dataError, refetch, footerData, data]);
 
   return <TableDataContext.Provider value={value}>
     {children}
@@ -104,7 +104,7 @@ interface TableDataArgs<T = any, FooterData = any> {
   pagination: Pagination
   searchQuery?: null | string
   onQueryChange?: (props: DataProps<T>) => void;
-  data: DataFn<T[], FooterData[]> | T[];
+  data?: DataFn<T[], FooterData[]> | T[];
   totalCount?: number;
   isLoading?: boolean;
   footerData?: FooterData[];
@@ -124,10 +124,10 @@ export const TableDataProvider: React.FC<TableDataProviderProps> = ({
   TableBody,
   ...tableArgs
 }) => {
-  const {loaderElement, ...tableData} = useTableData(tableArgs);
+  const {loaderElement, dataNotSuppliedError, ...tableData} = useTableData(tableArgs);
   return (<>
     {loaderElement}
-    <TableBody {...tableData}>{children}</TableBody>
+    <TableBody {...tableData} dataError={dataNotSuppliedError ? 'No data was supplied to the data table - either define a data prop, or a custom DataProvider' : undefined}>{children}</TableBody>
   </>);
 }
 
@@ -136,6 +136,7 @@ export const TableDataProvider: React.FC<TableDataProviderProps> = ({
  */
 interface TableDataResult extends TableDataContextInterface {
   loaderElement: React.ReactElement<any> | null
+  dataNotSuppliedError?: boolean
 }
 
 function useTableData<T, FooterData>({
@@ -161,8 +162,8 @@ function useTableData<T, FooterData>({
   const propDataComparator = typeof propData === 'function' ? 'function' : propData;
 
   const [data, setData] = useDerivedState<DataFnResult<T[], FooterData[]>>(() => ({
-    data: (typeof propData === 'function') ? EMPTY_ARRAY : propData,
-    total: ((typeof propData === 'function') ? undefined : totalCount ?? propData.length) ?? 0,
+    data: (!propData || typeof propData === 'function') ? EMPTY_ARRAY : propData,
+    total: ((typeof propData === 'function') ? undefined : totalCount ?? propData?.length) ?? 0,
     footerData,
     refetch: (typeof propData === 'function') ? undefined : propRefetch,
   }), [totalCount, propRefetch, footerData, propDataComparator]);
@@ -233,6 +234,7 @@ function useTableData<T, FooterData>({
     footerData: data.footerData,
     total: data.total,
     refetch: data.refetch ?? fallbackRefetch,
-    loaderElement
+    loaderElement,
+    dataNotSuppliedError: !propData,
   };
 }

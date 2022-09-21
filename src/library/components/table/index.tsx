@@ -272,73 +272,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   );
 
   const [, setCtxData] = useTableSelector(() => ({}), isEqual);
-  // const [editCount, setEditCount] = useState(0);
-
-  // const [stateDataList, setDataList] = useState<DataFnResult<T[], FooterData[]>>({ data: [], total: 0 });
-  // const [dataLoading, setLoading] = useState(true);
-  // const [dataLoaderEl, setDataLoaderEl] = useState<React.ReactElement<any> | null>(null);
   
-  // function doSetDataList(data: T[] | DataFnResult<T[], FooterData[]>) {
-  //   if (Array.isArray(data)) {
-  //     setDataList({ data: data, total: data.length });
-  //   } else {
-  //     setDataList(data);
-  //   }
-  //   setLoading(false);
-  // }
-
-  // const visibleColumnComparator = passColumnsToQuery ? actualColumnsComparator : false;
-
-  // useDeepEffect(() => {
-  //   async function getData() {
-  //     let fullSort: ColumnSort[] = [
-  //       ...groupBy,
-  //       ...columnSort.sort.filter(s => (!groupBy.length || !groupBy.find(g => g.column === s.column))),
-  //     ];
-
-  //     if (typeof props.onQueryChange === 'function') {
-  //       props.onQueryChange({
-  //         pagination,
-  //         search: hideSearchForm ? '' : (searchQuery.query ?? ''),
-  //         sorts: fullSort,
-  //         filters: filter.filters.length ? filter : undefined,
-  //         visibleColumns: columnData.actualColumns.filter(c => c.isVisible),
-  //       });
-  //     }
-
-  //     if (typeof props.data === 'function') {
-  //       let returnedData = await props.data({
-  //         pagination,
-  //         search: hideSearchForm ? '' : (searchQuery.query ?? ''),
-  //         sorts: fullSort,
-  //         filters: filter.filters.length ? filter : undefined,
-  //         visibleColumns: columnData.actualColumns.filter(c => c.isVisible),
-  //       }, doSetDataList);
-
-  //       if (React.isValidElement(returnedData)) {
-  //         setDataLoaderEl(returnedData);
-  //       }
-  //       else {
-  //         doSetDataList(returnedData);
-  //       }
-  //     } else {
-  //       doSetDataList({
-  //         data: props.data,
-  //         total: typeof props.totalCount === 'undefined'
-  //           ? props.data.length
-  //           : props.totalCount,
-  //         footerData: props.footerData,
-  //       });
-  //     }
-  //   }
-
-  //   setLoading(true);
-  //   doSetSelectedRows({});
-  //   // TODO: clear edit data (on filter/page/search)?
-  //   getData();
-  // }, [ pagination, searchQuery.query, filter, columnSort, groupBy, editCount, canGroupBy, visibleColumnComparator ]);
-
-  // const Paginate = props.components?.Paginate ?? PageNav;
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
   const ActionButtons = props.components?.ActionButtons ?? TableActionButtons;
   const DataProvider = props.components?.DataProvider ?? DefaultDataProvider;
@@ -534,8 +468,6 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     columnOrder, setColumnOrder,
     qsGroupBy, setGroupBy
   ]);
-
-  // const footerData = typeof props.data === 'function' ? stateDataList.footerData : props.footerData;
 
   let tableContainerClasses: string[] = ['ts-datatable', 'ts-datatable-container'];
   if (props.tableContainerProps?.className) tableContainerClasses.push(props.tableContainerProps?.className);

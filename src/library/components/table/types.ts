@@ -46,7 +46,7 @@ export interface DataTableProperties<T, FooterData extends T = T> {
   id: string;
   columns: Partial<DataColumnProp<T>>[];
   filters?: ColumnFilter[];
-  data: DataFn<T[], FooterData[]> | T[];
+  data?: DataFn<T[], FooterData[]> | T[];
   totalCount?: number;
   isLoading?: boolean;
   preMDRColumn?: Partial<DataColumnProp<T>>;
