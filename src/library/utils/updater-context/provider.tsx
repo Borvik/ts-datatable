@@ -1,7 +1,5 @@
 import React, { PropsWithChildren, useCallback, useMemo, useRef } from 'react';
 import { ProviderProps, SelectorInternalContext, SubscriberCallback, UnsubscribeCallback, UpdaterCallback } from './types';
-import pick from 'lodash/pick';
-import isEqual from 'lodash/isEqual';
 
 export function createProvider<T extends object>(Context: React.Context<SelectorInternalContext<T> | null>, initialState: T) {
   return function Provider({ children, initialValue }: PropsWithChildren<ProviderProps<T>>): JSX.Element {
