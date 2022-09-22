@@ -1,5 +1,5 @@
 import { createContext as createSelContext } from '../../utils/updater-context';
-import React, { createContext, DetailedHTMLProps, TdHTMLAttributes, HTMLAttributes, useState } from 'react';
+import React, { createContext, DetailedHTMLProps, TdHTMLAttributes, HTMLAttributes } from 'react';
 import {
   DataColumn,
   ColumnSorts,

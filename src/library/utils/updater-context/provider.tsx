@@ -1,5 +1,7 @@
 import React, { PropsWithChildren, useCallback, useMemo, useRef } from 'react';
 import { ProviderProps, SelectorInternalContext, SubscriberCallback, UnsubscribeCallback, UpdaterCallback } from './types';
+import pick from 'lodash/pick';
+import isEqual from 'lodash/isEqual';
 
 export function createProvider<T extends object>(Context: React.Context<SelectorInternalContext<T> | null>, initialState: T) {
   return function Provider({ children, initialValue }: PropsWithChildren<ProviderProps<T>>): JSX.Element {
@@ -16,15 +18,18 @@ export function createProvider<T extends object>(Context: React.Context<Selector
           ? (newState as any)(storeRef.current) as T
           : newState;
 
-        // TODO: Check for differences
+        const newKeys = Object.keys(publicState);
+        const oldData = pick(storeRef.current, newKeys);
+        const hasChanged = !isEqual(oldData, publicState);
         storeRef.current = {
           ...storeRef.current,
           ...publicState,
         };
 
-        // TODO: Only notify if we detect differences
         // Notify all subscribers...
-        subscribersRef.current.forEach(sub => sub());
+        if (hasChanged) {
+          subscribersRef.current.forEach(sub => sub());
+        }
       }, [storeRef, subscribersRef]
     );
   
