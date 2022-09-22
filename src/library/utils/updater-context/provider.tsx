@@ -18,18 +18,13 @@ export function createProvider<T extends object>(Context: React.Context<Selector
           ? (newState as any)(storeRef.current) as T
           : newState;
 
-        const newKeys = Object.keys(publicState);
-        const oldData = pick(storeRef.current, newKeys);
-        const hasChanged = !isEqual(oldData, publicState);
         storeRef.current = {
           ...storeRef.current,
           ...publicState,
         };
 
         // Notify all subscribers...
-        if (hasChanged) {
-          subscribersRef.current.forEach(sub => sub());
-        }
+        subscribersRef.current.forEach(sub => sub());
       }, [storeRef, subscribersRef]
     );
   
