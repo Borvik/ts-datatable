@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## [1.8.0]
 ### Added
 - Refresh button and configurable refetch handler.
 - New method of supplying data to the datatable - the overrideable DataProvider.
