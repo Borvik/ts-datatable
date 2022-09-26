@@ -7,7 +7,6 @@ import { ColumnSort, isValidPreMDRColumn } from './types';
 
 interface HeadProps {
   headRef: React.RefObject<HTMLTableSectionElement>
-  data: any[]
 }
 
 export const TableHeader: React.FC<HeadProps> = function TableHeader(props) {
@@ -55,7 +54,6 @@ export const TableHeader: React.FC<HeadProps> = function TableHeader(props) {
                     <RowSelector
                       row={null}
                       rowIndex={-1}
-                      data={props.data}
                     />
                   </span>
                 </th>}

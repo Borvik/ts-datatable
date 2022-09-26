@@ -76,6 +76,12 @@
     border-collapse: collapse;
     width: 100%;
 
+    .ts-datatable-error {
+      text-align: center;
+      padding: 2em;
+      font-style: italic;
+    }
+
     .row-group {
       text-align: left;
       position: sticky;

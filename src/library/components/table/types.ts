@@ -1,5 +1,5 @@
 import { ReactRenderable, ResolveProps } from '../../types';
-import {
+import React, {
   DetailedHTMLProps,
   TableHTMLAttributes,
   TdHTMLAttributes,
@@ -13,7 +13,7 @@ import { PaginateRequiredProps, PaginateOptions, PageChange } from '../paginatio
 import { SearchRequiredProps } from '../search/types';
 import { CustomFilterButtonProps, FilterSettings } from '../filter/types';
 import { CustomColumnPickerButtonProps } from '../column-picker/types';
-import { TableActionButtonsProps } from './actions';
+import { CustomRefreshButtonProps, TableActionButtonsProps } from './actions';
 import { RowSelectorCheckboxProps } from '../row-selector/checkbox';
 
 export type Pagination = { page: number; perPage: number };
@@ -24,6 +24,7 @@ export interface DataFnResult<T, FooterData> {
   data: T;
   footerData?: FooterData
   total: number;
+  refetch?: () => void;
 }
 
 export interface DataProps<T> {
@@ -45,7 +46,7 @@ export interface DataTableProperties<T, FooterData extends T = T> {
   id: string;
   columns: Partial<DataColumnProp<T>>[];
   filters?: ColumnFilter[];
-  data: DataFn<T[], FooterData[]> | T[];
+  data?: DataFn<T[], FooterData[]> | T[];
   totalCount?: number;
   isLoading?: boolean;
   preMDRColumn?: Partial<DataColumnProp<T>>;
@@ -76,6 +77,8 @@ export interface DataTableProperties<T, FooterData extends T = T> {
   onSaveQuickEdit?: OnSaveQuickEdit<T>;
   quickEditPosition?: 'top' | 'bottom' | 'both';
   editMode?: EditModes;
+  refetch?: () => void;
+  hideRefetch?: boolean
 
   tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
@@ -122,11 +125,13 @@ export interface CustomComponents<T> {
   Paginate?: React.ElementType<PaginateRequiredProps>;
   SearchForm?: React.ElementType<SearchRequiredProps>;
   ActionButtons?: React.ElementType<TableActionButtonsProps>;
+  DataProvider?: React.ElementType<unknown>;
   Loading?: ReactRenderable;
   RowCheckbox?: React.ElementType<RowSelectorCheckboxProps<T>>;
   Buttons?: {
     ColumnPicker?: React.ElementType<CustomColumnPickerButtonProps>
     Filter?: React.ElementType<CustomFilterButtonProps>
+    Refresh?: React.ElementType<CustomRefreshButtonProps>
   }
 }
 
@@ -142,6 +147,7 @@ export interface CustomClasses {
   actionButtonDiscard?: string
   actionButtonFilter?: string
   actionButtonSettings?: string
+  actionButtonRefresh?: string
 }
 
 export interface CustomLabels {
@@ -161,6 +167,7 @@ export interface CustomLabels {
   saveChanges?: string
   discardChanges?: string
   filter?: string
+  refresh?: string
 }
 
 interface ResolvableColumnTypes {
@@ -235,10 +242,8 @@ export interface ColumnConfigurationWithGroup extends ColumnConfiguration {
 }
 
 export interface TableBodyProps<T> {
-  data: T[];
   getRowKey?: (row: T) => string | number;
   canEditRow?: (row: T) => boolean;
-  loading: boolean;
   LoadingComponent?: ReactRenderable;
 }
 

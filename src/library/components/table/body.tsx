@@ -9,8 +9,10 @@ import { useArrayDerivedState } from '../../utils/useDerivedState';
 import { getGroupKey, getGroupKeys, GroupKey } from '../../utils/getGroupKey';
 import { TableGroup } from './table-group';
 import { update } from '../../utils/immutable';
+import { TableDataContext } from './data-provider';
 
-export const TableBody = function TableBody<T>({ data, loading, canEditRow, LoadingComponent, ...props }: TableBodyProps<T>) {
+export const TableBody = function TableBody<T>({ canEditRow, LoadingComponent, ...props }: TableBodyProps<T>) {
+  const { data, loading, dataError } = useContext(TableDataContext);
   const { actualColumns: columns, groupBy } = useContext(ColumnContext);
   const tbodyRef = useRef<HTMLTableSectionElement>(null);
 
@@ -73,6 +75,11 @@ export const TableBody = function TableBody<T>({ data, loading, canEditRow, Load
     <>
       <GroupCollapseContext.Provider value={{ collapsedState: groupCollapsed, setExpanded: setGroupExpanded }}>
         <tbody ref={tbodyRef} className={`${!data.length && loading ? 'ts-loading' : ''}`}>
+          {!!dataError && <>
+            <tr>
+              <td className='ts-datatable-error' colSpan={columns.length}>{dataError}</td>
+            </tr>
+          </>}
           {isDataGroupArray(groupedData) && <>
             {groupedData.map(grp => <TableGroup
               key={grp.key}

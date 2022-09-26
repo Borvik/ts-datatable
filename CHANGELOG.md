@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [1.8.0]
+### Added
+- Refresh button and configurable refetch handler.
+- New method of supplying data to the datatable - the overrideable DataProvider.
+
 ## [1.7.0]
 ### Added
 - Pass row edit data to custom cell editors - allows altering other editors based on changes to other cells.

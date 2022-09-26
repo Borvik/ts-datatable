@@ -16,7 +16,7 @@ export function createProvider<T extends object>(Context: React.Context<Selector
           ? (newState as any)(storeRef.current) as T
           : newState;
 
-          storeRef.current = {
+        storeRef.current = {
           ...storeRef.current,
           ...publicState,
         };

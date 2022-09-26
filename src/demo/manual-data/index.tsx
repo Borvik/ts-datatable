@@ -10,7 +10,7 @@ const DEFAULT_SORT: ColumnSort[] = [
 
 export function ManualDataExample({ tableRef }) {
   const [staticData, setStaticData] = React.useState<DataState>({list: [], total: 0, loading: true});
-  const onQueryChangeCB = useCallback((queryProps: DataProps) => onQueryChange(queryProps, setStaticData), [ setStaticData ]);
+  const onQueryChangeCB = useCallback((queryProps: DataProps<Pokemon>) => onQueryChange(queryProps, setStaticData), [ setStaticData ]);
 
   return <DataTable<Pokemon>
     id='pokemon'

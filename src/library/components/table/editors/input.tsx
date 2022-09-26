@@ -6,16 +6,17 @@ import { getRowValue } from '../../../utils/getRowKey';
 import { update } from '../../../utils/immutable';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
+import { useSaveQuickEdit } from '../useSaveQuickEdit';
 
 interface InputEditorProps extends EditorProps {
   type: InputType
 }
 
 export const InputEditor: React.FC<InputEditorProps> = function InputEditor({row, column, value, type}) {
+  const onSaveQuickEdit = useSaveQuickEdit();
   const {
     actualColumns: columns,
     getRowKey,
-    onSaveQuickEdit,
   } = useContext(ColumnContext);
 
   const [inputWidth, setWidth] = useState(null as string | null);

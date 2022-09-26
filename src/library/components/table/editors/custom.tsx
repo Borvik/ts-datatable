@@ -6,13 +6,14 @@ import { getRowValue } from '../../../utils/getRowKey';
 import { update } from '../../../utils/immutable';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
+import { useSaveQuickEdit } from '../useSaveQuickEdit';
 
 export const CustomEditor: React.FC<EditorProps> = function CustomEditor({row, column, value}) {
   const {
     actualColumns: columns,
     getRowKey,
-    onSaveQuickEdit,
   } = useContext(ColumnContext);
+  const onSaveQuickEdit = useSaveQuickEdit();
 
   const editorDef = column.editor as CustomColumnEditor<any>;
   const Editor = editorDef.Editor;
