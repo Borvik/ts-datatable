@@ -72,7 +72,7 @@ the provider is given a BODY component and the table children which is itself th
 */
 
 
-export const DataProviderContent: React.FC<TableDataContextInterface> = ({
+export const DataProviderContent: React.FC<TableDataContextInterface> = function DataProviderContent({
   loading,
   dataError,
   data,
@@ -80,7 +80,7 @@ export const DataProviderContent: React.FC<TableDataContextInterface> = ({
   total,
   refetch,
   children,
-}) => {
+}) {
 
   // Using `useDeepMemo` to ensure same instance
   const value = useDeepMemo((): TableDataContextInterface => {
@@ -119,11 +119,11 @@ export interface TableDataProviderProps extends TableDataArgs {
   children: React.ReactNode
 }
 
-export const TableDataProvider: React.FC<TableDataProviderProps> = ({
+export const TableDataProvider: React.FC<TableDataProviderProps> = function TableDataProvider({
   children,
   TableBody,
   ...tableArgs
-}) => {
+}) {
   const {loaderElement, dataNotSuppliedError, ...tableData} = useTableData(tableArgs);
   return (<>
     {loaderElement}
@@ -212,7 +212,9 @@ function useTableData<T, FooterData>({
       }
     }
 
-    setIsLoading(true);
+    if (typeof propData === 'function') {
+      setIsLoading(true);
+    }
     setAllSelected(false, []);
     // TODO: clear edit data (on filter/page/search)?
     getData();

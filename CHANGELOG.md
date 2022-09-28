@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.8.1]
+### Fixed
+- Fixed the default DataProvider to better recognize when `isLoading` checks aren't needed.
+
 ## [1.8.0]
 ### Added
 - Refresh button and configurable refetch handler.
