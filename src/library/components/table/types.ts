@@ -128,6 +128,7 @@ export interface CustomComponents<T> {
   DataProvider?: React.ElementType<unknown>;
   Loading?: ReactRenderable;
   RowCheckbox?: React.ElementType<RowSelectorCheckboxProps<T>>;
+  TableWrapper?: React.ElementType<HTMLProps<HTMLDivElement>>;
   Buttons?: {
     ColumnPicker?: React.ElementType<CustomColumnPickerButtonProps>
     Filter?: React.ElementType<CustomFilterButtonProps>

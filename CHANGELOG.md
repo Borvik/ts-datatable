@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.8.2]
+### Added
+- Added the ability to specify a custom table wrapper component.
+
 ## [1.8.1]
 ### Fixed
 - Fixed the default DataProvider to better recognize when `isLoading` checks aren't needed.

@@ -276,6 +276,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
   const ActionButtons = props.components?.ActionButtons ?? TableActionButtons;
   const DataProvider = props.components?.DataProvider ?? DefaultDataProvider;
+  const TableWrapper = props.components?.TableWrapper ?? 'div';
 
   let wrapperStyle: any = {
     '--ts-dt-fixed-bg': props.fixedColBg ?? 'white'
@@ -561,7 +562,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
               />}
             </div>
           </div>
-          <div ref={tableWrapperEl} {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
+          <TableWrapper id={`ts-datatable-wrapper_${props.id}`} ref={tableWrapperEl} {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
             <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
               <TableHeader headRef={theadEl} />
               <TableBody
@@ -571,7 +572,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
               />
               <TableFooter />
             </table>
-          </div>
+          </TableWrapper>
           {(paginate === 'bottom' || paginate === 'both') &&
             <div className='ts-datatable-bottom-page'>
               <Paginate
