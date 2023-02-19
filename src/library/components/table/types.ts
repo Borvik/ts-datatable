@@ -53,6 +53,7 @@ export interface DataTableProperties<T, FooterData extends T = T> {
   footerData?: FooterData[];
   passColumnsToQuery?: boolean
   fixedHeaders?: boolean
+  fixedFooters?: boolean
 
   multiColumnSorts?: boolean;
   defaultSort?: ColumnSort[];
@@ -104,6 +105,7 @@ export interface DataTableProperties<T, FooterData extends T = T> {
 
   suppressFixedWarning?: boolean
   doNotUseHTML5Dialog?: boolean
+  doNotUseRefetchAfterSave?: boolean
   methodRef?: React.Ref<RefMethods>
 }
 

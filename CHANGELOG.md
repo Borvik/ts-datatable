@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [1.8.3]
+### Added
+- Added the ability to NOT automatically refetch after saving quick edit.
+- Added the ability to make the summary row fixed to the bottom.
+
 ## [1.8.2]
 ### Added
 - Added the ability to specify a custom table wrapper component.

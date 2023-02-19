@@ -6,7 +6,7 @@ import { QuickEditFormData } from "./types";
 
 export function useSaveQuickEdit<T>() {
   const { data: currentData, refetch } = useContext(TableDataContext);
-  const { actualColumns, getRowKey: propGetRowKey, propOnSaveQuickEdit } = useContext(ColumnContext);
+  const { actualColumns, getRowKey: propGetRowKey, propOnSaveQuickEdit, doNotUseRefetchAfterSave } = useContext(ColumnContext);
   const setCtxData = useTableContexSetter();
 
   const onSaveQuickEdit = useCallback(async (data: QuickEditFormData<T>) => {
@@ -23,7 +23,9 @@ export function useSaveQuickEdit<T>() {
 
         await propOnSaveQuickEdit(data, originalData);
         setCtxData({ editData: {} });
-        refetch?.();
+        if (!doNotUseRefetchAfterSave) {
+          refetch?.();
+        }
       }
       setCtxData({ isEditing: false });
     }

@@ -473,6 +473,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   let tableContainerClasses: string[] = ['ts-datatable', 'ts-datatable-container'];
   if (props.tableContainerProps?.className) tableContainerClasses.push(props.tableContainerProps?.className);
   if ((props.fixedHeaders ?? true)) tableContainerClasses.push('fixed-headers');
+  if ((props.fixedFooters ?? false)) tableContainerClasses.push('fixed-footers');
 
   /**
    * Finally we setup the contexts that will house all the data
@@ -509,6 +510,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
       canSelectRow: props.canSelectRow,
       groupsExpandedByDefault: props.groupsExpandedByDefault ?? true,
       doNotUseHTML5Dialog: props.doNotUseHTML5Dialog,
+      doNotUseRefetchAfterSave: props.doNotUseRefetchAfterSave ?? false,
       getTableRowProps: props.getTableRowProps,
       getTableCellProps: props.getTableCellProps
     }}>

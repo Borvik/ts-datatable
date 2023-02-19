@@ -72,6 +72,16 @@
     }
   }
 
+  &.fixed-footers {
+    tfoot {
+      position: sticky;
+      bottom: 0;
+      z-index: 3;
+      background-clip: padding-box;
+      background-color: var(--ts-dt-fixed-bg, white);
+    }
+  }
+
   .ts-datatable-table {
     border-collapse: collapse;
     width: 100%;
