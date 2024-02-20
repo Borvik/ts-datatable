@@ -80,6 +80,7 @@ export interface DataTableProperties<T, FooterData extends T = T> {
   editMode?: EditModes;
   refetch?: () => void;
   hideRefetch?: boolean
+  enableColumnSearch?:boolean
 
   tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
@@ -198,7 +199,15 @@ interface BaseColumnProps<T> {
   canEdit?: (row: T, column: DataColumn<T>) => boolean;
   preMDRColumnWidth?: number
   EditorWrapper?: React.ElementType<EditorWrapperProps<T>>
+  columnSearch?: ColumnSearch
 }
+
+type ColumnSearch = {
+  enabled: boolean
+  op?: AllFilterOperators
+  renderSearchButton?: boolean
+}
+
 
 /** Provides definition for columns as they are to be passed in */
 export interface DataColumnProp<T> extends ResolveProps<ResolvableColumnTypes>, BaseColumnProps<T> {

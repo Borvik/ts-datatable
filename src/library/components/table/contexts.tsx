@@ -7,7 +7,6 @@ import {
   OnShowColumnPicker,
   QueryFilterGroup,
   EditFormData,
-  QuickEditFormData,
   CustomClasses,
   CustomLabels,
   CustomComponents,
@@ -64,10 +63,10 @@ export const ColumnContext = createContext<ColumnContextInterface<any>>({
   headerRows: [],
   columnSorts: [],
   groupBy: [],
-  filter: {groupOperator: 'and', filters: []},
+  filter: { groupOperator: 'and', filters: [] },
   multiColumnSorts: false,
   doNotUseRefetchAfterSave: false,
-  
+
   canSelectRows: false,
   setColumnSort: () => {},
   setAllSelected: () => {},

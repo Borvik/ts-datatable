@@ -198,7 +198,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     {
       ...props.qs
     }
-  )
+  );
 
   const [searchQuery, setSearchQuery] = useQueryState({query: ''}, {
     ...props.qs
@@ -226,14 +226,6 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     };
   }, [ defaultFilter, filterColumns ]);
 
-  const [rawFilter, setRawFilter] = useQueryState<{filter?: any}>(defaultRawFilter, {
-    ...props.qs,
-    types: {
-      filter: 'any'
-    },
-    filterToTypeDef: true,
-  });
-
   const [filter, setFilter] = useParsedQs<QueryFilterGroup, {filter?: any}>(
     defaultConvertedFilter,
     (qsFilter) => convertFromQS(qsFilter, filterColumns),
@@ -245,7 +237,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
       },
       filterToTypeDef: true,
     }
-  )
+  );
 
   const [columnSort, setColumnSort] = useParsedQs<ColumnSorts, QSColumnSorts>(
     { sort: props.defaultSort ?? [] },
@@ -409,13 +401,6 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     });
   }, [setSearchQuery, setPagination]);
 
-  const searchFormApplyFilter = useCallback((newFilter: any) => {
-    batchedQSUpdate(() => {
-      setRawFilter({ filter: newFilter });
-      setPagination(prev => ({ page: 1, perPage: prev.perPage }));
-    });
-  }, [setRawFilter, setPagination]);
-
   const actualColumnSorts = useMemo(() => {
     return [
       ...groupBy,
@@ -534,9 +519,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
             <div className='ts-datatable-search-filters'>
               {!hideSearchForm && <SearchForm
                 searchQuery={searchQuery.query ?? ''}
-                filter={rawFilter.filter}
                 onSearch={searchFormOnSearch}
-                applyFilter={searchFormApplyFilter}
               />}
               <FilterBar />
             </div>
@@ -566,7 +549,10 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
           </div>
           <TableWrapper id={`ts-datatable-wrapper_${props.id}`} ref={tableWrapperEl} {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
             <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
-              <TableHeader headRef={theadEl} />
+              <TableHeader 
+                headRef={theadEl} 
+                enableColumnSearch={!!props.enableColumnSearch}
+              />
               <TableBody
                 getRowKey={props.getRowKey}
                 canEditRow={props.canEditRow}
