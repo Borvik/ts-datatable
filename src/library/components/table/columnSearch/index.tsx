@@ -29,7 +29,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
       for (const columnFilter of filter.filters) {
         if (isFilterItem(columnFilter)) {
           const actualColumn = actualColumns.find(c => (c.accessor == columnFilter.column));
-          if (actualColumn?.columnSearch?.enabled && ((actualColumn?.columnSearch?.op != null && actualColumn.columnSearch.op == columnFilter.operator) || (actualColumn?.columnSearch?.op == null && columnFilter.operator == 'con'))) {
+          if (actualColumn?.columnSearch?.enabled && ((actualColumn?.columnSearch?.columnSearchOperator != null && actualColumn.columnSearch.columnSearchOperator == columnFilter.operator) || (actualColumn?.columnSearch?.columnSearchOperator == null && columnFilter.operator == 'con'))) {
             columnSearchQueries[columnFilter.column] = columnFilter.value;
           }
         }
@@ -49,12 +49,12 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
             const value = columnSearchQueries[column];
             if (value != null) {
               const actualColumn = actualColumns.find(c => (c.accessor == column));
-              const existingColumnIndex = newFilters.find((filter => (isFilterItem(filter) && ((actualColumn?.columnSearch?.op != null && actualColumn.columnSearch.op == filter.operator) || (actualColumn?.columnSearch?.op == null && filter.operator == 'con')) && filter.column == column)));
+              const existingColumnIndex = newFilters.find((filter => (isFilterItem(filter) && ((actualColumn?.columnSearch?.columnSearchOperator != null && actualColumn.columnSearch.columnSearchOperator == filter.operator) || (actualColumn?.columnSearch?.columnSearchOperator == null && filter.operator == 'con')) && filter.column == column)));
               if (existingColumnIndex) {
                 (existingColumnIndex as QueryFilterItem).value = value;
               } else {
                 filtersToConcat.push({
-                  operator: actualColumn?.columnSearch?.op ?? 'con',
+                  operator: actualColumn?.columnSearch?.columnSearchOperator ?? 'con',
                   column,
                   value,
                 });
@@ -73,7 +73,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
               searchFilters.push({
                 column,
                 value: columnSearchQueries[column],
-                operator: actualColumn?.columnSearch?.op ?? 'con',
+                operator: actualColumn?.columnSearch?.columnSearchOperator ?? 'con',
               });
             }
           };

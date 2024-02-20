@@ -226,6 +226,14 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     };
   }, [ defaultFilter, filterColumns ]);
 
+  const [rawFilter, setRawFilter] = useQueryState<{ filter?: any }>(defaultRawFilter, {
+    ...props.qs,
+    types: {
+      filter: 'any'
+    },
+    filterToTypeDef: true,
+  });
+
   const [filter, setFilter] = useParsedQs<QueryFilterGroup, {filter?: any}>(
     defaultConvertedFilter,
     (qsFilter) => convertFromQS(qsFilter, filterColumns),
@@ -401,6 +409,13 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     });
   }, [setSearchQuery, setPagination]);
 
+  const searchFormApplyFilter = useCallback((newFilter: any) => {
+    batchedQSUpdate(() => {
+      setRawFilter({ filter: newFilter });
+      setPagination(prev => ({ page: 1, perPage: prev.perPage }));
+    });
+  }, [setRawFilter, setPagination]);
+
   const actualColumnSorts = useMemo(() => {
     return [
       ...groupBy,
@@ -519,7 +534,9 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
             <div className='ts-datatable-search-filters'>
               {!hideSearchForm && <SearchForm
                 searchQuery={searchQuery.query ?? ''}
+                filter={rawFilter.filter}
                 onSearch={searchFormOnSearch}
+                applyFilter={searchFormApplyFilter}
               />}
               <FilterBar />
             </div>

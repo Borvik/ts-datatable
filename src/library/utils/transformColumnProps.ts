@@ -70,7 +70,7 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       isGrouped: false,
       columnSearch: {
         enabled: !!column.columnSearch?.enabled && column.accessor != null,
-        op: column.columnSearch?.op ?? 'con',
+        columnSearchOperator: column.columnSearch?.columnSearchOperator ?? 'con',
         renderSearchButton: !!column.columnSearch?.renderSearchButton,
       },
     };

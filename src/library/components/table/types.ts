@@ -204,7 +204,7 @@ interface BaseColumnProps<T> {
 
 type ColumnSearch = {
   enabled: boolean
-  op?: AllFilterOperators
+  columnSearchOperator?: AllFilterOperators
   renderSearchButton?: boolean
 }
 
