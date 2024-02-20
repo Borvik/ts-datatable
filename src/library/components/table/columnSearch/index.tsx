@@ -29,7 +29,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
       for (const columnFilter of filter.filters) {
         if (isFilterItem(columnFilter)) {
           const actualColumn = actualColumns.find(c => (c.accessor == columnFilter.column));
-          if (actualColumn?.columnSearch?.enabled && ((actualColumn?.columnSearch?.columnSearchOperator != null && actualColumn.columnSearch.columnSearchOperator == columnFilter.operator) || (actualColumn?.columnSearch?.columnSearchOperator == null && columnFilter.operator == 'con'))) {
+          if (actualColumn?.columnSearch?.enabled && ((actualColumn.columnSearch.columnSearchOperator ?? 'con') == columnFilter.operator)) {
             columnSearchQueries[columnFilter.column] = columnFilter.value;
           }
         }
@@ -43,27 +43,35 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
     batchedQSUpdate(() => {
       setFilter((prevFilter) => {
         if (prevFilter.groupOperator === 'and') {
-          const newFilters = [...prevFilter.filters];
           const filtersToConcat: QueryFilterItem[] = [];
-          for (const column of Object.keys(columnSearchQueries)) {
-            const value = columnSearchQueries[column];
-            if (value != null) {
+          const modifiedColumns = Object.keys(columnSearchQueries);
+          const existingFilters = prevFilter.filters.map(filter => {
+            if (isFilterItem(filter) && modifiedColumns.includes(filter.column)) {
+              const actualColumn = actualColumns.find(c => (c.accessor == filter.column));
+              if ((actualColumn?.columnSearch?.columnSearchOperator ?? 'con') == filter.operator) {
+                return {
+                  ...filter,
+                  value: columnSearchQueries[filter.column],
+                }
+              }
+            }
+            return filter;
+          });
+          for (const column of modifiedColumns) {
+            if (existingFilters.findIndex(filter => (isFilterItem(filter) && filter.column == column)) == -1) {
               const actualColumn = actualColumns.find(c => (c.accessor == column));
-              const existingColumnIndex = newFilters.find((filter => (isFilterItem(filter) && ((actualColumn?.columnSearch?.columnSearchOperator != null && actualColumn.columnSearch.columnSearchOperator == filter.operator) || (actualColumn?.columnSearch?.columnSearchOperator == null && filter.operator == 'con')) && filter.column == column)));
-              if (existingColumnIndex) {
-                (existingColumnIndex as QueryFilterItem).value = value;
-              } else {
+              if (actualColumn) {
                 filtersToConcat.push({
-                  operator: actualColumn?.columnSearch?.columnSearchOperator ?? 'con',
                   column,
-                  value,
+                  value: columnSearchQueries[column],
+                  operator: actualColumn.columnSearch?.columnSearchOperator ?? 'con',
                 });
               }
             }
           }
           return {
             ...prevFilter,
-            filters: [...newFilters, ...filtersToConcat],
+            filters: [...existingFilters, ...filtersToConcat],
           };
         } else {
           const searchFilters: QueryFilterItem[] = [];
