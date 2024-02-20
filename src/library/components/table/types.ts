@@ -208,7 +208,6 @@ type ColumnSearch = {
   renderSearchButton?: boolean
 }
 
-
 /** Provides definition for columns as they are to be passed in */
 export interface DataColumnProp<T> extends ResolveProps<ResolvableColumnTypes>, BaseColumnProps<T> {
   columns: Partial<DataColumnProp<T>>[];
