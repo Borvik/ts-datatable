@@ -1,4 +1,4 @@
-import React, { FC, FormEvent, memo, useCallback, useContext } from "react";
+import React, { FC, FormEvent, useCallback, useContext } from "react";
 import { ColumnContext } from "../contexts";
 import { QueryFilterItem, isFilterItem } from "../types";
 import { useDerivedState } from "../../../utils/useDerivedState";
@@ -13,7 +13,7 @@ interface ColumnSearchQueryState {
   [x: string]: string
 }
 
-export const ColumnSearch: FC<Props> = memo(function ColumnSearch(props) {
+export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
   const { hasValidPreMDRColumn, hasDetailRenderer } = props;
   const {
     actualColumns,
@@ -25,7 +25,7 @@ export const ColumnSearch: FC<Props> = memo(function ColumnSearch(props) {
 
   const [columnSearchQueries, setColumnSearchQueries] = useDerivedState<ColumnSearchQueryState>(() => {
     const columnSearchQueries: ColumnSearchQueryState = {};
-    if (filter.groupOperator === 'and' || filter.filters.length) {
+    if (filter.groupOperator === 'and') {
       for (const columnFilter of filter.filters) {
         if (isFilterItem(columnFilter)) {
           const actualColumn = actualColumns.find(c => (c.accessor == columnFilter.column));
@@ -121,4 +121,4 @@ export const ColumnSearch: FC<Props> = memo(function ColumnSearch(props) {
       }
     })}
   </tr>;
-})
+}
