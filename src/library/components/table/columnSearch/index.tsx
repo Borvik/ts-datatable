@@ -104,7 +104,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
     });
   }, [columnSearchQueries, actualColumns, setPagination, setFilter]);
 
-  const onColumnSearchInput = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>, column: string | number, type: ColumnSearchType['type']) => {
+  const onColumnSearchInput = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>, column: string | number) => {
     const { target: { value } } = e;
     setColumnSearchQueries((prevState) => ({
       ...prevState,
@@ -124,15 +124,15 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
           {!!(column.columnSearch && column.accessor) && <form onSubmit={onSubmit}>
             {column.columnSearch.type === 'string' && <input
               value={columnSearchQueries[column.accessor] as string ?? ''}
-              onChange={(e) => onColumnSearchInput(e, column.accessor!, column.columnSearch!.type)}
+              onChange={(e) => onColumnSearchInput(e, column.accessor!)}
               onBlur={() => onSubmit()}
             />}
             {column.columnSearch.type === 'select' && <select
               defaultValue={columnSearchQueries[column.accessor] as string}
-              onChange={(e) => onColumnSearchInput(e, column.accessor!, column.columnSearch!.type)}
+              onChange={(e) => onColumnSearchInput(e, column.accessor!)}
               onBlur={() => onSubmit()}
             >
-              <option value="" selected/>
+              <option value=""/>
               {column.columnSearch.options.map((op, i) => (<option key={`${op.value}-${i}`} value={op.value}>{op.display}</option>))}
               </select>}
           </form>}
