@@ -24,7 +24,14 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
       type: 'string',
     },
     columnSearch: {
-      columnSearchOperator: 'con',
+      type: 'select',
+      options: [{
+        display: '063',
+        value: '063',
+      }, {
+        display: '064',
+        value: '064',
+      }]
     },
   },
   {
@@ -46,6 +53,7 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
       type: 'string',
     },
     columnSearch: {
+      type: 'string',
       columnSearchOperator: 'con',
     },
   },
@@ -181,6 +189,6 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     canEdit: () => false,
     sortable: false,
     canToggleVisibility: false,
-    render: () => <button>View</button>,
+    render: () => <button>View</button>
   }
 ]

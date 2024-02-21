@@ -1,4 +1,4 @@
-import { DataColumnProp, DataColumn, ColumnVisibilityStorage, ColumnSort } from '../components/table/types';
+import { DataColumnProp, DataColumn, ColumnVisibilityStorage, ColumnSort, ColumnSearch } from '../components/table/types';
 import { resolve } from '../types';
 import { cloneDeep } from 'lodash';
 
@@ -35,6 +35,16 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       filter.filterKey = column.name ?? (typeof column.accessor === 'string' ? column.accessor : undefined);
     }
 
+    const columnSearch = cloneDeep(column.columnSearch);
+    if (columnSearch) {
+      if (columnSearch.type === 'string') {
+        columnSearch.columnSearchOperator = columnSearch.columnSearchOperator ?? 'con';
+      } else if (columnSearch.type === 'select') {
+        columnSearch.options = columnSearch.options?.length ? columnSearch.options : [];
+        columnSearch.columnSearchOperator = columnSearch.columnSearchOperator ?? 'eq';
+      }
+    }
+
     let transformedColumn: DataColumn<T> = {
       key,
       render: column.render,
@@ -68,9 +78,7 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       rowSpan: 1,
       colSpan: 1,
       isGrouped: false,
-      columnSearch: column.columnSearch ? {
-        columnSearchOperator: column.columnSearch.columnSearchOperator,
-      } : undefined,
+      columnSearch,
     };
 
     transformedColumn.isGrouped = transformedColumn.name ? !!groupByNames.includes(transformedColumn.name) : false;

@@ -202,8 +202,22 @@ interface BaseColumnProps<T> {
   columnSearch?: ColumnSearch
 }
 
-type ColumnSearch = {
-  columnSearchOperator: AllFilterOperators
+export type ColumnSearch = StringColumnSearch | SelectColumnSearch;
+
+type StringColumnSearch = {
+  type: 'string'
+  columnSearchOperator?: StringOperator
+}
+
+type SelectColumnSearch = {
+  type: 'select'
+  columnSearchOperator?: 'eq'
+  options: SelectColumnSearchOption[]
+}
+
+type SelectColumnSearchOption = {
+  display: string
+  value: string
 }
 
 /** Provides definition for columns as they are to be passed in */
