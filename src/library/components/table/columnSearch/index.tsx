@@ -1,4 +1,4 @@
-import React, { FC, FormEvent, useCallback, useContext } from "react";
+import React, { ChangeEvent, FC, FormEvent, useCallback, useContext } from "react";
 import { ColumnContext } from "../contexts";
 import { QueryFilterItem, isFilterItem } from "../types";
 import { useDerivedState } from "../../../utils/useDerivedState";
@@ -29,7 +29,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
       for (const columnFilter of filter.filters) {
         if (isFilterItem(columnFilter)) {
           const actualColumn = actualColumns.find(c => (c.accessor == columnFilter.column));
-          if (actualColumn?.columnSearch?.enabled && ((actualColumn.columnSearch.columnSearchOperator ?? 'con') == columnFilter.operator)) {
+          if ((actualColumn?.columnSearch?.columnSearchOperator) == columnFilter.operator) {
             columnSearchQueries[columnFilter.column] = columnFilter.value;
           }
         }
@@ -48,7 +48,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
           const existingFilters = prevFilter.filters.map(filter => {
             if (isFilterItem(filter) && modifiedColumns.includes(filter.column)) {
               const actualColumn = actualColumns.find(c => (c.accessor == filter.column));
-              if ((actualColumn?.columnSearch?.columnSearchOperator ?? 'con') == filter.operator) {
+              if (actualColumn?.columnSearch?.columnSearchOperator == filter.operator) {
                 return {
                   ...filter,
                   value: columnSearchQueries[filter.column],
@@ -60,11 +60,11 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
           for (const column of modifiedColumns) {
             if (existingFilters.findIndex(filter => (isFilterItem(filter) && filter.column == column)) == -1) {
               const actualColumn = actualColumns.find(c => (c.accessor == column));
-              if (actualColumn) {
+              if (actualColumn?.columnSearch) {
                 filtersToConcat.push({
                   column,
                   value: columnSearchQueries[column],
-                  operator: actualColumn.columnSearch?.columnSearchOperator ?? 'con',
+                  operator: actualColumn.columnSearch.columnSearchOperator,
                 });
               }
             }
@@ -78,11 +78,13 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
           for (const column of Object.keys(columnSearchQueries)) {
             if (columnSearchQueries[column] != null) {
               const actualColumn = actualColumns.find(c => (c.accessor == column));
-              searchFilters.push({
-                column,
-                value: columnSearchQueries[column],
-                operator: actualColumn?.columnSearch?.columnSearchOperator ?? 'con',
-              });
+              if (actualColumn?.columnSearch) {
+                searchFilters.push({
+                  column,
+                  value: columnSearchQueries[column],
+                  operator: actualColumn.columnSearch.columnSearchOperator,
+                });
+              }
             }
           };
           return {
@@ -98,7 +100,8 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
     });
   }, [columnSearchQueries, actualColumns, setPagination, setFilter]);
 
-  const onColumnSearchInput = useCallback((value: string, column?: string | number) => {
+  const onColumnSearchInput = useCallback((e: ChangeEvent<HTMLInputElement>, column?: string | number) => {
+    const { target: { value } } = e;
     if (column) {
       setColumnSearchQueries((prevState) => ({
         ...prevState,
@@ -116,11 +119,11 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
         return null;
       } else {
         return <th key={`${column.key}-${index}`}>
-          {column.columnSearch?.enabled && <form onSubmit={onSubmit}>
+          {column.columnSearch && <form onSubmit={onSubmit}>
             <input
               value={column.accessor ? columnSearchQueries[column.accessor] ?? '' : ''}
-              onChange={(e) => onColumnSearchInput(e.target.value, column.accessor)}
-              onBlur={()=>onSubmit()}
+              onChange={(e) => onColumnSearchInput(e, column.accessor)}
+              onBlur={() => onSubmit()}
             />
           </form>}
         </th>;

@@ -24,7 +24,7 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
       type: 'string',
     },
     columnSearch: {
-      enabled: true,
+      columnSearchOperator: 'con',
     },
   },
   {
@@ -46,7 +46,7 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
       type: 'string',
     },
     columnSearch: {
-      enabled: true,
+      columnSearchOperator: 'con',
     },
   },
   {

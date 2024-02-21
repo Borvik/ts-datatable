@@ -68,10 +68,9 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       rowSpan: 1,
       colSpan: 1,
       isGrouped: false,
-      columnSearch: {
-        enabled: !!column.columnSearch?.enabled && column.accessor != null,
-        columnSearchOperator: column.columnSearch?.columnSearchOperator ?? 'con',
-      },
+      columnSearch: column.columnSearch ? {
+        columnSearchOperator: column.columnSearch.columnSearchOperator,
+      } : undefined,
     };
 
     transformedColumn.isGrouped = transformedColumn.name ? !!groupByNames.includes(transformedColumn.name) : false;
