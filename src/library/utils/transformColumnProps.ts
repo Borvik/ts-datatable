@@ -71,7 +71,6 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
       columnSearch: {
         enabled: !!column.columnSearch?.enabled && column.accessor != null,
         columnSearchOperator: column.columnSearch?.columnSearchOperator ?? 'con',
-        renderSearchButton: !!column.columnSearch?.renderSearchButton,
       },
     };
 

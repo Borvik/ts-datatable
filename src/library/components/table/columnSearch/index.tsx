@@ -91,7 +91,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
               { ...prevFilter },
               ...searchFilters,
             ]
-          }; 
+          };
         }
       });
       setPagination(prev => ({ ...prev, page: 1 }));
@@ -116,15 +116,13 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
         return null;
       } else {
         return <th key={`${column.key}-${index}`}>
-          {column.columnSearch?.renderSearchButton ? 
-            <button onClick={() => onSubmit()}>search</button> : 
-            <form onSubmit={onSubmit}>
-              <input
-                value={column.accessor ? columnSearchQueries[column.accessor] ?? '' : ''}
-                disabled={!column.columnSearch?.enabled}
-                onChange={(e) => onColumnSearchInput(e.target.value, column.accessor)}
-              />
-            </form>}
+          {column.columnSearch?.enabled && <form onSubmit={onSubmit}>
+            <input
+              value={column.accessor ? columnSearchQueries[column.accessor] ?? '' : ''}
+              onChange={(e) => onColumnSearchInput(e.target.value, column.accessor)}
+              onBlur={()=>onSubmit()}
+            />
+          </form>}
         </th>;
       }
     })}

@@ -205,7 +205,6 @@ interface BaseColumnProps<T> {
 type ColumnSearch = {
   enabled: boolean
   columnSearchOperator?: AllFilterOperators
-  renderSearchButton?: boolean
 }
 
 /** Provides definition for columns as they are to be passed in */

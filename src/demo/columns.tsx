@@ -172,9 +172,6 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     editor: {
       type: 'checkbox',
     },
-    columnSearch: {
-      enabled: false,
-    }
   },
   {
     header: '',
@@ -185,9 +182,5 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     sortable: false,
     canToggleVisibility: false,
     render: () => <button>View</button>,
-    columnSearch: {
-      enabled: false,
-      renderSearchButton: true,
-    }
   }
 ]
