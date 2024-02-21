@@ -202,7 +202,7 @@ interface BaseColumnProps<T> {
   columnSearch?: ColumnSearch
 }
 
-export type ColumnSearch = StringColumnSearch | SelectColumnSearch;
+export type ColumnSearch = StringColumnSearch | SelectColumnSearch | BooleanColumnSearch;
 
 type StringColumnSearch = {
   type: 'string'
@@ -213,6 +213,11 @@ type SelectColumnSearch = {
   type: 'select'
   columnSearchOperator?: 'eq'
   options: SelectColumnSearchOption[]
+}
+
+type BooleanColumnSearch = {
+  type: 'boolean'
+  columnSearchOperator?: 'eq'
 }
 
 type SelectColumnSearchOption = {

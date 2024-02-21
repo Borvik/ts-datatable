@@ -127,13 +127,17 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
               onChange={(e) => onColumnSearchInput(e, column.accessor!)}
               onBlur={() => onSubmit()}
             />}
-            {column.columnSearch.type === 'select' && <select
+            {(column.columnSearch.type === 'select' || column.columnSearch.type === 'boolean') && <select
               defaultValue={columnSearchQueries[column.accessor] as string}
               onChange={(e) => onColumnSearchInput(e, column.accessor!)}
               onBlur={() => onSubmit()}
             >
               <option value=""/>
-              {column.columnSearch.options.map((op, i) => (<option key={`${op.value}-${i}`} value={op.value}>{op.display}</option>))}
+              {column.columnSearch.type === 'select' && column.columnSearch.options.map((op, i) => (<option key={`${op.value}-${i}`} value={op.value}>{op.display}</option>))}
+              {column.columnSearch.type === 'boolean' && <>
+                <option value={'1'}>true</option>
+                <option value={'0'}>false</option>
+              </>}
               </select>}
           </form>}
         </th>;

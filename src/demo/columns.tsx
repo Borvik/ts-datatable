@@ -180,6 +180,12 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     editor: {
       type: 'checkbox',
     },
+    filter: {
+      type: 'boolean',
+    },
+    columnSearch: {
+      type: 'boolean',
+    },
   },
   {
     header: '',

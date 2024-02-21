@@ -39,8 +39,10 @@ export function transformColumns<T>(tableId: string, propColumns: Partial<DataCo
     if (columnSearch) {
       if (columnSearch.type === 'string') {
         columnSearch.columnSearchOperator = columnSearch.columnSearchOperator ?? 'con';
-      } else if (columnSearch.type === 'select') {
-        columnSearch.options = columnSearch.options?.length ? columnSearch.options : [];
+      } else if (columnSearch.type === 'boolean' || columnSearch.type === 'select') {
+        if (columnSearch.type === 'select') {
+          columnSearch.options = columnSearch.options?.length ? columnSearch.options : [];
+        }
         columnSearch.columnSearchOperator = columnSearch.columnSearchOperator ?? 'eq';
       }
     }
