@@ -221,10 +221,14 @@ export type BooleanColumnSearch = {
   columnSearchOperator?: 'eq'
 }
 
-export type CustomColumnSearch = {
+type CustomColumnSearch = {
   type: 'custom'
   columnSearchOperator: AllFilterOperators
-  CustomInputComponent: FC<GenericColumnSearchInputProps>
+  CustomInputComponent: FC<CustomColumnSearchInputProps>
+}
+
+export interface CustomColumnSearchInputProps extends GenericColumnSearchInputProps {
+  columnSearch: CustomColumnSearch
 }
 
 export interface GenericColumnSearchInputProps {
