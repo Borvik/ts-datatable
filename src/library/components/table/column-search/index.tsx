@@ -1,8 +1,9 @@
 import React, { ChangeEvent, FC, FormEvent, useCallback, useContext } from "react";
 import { ColumnContext } from "../contexts";
-import { QueryFilterItem, isFilterItem, ColumnSearch as ColumnSearchType } from "../types";
+import { QueryFilterItem, isFilterItem } from "../types";
 import { useDerivedState } from "../../../utils/useDerivedState";
 import { batchedQSUpdate } from "@borvik/use-querystate";
+import { ColumnSearchInput } from "./column-search-input";
 
 interface Props {
   hasValidPreMDRColumn: boolean
@@ -10,7 +11,7 @@ interface Props {
 }
 
 interface ColumnSearchQueryState {
-  [x: string]: string | boolean
+  [x: string]: string
 }
 
 export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
@@ -104,13 +105,17 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
     });
   }, [columnSearchQueries, actualColumns, setPagination, setFilter]);
 
-  const onColumnSearchInput = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>, column: string | number) => {
-    const { target: { value } } = e;
+  const onColumnSearchInput = useCallback((newValue: string, column: string | number) => {
     setColumnSearchQueries((prevState) => ({
       ...prevState,
-      [column]: value,
+      [column]: newValue,
     }));
   }, [setColumnSearchQueries]);
+
+  const onColumnSearchChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>, column: string | number) => {
+    const { target: { value } } = e;
+    onColumnSearchInput(value, column);
+  }, [onColumnSearchInput]);
 
   return <tr>
     {hasValidPreMDRColumn && <th />}
@@ -122,23 +127,12 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
       } else {
         return <th key={`${column.key}-${index}`}>
           {!!(column.columnSearch && column.accessor) && <form onSubmit={onSubmit}>
-            {column.columnSearch.type === 'string' && <input
-              value={columnSearchQueries[column.accessor] as string ?? ''}
-              onChange={(e) => onColumnSearchInput(e, column.accessor!)}
+            <ColumnSearchInput
+              columnSearch={column.columnSearch}
+              value={columnSearchQueries[column.accessor]}
+              onChange={(e) => onColumnSearchChange(e, column.accessor!)}
               onBlur={() => onSubmit()}
-            />}
-            {(column.columnSearch.type === 'select' || column.columnSearch.type === 'boolean') && <select
-              defaultValue={columnSearchQueries[column.accessor] as string}
-              onChange={(e) => onColumnSearchInput(e, column.accessor!)}
-              onBlur={() => onSubmit()}
-            >
-              <option value=""/>
-              {column.columnSearch.type === 'select' && column.columnSearch.options.map((op, i) => (<option key={`${op.value}-${i}`} value={op.value}>{op.display}</option>))}
-              {column.columnSearch.type === 'boolean' && <>
-                <option value={'1'}>true</option>
-                <option value={'0'}>false</option>
-              </>}
-              </select>}
+            />
           </form>}
         </th>;
       }

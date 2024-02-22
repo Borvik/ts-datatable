@@ -4,7 +4,7 @@ import { RowSelector } from '../row-selector';
 import { ColumnContext } from './contexts';
 import { HeaderSort } from './sortable';
 import { ColumnSort, isValidPreMDRColumn } from './types';
-import { ColumnSearch } from './columnSearch';
+import { ColumnSearch } from './column-search';
 
 interface HeadProps {
   headRef: React.RefObject<HTMLTableSectionElement>

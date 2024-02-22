@@ -204,18 +204,18 @@ interface BaseColumnProps<T> {
 
 export type ColumnSearch = StringColumnSearch | SelectColumnSearch | BooleanColumnSearch;
 
-type StringColumnSearch = {
+export type StringColumnSearch = {
   type: 'string'
   columnSearchOperator?: StringOperator
 }
 
-type SelectColumnSearch = {
+export type SelectColumnSearch = {
   type: 'select'
   columnSearchOperator?: 'eq'
   options: SelectColumnSearchOption[]
 }
 
-type BooleanColumnSearch = {
+export type BooleanColumnSearch = {
   type: 'boolean'
   columnSearchOperator?: 'eq'
 }
