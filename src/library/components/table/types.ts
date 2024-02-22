@@ -206,7 +206,7 @@ export type ColumnSearch = StringColumnSearch | SelectColumnSearch | BooleanColu
 
 export type StringColumnSearch = {
   type: 'string'
-  columnSearchOperator?: StringOperator
+  columnSearchOperator?: SingleStringOperator
 }
 
 export type SelectColumnSearch = {
@@ -415,10 +415,12 @@ export interface CustomFilterEditorProps {
   editorOptions?: any;
 }
 
-export const StringOperators = ['eq', 'ieq', 'neq', 'gt', 'gte', 'lt', 'lte', 'bet', 'nbet', 'con', 'ncon', 'beg', 'end', 'nul', 'nnul', 'any', 'none'] as const;
+const SingleStringOperators = ['eq', 'ieq', 'neq', 'gt', 'gte', 'lt', 'lte', 'con', 'ncon', 'beg', 'end', 'nul', 'nnul'] as const;
+export const StringOperators = [...SingleStringOperators, 'bet', 'nbet', 'any', 'none'] as const;
 export const NumberOperators = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'bet', 'nbet', 'nul', 'nnul', 'any', 'none'] as const;
 export const BooleanOperators = ['eq', 'neq', 'nul', 'nnul'] as const;
 
+type SingleStringOperator = typeof SingleStringOperators[number];
 type StringOperator = typeof StringOperators[number];
 type NumberOperator = typeof NumberOperators[number];
 type BooleanOperator = typeof BooleanOperators[number];
