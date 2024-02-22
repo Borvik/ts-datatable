@@ -2,7 +2,7 @@ import React, { FC } from "react";
 import { TextInput } from "./text-input";
 import { SelectInput } from "./select-input";
 import { BooleanSelectInput } from "./boolean-select-input";
-import { GenericColumnSearchInputProps } from "./types";
+import { GenericColumnSearchInputProps } from "../../types";
 
 export const ColumnSearchInput: FC<GenericColumnSearchInputProps> = function ColumnSearchInput(props) {
   const { columnSearch, ...rest } = props;

@@ -1,6 +1,5 @@
 import React, { FC, useCallback, ChangeEvent } from "react";
-import { GenericColumnSearchInputProps } from "./types";
-import { SelectColumnSearch } from "../../types";
+import { GenericColumnSearchInputProps, SelectColumnSearch } from "../../types";
 
 interface Props extends GenericColumnSearchInputProps {
   columnSearch: SelectColumnSearch

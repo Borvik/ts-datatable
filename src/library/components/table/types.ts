@@ -5,7 +5,8 @@ import React, {
   TdHTMLAttributes,
   HTMLAttributes,
   HTMLProps,
-  ReactElement
+  ReactElement,
+  FC
 } from 'react';
 import { QueryStateOptions } from '@borvik/use-querystate/dist/types';
 import { QueryStringFilterTypes } from '@borvik/querystring/dist/types';
@@ -202,7 +203,7 @@ interface BaseColumnProps<T> {
   columnSearch?: ColumnSearch
 }
 
-export type ColumnSearch = StringColumnSearch | SelectColumnSearch | BooleanColumnSearch;
+export type ColumnSearch = StringColumnSearch | SelectColumnSearch | BooleanColumnSearch | CustomColumnSearch;
 
 export type StringColumnSearch = {
   type: 'string'
@@ -218,6 +219,20 @@ export type SelectColumnSearch = {
 export type BooleanColumnSearch = {
   type: 'boolean'
   columnSearchOperator?: 'eq'
+}
+
+export type CustomColumnSearch = {
+  type: 'custom'
+  columnSearchOperator: AllFilterOperators
+  CustomInputComponent: FC<GenericColumnSearchInputProps>
+}
+
+export interface GenericColumnSearchInputProps {
+  value: string | undefined
+  accessor: string | number
+  columnSearch: ColumnSearch
+  onColumnSearchInput: (newValue: string, column: string | number) => void
+  onSubmit: () => void
 }
 
 type SelectColumnSearchOption = {
