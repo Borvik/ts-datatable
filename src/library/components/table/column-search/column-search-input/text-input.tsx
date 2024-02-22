@@ -1,18 +1,22 @@
-import React, { InputHTMLAttributes, FC } from "react";
+import React, { FC, useCallback, ChangeEvent } from "react";
 import { StringColumnSearch } from "../../types";
+import { GenericColumnSearchInputProps } from "./types";
 
-interface Props {
-  value: string | undefined
-  onChange: InputHTMLAttributes<HTMLInputElement>['onChange']
-  onBlur: InputHTMLAttributes<HTMLInputElement>['onBlur']
+interface Props extends GenericColumnSearchInputProps {
   columnSearch: StringColumnSearch
 }
 
 export const TextInput: FC<Props> = function TextInput(props) {
-  const { value, onChange, onBlur } = props;
+  const { value, accessor, onColumnSearchInput, onSubmit } = props;
+
+  const onColumnSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const { target: { value } } = e;
+    onColumnSearchInput(value, accessor);
+  }, [onColumnSearchInput, accessor]);
+
   return <input
     defaultValue={value}
-    onChange={onChange}
-    onBlur={onBlur}
+    onChange={onColumnSearchChange}
+    onBlur={() => onSubmit()}
   />;
 }

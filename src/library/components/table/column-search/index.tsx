@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, FormEvent, useCallback, useContext } from "react";
+import React, { FC, FormEvent, useCallback, useContext } from "react";
 import { ColumnContext } from "../contexts";
 import { QueryFilterItem, isFilterItem } from "../types";
 import { useDerivedState } from "../../../utils/useDerivedState";
@@ -112,11 +112,6 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
     }));
   }, [setColumnSearchQueries]);
 
-  const onColumnSearchChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>, column: string | number) => {
-    const { target: { value } } = e;
-    onColumnSearchInput(value, column);
-  }, [onColumnSearchInput]);
-
   return <tr>
     {hasValidPreMDRColumn && <th />}
     {hasDetailRenderer && <th />}
@@ -129,9 +124,10 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
           {!!(column.columnSearch && column.accessor) && <form onSubmit={onSubmit}>
             <ColumnSearchInput
               columnSearch={column.columnSearch}
+              accessor={column.accessor}
               value={columnSearchQueries[column.accessor]}
-              onChange={(e) => onColumnSearchChange(e, column.accessor!)}
-              onBlur={() => onSubmit()}
+              onColumnSearchInput={onColumnSearchInput}
+              onSubmit={onSubmit}
             />
           </form>}
         </th>;

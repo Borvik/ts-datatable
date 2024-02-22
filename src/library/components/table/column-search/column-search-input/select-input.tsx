@@ -1,21 +1,25 @@
-import React, { InputHTMLAttributes, FC } from "react";
+import React, { FC, useCallback, ChangeEvent } from "react";
+import { GenericColumnSearchInputProps } from "./types";
 import { SelectColumnSearch } from "../../types";
 
-interface Props {
-  value: string | undefined
-  onChange: InputHTMLAttributes<HTMLInputElement | HTMLSelectElement>['onChange']
-  onBlur: InputHTMLAttributes<HTMLInputElement | HTMLSelectElement>['onBlur']
+interface Props extends GenericColumnSearchInputProps {
   columnSearch: SelectColumnSearch
 }
 
 export const SelectInput: FC<Props> = function SelectInput(props) {
-  const { value, onChange, onBlur, columnSearch } = props;
+  const { value, columnSearch, accessor, onColumnSearchInput, onSubmit } = props;
+
+  const onColumnSearchChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
+    const { target: { value } } = e;
+    onColumnSearchInput(value, accessor);
+  }, [onColumnSearchInput, accessor]);
+
   return <select
     defaultValue={value}
-    onChange={onChange}
-    onBlur={onBlur}
+    onChange={onColumnSearchChange}
+    onBlur={() => onSubmit()}
   >
     <option value="" />
-    {columnSearch.type === 'select' && columnSearch.options.map((op, i) => (<option key={`${op.value}-${i}`} value={op.value}>{op.display}</option>))}
+    {columnSearch.options.map((op, i) => (<option key={`${op.value}-${i}`} value={op.value}>{op.display}</option>))}
   </select>;
 }
