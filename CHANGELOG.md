@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.9.0]
+### Added
+- Added the ability to have a simple per column quick filter. Thanks @1Carolus1
+
 ## [1.8.3]
 ### Added
 - Added the ability to NOT automatically refetch after saving quick edit.
