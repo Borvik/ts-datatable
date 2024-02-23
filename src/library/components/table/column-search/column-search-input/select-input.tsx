@@ -6,12 +6,12 @@ interface Props extends GenericColumnSearchInputProps {
 }
 
 export const SelectInput: FC<Props> = function SelectInput(props) {
-  const { value, columnSearch, accessor, onColumnSearchInput, onSubmit } = props;
+  const { value, columnSearch, searchKey, onColumnSearchInput, onSubmit } = props;
 
   const onColumnSearchChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
     const { target: { value } } = e;
-    onColumnSearchInput(value, accessor);
-  }, [onColumnSearchInput, accessor]);
+    onColumnSearchInput(value, searchKey);
+  }, [onColumnSearchInput, searchKey]);
 
   return <select
     defaultValue={value}
