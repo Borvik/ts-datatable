@@ -6,7 +6,7 @@ interface Props extends GenericColumnSearchInputProps {
 }
 
 export const BooleanSelectInput: FC<Props> = function BooleanSelectInput(props) {
-  const { value, accessor, onColumnSearchInput, onSubmit } = props;
+  const { value, accessor, columnSearch, onColumnSearchInput, onSubmit } = props;
 
   const onColumnSearchChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { target: { value } } = e;
@@ -17,6 +17,7 @@ export const BooleanSelectInput: FC<Props> = function BooleanSelectInput(props) 
     defaultValue={value}
     onChange={onColumnSearchChange}
     onBlur={() => onSubmit()}
+    className={`column-search-boolean-input ${columnSearch.className ?? ''}`}
   >
     <option value="" />
     <option value={'1'}>true</option>

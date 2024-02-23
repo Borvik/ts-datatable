@@ -14,7 +14,7 @@ export const ColumnSearchInput: FC<GenericColumnSearchInputProps> = function Col
   } else if (columnSearch.type === 'boolean') {
     return <BooleanSelectInput columnSearch={columnSearch} {...rest} />;
   } else if (columnSearch.type === 'custom') {
-    return <CustomInput columnSearch={columnSearch} {...rest} />
+    return <CustomInput columnSearch={columnSearch} {...rest} />;
   }
   return null;
 }

@@ -17,6 +17,7 @@ export const SelectInput: FC<Props> = function SelectInput(props) {
     defaultValue={value}
     onChange={onColumnSearchChange}
     onBlur={() => onSubmit()}
+    className={`column-search-select-input ${columnSearch.className ?? ''}`}
   >
     <option value="" />
     {columnSearch.options.map((op, i) => (<option key={`${op.value}-${i}`} value={op.value}>{op.display}</option>))}

@@ -208,17 +208,20 @@ export type ColumnSearch = StringColumnSearch | SelectColumnSearch | BooleanColu
 export type StringColumnSearch = {
   type: 'string'
   columnSearchOperator?: SingleStringOperator
+  className?: string
 }
 
 export type SelectColumnSearch = {
   type: 'select'
   columnSearchOperator?: 'eq'
   options: SelectColumnSearchOption[]
+  className?: string
 }
 
 export type BooleanColumnSearch = {
   type: 'boolean'
   columnSearchOperator?: 'eq'
+  className?: string
 }
 
 type CustomColumnSearch = {
@@ -237,6 +240,7 @@ export interface GenericColumnSearchInputProps {
   columnSearch: ColumnSearch
   onColumnSearchInput: (newValue: string, column: string | number) => void
   onSubmit: () => void
+  inputClassName?: string
 }
 
 type SelectColumnSearchOption = {

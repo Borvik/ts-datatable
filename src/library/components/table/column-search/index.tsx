@@ -112,7 +112,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
     }));
   }, [setColumnSearchQueries]);
 
-  return <tr>
+  return <tr className="ts-data-table-column-search-row">
     {hasValidPreMDRColumn && <th />}
     {hasDetailRenderer && <th />}
     {canSelectRows && <th />}
