@@ -4,9 +4,11 @@ import { RowSelector } from '../row-selector';
 import { ColumnContext } from './contexts';
 import { HeaderSort } from './sortable';
 import { ColumnSort, isValidPreMDRColumn } from './types';
+import { ColumnSearch } from './column-search';
 
 interface HeadProps {
   headRef: React.RefObject<HTMLTableSectionElement>
+  enableColumnSearch: boolean
 }
 
 export const TableHeader: React.FC<HeadProps> = function TableHeader(props) {
@@ -26,6 +28,8 @@ export const TableHeader: React.FC<HeadProps> = function TableHeader(props) {
   let hasDetailRenderer = (!!DetailRow);
 
   let indentStyle: any = {'--indent': groupBy.length};
+
+  const hasValidPreMDRColumn = isValidPreMDRColumn(preMDRColumn);
   return (
     <thead ref={props.headRef}>
       {headerRows.map((row, rowIdx) => (
@@ -47,7 +51,7 @@ export const TableHeader: React.FC<HeadProps> = function TableHeader(props) {
 
             return (<React.Fragment key={`row-key-${colIdx}`}>
               {(colIdx === 0 && rowIdx === 0) && <>
-                {isValidPreMDRColumn(preMDRColumn) && <th scope='col' style={indentStyle} key='premdr' rowSpan={headerRows.length} className={`fixed fixed-left premdr-col ${preMDRColumn.className ?? ''}`.trim()}><span className='ts-datatable-header-cell'></span></th>}
+                {hasValidPreMDRColumn && <th scope='col' style={indentStyle} key='premdr' rowSpan={headerRows.length} className={`fixed fixed-left premdr-col ${preMDRColumn!.className ?? ''}`.trim()}><span className='ts-datatable-header-cell'></span></th>}
                 {hasDetailRenderer && <th scope='col' style={indentStyle} key='mdr' rowSpan={headerRows.length} className='fixed fixed-left mdr-control'><span className='ts-datatable-header-cell'></span></th>}
                 {canSelectRows && <th scope='col' style={indentStyle} key='sel' rowSpan={headerRows.length} className='fixed fixed-left row-selector'>
                   <span className='ts-datatable-header-cell'>
@@ -68,6 +72,10 @@ export const TableHeader: React.FC<HeadProps> = function TableHeader(props) {
           })}
         </tr>
       ))}
+      {props.enableColumnSearch && <ColumnSearch 
+        hasValidPreMDRColumn={hasValidPreMDRColumn}
+        hasDetailRenderer={hasDetailRenderer}
+      />}
     </thead>
   );
 };

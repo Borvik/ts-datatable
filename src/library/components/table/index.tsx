@@ -198,7 +198,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     {
       ...props.qs
     }
-  )
+  );
 
   const [searchQuery, setSearchQuery] = useQueryState({query: ''}, {
     ...props.qs
@@ -226,7 +226,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     };
   }, [ defaultFilter, filterColumns ]);
 
-  const [rawFilter, setRawFilter] = useQueryState<{filter?: any}>(defaultRawFilter, {
+  const [rawFilter, setRawFilter] = useQueryState<{ filter?: any }>(defaultRawFilter, {
     ...props.qs,
     types: {
       filter: 'any'
@@ -245,7 +245,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
       },
       filterToTypeDef: true,
     }
-  )
+  );
 
   const [columnSort, setColumnSort] = useParsedQs<ColumnSorts, QSColumnSorts>(
     { sort: props.defaultSort ?? [] },
@@ -566,7 +566,10 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
           </div>
           <TableWrapper id={`ts-datatable-wrapper_${props.id}`} ref={tableWrapperEl} {...(props.tableWrapperProps ?? {})} className={`ts-datatable-wrapper ${props.tableWrapperProps?.className ?? ''}`}>
             <table {...(props.tableProps ?? {})} className={`ts-datatable-table ${props.tableProps?.className ?? ''}`}>
-              <TableHeader headRef={theadEl} />
+              <TableHeader 
+                headRef={theadEl} 
+                enableColumnSearch={!!props.enableColumnSearch}
+              />
               <TableBody
                 getRowKey={props.getRowKey}
                 canEditRow={props.canEditRow}

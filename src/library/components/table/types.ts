@@ -5,7 +5,8 @@ import React, {
   TdHTMLAttributes,
   HTMLAttributes,
   HTMLProps,
-  ReactElement
+  ReactElement,
+  FC
 } from 'react';
 import { QueryStateOptions } from '@borvik/use-querystate/dist/types';
 import { QueryStringFilterTypes } from '@borvik/querystring/dist/types';
@@ -80,6 +81,7 @@ export interface DataTableProperties<T, FooterData extends T = T> {
   editMode?: EditModes;
   refetch?: () => void;
   hideRefetch?: boolean
+  enableColumnSearch?:boolean
 
   tableContainerProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
   tableWrapperProps?: Omit<HTMLProps<HTMLDivElement>, 'id' | 'style'>;
@@ -198,6 +200,48 @@ interface BaseColumnProps<T> {
   canEdit?: (row: T, column: DataColumn<T>) => boolean;
   preMDRColumnWidth?: number
   EditorWrapper?: React.ElementType<EditorWrapperProps<T>>
+  columnSearch?: ColumnSearch
+}
+
+export type ColumnSearch = StringColumnSearch | SelectColumnSearch | BooleanColumnSearch | CustomColumnSearch;
+
+export type StringColumnSearch = {
+  type: 'string'
+  columnSearchOperator?: SingleStringOperator
+}
+
+export type SelectColumnSearch = {
+  type: 'select'
+  columnSearchOperator?: 'eq'
+  options: SelectColumnSearchOption[]
+}
+
+export type BooleanColumnSearch = {
+  type: 'boolean'
+  columnSearchOperator?: 'eq'
+}
+
+type CustomColumnSearch = {
+  type: 'custom'
+  columnSearchOperator: AllFilterOperators
+  CustomInputComponent: FC<CustomColumnSearchInputProps>
+}
+
+export interface CustomColumnSearchInputProps extends GenericColumnSearchInputProps {
+  columnSearch: CustomColumnSearch
+}
+
+export interface GenericColumnSearchInputProps {
+  value: string | undefined
+  accessor: string | number
+  columnSearch: ColumnSearch
+  onColumnSearchInput: (newValue: string, column: string | number) => void
+  onSubmit: () => void
+}
+
+type SelectColumnSearchOption = {
+  display: string
+  value: string
 }
 
 /** Provides definition for columns as they are to be passed in */
@@ -390,10 +434,12 @@ export interface CustomFilterEditorProps {
   editorOptions?: any;
 }
 
-export const StringOperators = ['eq', 'ieq', 'neq', 'gt', 'gte', 'lt', 'lte', 'bet', 'nbet', 'con', 'ncon', 'beg', 'end', 'nul', 'nnul', 'any', 'none'] as const;
+const SingleStringOperators = ['eq', 'ieq', 'neq', 'gt', 'gte', 'lt', 'lte', 'con', 'ncon', 'beg', 'end', 'nul', 'nnul'] as const;
+export const StringOperators = [...SingleStringOperators, 'bet', 'nbet', 'any', 'none'] as const;
 export const NumberOperators = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'bet', 'nbet', 'nul', 'nnul', 'any', 'none'] as const;
 export const BooleanOperators = ['eq', 'neq', 'nul', 'nnul'] as const;
 
+type SingleStringOperator = typeof SingleStringOperators[number];
 type StringOperator = typeof StringOperators[number];
 type NumberOperator = typeof NumberOperators[number];
 type BooleanOperator = typeof BooleanOperators[number];

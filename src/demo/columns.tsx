@@ -23,6 +23,16 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     filter: {
       type: 'string',
     },
+    columnSearch: {
+      type: 'select',
+      options: [{
+        display: '063',
+        value: '063',
+      }, {
+        display: '064',
+        value: '064',
+      }]
+    },
   },
   {
     header: 'Image',
@@ -41,6 +51,10 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     canEdit: (row) => row.id !== 3,
     filter: {
       type: 'string',
+    },
+    columnSearch: {
+      type: 'string',
+      columnSearchOperator: 'con',
     },
   },
   {
@@ -165,7 +179,13 @@ export const CommonColumns: Partial<DataColumnProp<Pokemon>>[] = [
     render: (value: any) => value ? 'Yes' : 'No',
     editor: {
       type: 'checkbox',
-    }
+    },
+    filter: {
+      type: 'boolean',
+    },
+    columnSearch: {
+      type: 'boolean',
+    },
   },
   {
     header: '',

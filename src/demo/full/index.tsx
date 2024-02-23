@@ -81,6 +81,7 @@ export function FullFeaturedExample({tableRef}) {
         }));
       }
     }}
+    enableColumnSearch={true}
     canEditRow={(data) => data.id !== 7}
     DetailRow={({parentRow}) => <div>Detail row for {parentRow.name} goes here. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisis commodo purus eget vehicula. Duis sodales sem orci, et pulvinar neque lacinia ut. Fusce in massa vel lorem consequat maximus nec ac lectus. In in elementum nulla. Quisque odio purus, euismod sed ullamcorper commodo, ullamcorper in ligula. Fusce sollicitudin pretium diam a facilisis. In fermentum, lectus quis efficitur suscipit, justo elit fermentum velit, in aliquet massa nisi suscipit ligula. Etiam volutpat id nulla at eleifend. Nulla tristique tellus ipsum, in gravida mauris ornare et. Mauris aliquet blandit risus ac ornare.</div>}
     canRowShowDetail={(data) => data.id !== 4}
