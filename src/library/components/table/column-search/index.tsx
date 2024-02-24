@@ -29,7 +29,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
     if (filter.groupOperator === 'and') {
       for (const columnFilter of filter.filters) {
         if (isFilterItem(columnFilter)) {
-          const actualColumn = actualColumns.findIndex(c => (c.accessor == columnFilter.column && (c.columnSearch?.columnSearchOperator) == columnFilter.operator));
+          const actualColumn = actualColumns.findIndex(c => ((c.columnSearch?.customSearchKey ?? c.accessor) == columnFilter.column && (c.columnSearch?.columnSearchOperator) == columnFilter.operator));
           if (actualColumn !== -1) {
             columnSearchQueries[columnFilter.column] = columnFilter.value;
           }
@@ -48,7 +48,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
           const modifiedColumns = Object.keys(columnSearchQueries);
           const existingFilters = prevFilter.filters.map(filter => {
             if (isFilterItem(filter) && modifiedColumns.includes(filter.column)) {
-              const actualColumn = actualColumns.find(c => (c.accessor == filter.column));
+              const actualColumn = actualColumns.find(c => ((c.columnSearch?.customSearchKey ?? c.accessor) == filter.column));
               const value = columnSearchQueries[filter.column];
               if (actualColumn?.columnSearch?.columnSearchOperator == filter.operator) {
                 return {
@@ -60,7 +60,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
             return filter;
           });
           for (const column of modifiedColumns) {
-            const actualColumn = actualColumns.find(c => (c.accessor == column));
+            const actualColumn = actualColumns.find(c => ((c.columnSearch?.customSearchKey ?? c.accessor) == column));
             if (actualColumn?.columnSearch) {
               if (existingFilters.findIndex(filter => (isFilterItem(filter) && filter.column == column && actualColumn.columnSearch!.columnSearchOperator === filter.operator)) == -1) {
                 const value = columnSearchQueries[column];
@@ -82,7 +82,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
           const searchFilters: QueryFilterItem[] = [];
           for (const column of Object.keys(columnSearchQueries)) {
             if (columnSearchQueries[column] != null) {
-              const actualColumn = actualColumns.find(c => (c.accessor == column));
+              const actualColumn = actualColumns.find(c => ((c.columnSearch?.customSearchKey ?? c.accessor) == column));
               if (actualColumn?.columnSearch) {
                 searchFilters.push({
                   column,
@@ -112,7 +112,7 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
     }));
   }, [setColumnSearchQueries]);
 
-  return <tr>
+  return <tr className="ts-data-table-column-search-row">
     {hasValidPreMDRColumn && <th />}
     {hasDetailRenderer && <th />}
     {canSelectRows && <th />}
@@ -120,12 +120,13 @@ export const ColumnSearch: FC<Props> = function ColumnSearch(props) {
       if (!column.isVisible || !column.enabled || column.isGrouped) {
         return null;
       } else {
+        const searchKey = column?.columnSearch?.customSearchKey ?? column.accessor;
         return <th key={`${column.key}-${index}`}>
-          {!!(column.columnSearch && column.accessor) && <form onSubmit={onSubmit}>
+          {!!(column.columnSearch && searchKey) && <form onSubmit={onSubmit}>
             <ColumnSearchInput
               columnSearch={column.columnSearch}
-              accessor={column.accessor}
-              value={columnSearchQueries[column.accessor]}
+              searchKey={searchKey}
+              value={columnSearchQueries[searchKey]}
               onColumnSearchInput={onColumnSearchInput}
               onSubmit={onSubmit}
             />

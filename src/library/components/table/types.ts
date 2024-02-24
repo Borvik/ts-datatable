@@ -207,22 +207,29 @@ export type ColumnSearch = StringColumnSearch | SelectColumnSearch | BooleanColu
 
 export type StringColumnSearch = {
   type: 'string'
+  customSearchKey?: string
   columnSearchOperator?: SingleStringOperator
+  className?: string
 }
 
 export type SelectColumnSearch = {
   type: 'select'
+  customSearchKey?: string
   columnSearchOperator?: 'eq'
   options: SelectColumnSearchOption[]
+  className?: string
 }
 
 export type BooleanColumnSearch = {
   type: 'boolean'
+  customSearchKey?: string
   columnSearchOperator?: 'eq'
+  className?: string
 }
 
 type CustomColumnSearch = {
   type: 'custom'
+  customSearchKey?: string
   columnSearchOperator: AllFilterOperators
   CustomInputComponent: FC<CustomColumnSearchInputProps>
 }
@@ -233,10 +240,11 @@ export interface CustomColumnSearchInputProps extends GenericColumnSearchInputPr
 
 export interface GenericColumnSearchInputProps {
   value: string | undefined
-  accessor: string | number
+  searchKey: string | number
   columnSearch: ColumnSearch
   onColumnSearchInput: (newValue: string, column: string | number) => void
   onSubmit: () => void
+  inputClassName?: string
 }
 
 type SelectColumnSearchOption = {

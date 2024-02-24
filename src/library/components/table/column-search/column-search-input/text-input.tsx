@@ -6,16 +6,17 @@ interface Props extends GenericColumnSearchInputProps {
 }
 
 export const TextInput: FC<Props> = function TextInput(props) {
-  const { value, accessor, onColumnSearchInput, onSubmit } = props;
+  const { value, searchKey, columnSearch, onColumnSearchInput, onSubmit } = props;
 
   const onColumnSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const { target: { value } } = e;
-    onColumnSearchInput(value, accessor);
-  }, [onColumnSearchInput, accessor]);
+    onColumnSearchInput(value, searchKey);
+  }, [onColumnSearchInput, searchKey]);
 
   return <input
     defaultValue={value}
     onChange={onColumnSearchChange}
     onBlur={() => onSubmit()}
+    className={`column-search-string-input ${columnSearch.className ?? ''}`}
   />;
 }
