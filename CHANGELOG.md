@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.9.2]
+### Updated
+- Updated fontawesome libraries
+
 ## [1.9.1]
 ### Updated
 - Quick filter row given class name capabilities. Thanks @1Carolus1
