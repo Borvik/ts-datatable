@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { PropsWithChildren, createContext, useCallback, useContext, useState } from 'react';
 import { useDeepEffect } from '../../utils/useDeepEffect';
 import { useDeepMemo } from '../../utils/useDeepMemo';
 import { useDerivedState } from '../../utils/useDerivedState';
@@ -72,7 +72,7 @@ the provider is given a BODY component and the table children which is itself th
 */
 
 
-export const DataProviderContent: React.FC<TableDataContextInterface> = function DataProviderContent({
+export const DataProviderContent: React.FC<PropsWithChildren<TableDataContextInterface>> = function DataProviderContent({
   loading,
   dataError,
   data,
@@ -115,7 +115,7 @@ interface TableDataArgs<T = any, FooterData = any> {
 }
 
 export interface TableDataProviderProps extends TableDataArgs {
-  TableBody: React.ElementType<TableDataContextInterface>
+  TableBody: React.ElementType<PropsWithChildren<TableDataContextInterface>>
   children: React.ReactNode
 }
 
@@ -152,7 +152,7 @@ function useTableData<T, FooterData>({
   canGroupBy,
   filters,
   sorts,
-}: TableDataArgs): TableDataResult {
+}: TableDataArgs<T, FooterData>): TableDataResult {
   const {
     actualColumns,
     setAllSelected,
@@ -203,7 +203,7 @@ function useTableData<T, FooterData>({
           visibleColumns: actualColumns.filter(c => c.isVisible),
         }, doSetData);
 
-        if (React.isValidElement(returnedData)) {
+        if (React.isValidElement<any>(returnedData)) {
           setLoaderElement(returnedData);
         }
         else {

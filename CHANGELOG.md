@@ -1,4 +1,6 @@
 ## [Unreleased]
+### Updated
+- Updated types and references for compatability with React 18
 
 ## [1.9.2]
 ### Updated

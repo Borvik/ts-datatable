@@ -5,7 +5,7 @@ import { useDeepDerivedState } from '../../utils/useDerivedState';
 import { useQueryState, batchedQSUpdate } from '@borvik/use-querystate';
 import { transformColumns, getFlattenedColumns, generateHeaderRows } from '../../utils/transformColumnProps';
 import { useLocalState } from '../../utils/useLocalState';
-import { ColumnContext } from './contexts';
+import { ColumnContext, useTableContexSetter } from './contexts';
 import { TableHeader } from './header';
 import { TableBody } from './body';
 import { Paginate } from '../pagination';
@@ -271,7 +271,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     }
   );
 
-  const [, setCtxData] = useTableSelector(() => ({}), isEqual);
+  const setCtxData = useTableContexSetter();
   
   const SearchForm = props.components?.SearchForm ?? SearchFormComponent;
   const ActionButtons = props.components?.ActionButtons ?? TableActionButtons;

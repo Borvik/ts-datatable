@@ -579,4 +579,5 @@ export interface EditorWrapperProps<T> {
   rawValue: any;
   row: T;
   column: DataColumn<T>;
+  children?: React.ReactNode
 }

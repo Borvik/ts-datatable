@@ -1,4 +1,4 @@
-import { PureComponent, ReactNode } from 'react';
+import { FC, ReactNode, memo, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 interface Props {
@@ -6,49 +6,36 @@ interface Props {
   renderTarget?: () => HTMLElement | null;
 }
 
-interface State {
-  canRender: boolean;
-}
+export const Portal: FC<Props> = memo(function Portal({ children, renderTarget }) {
+  const containerRef = useRef<HTMLElement | null>(null);
+  const [_, toggleRerender] = useState(false);
 
-export class Portal extends PureComponent<Props, State> {
-  state = {
-    canRender: false
-  };
-  container = {} as HTMLDivElement;
-  targetEl?: HTMLElement | null;
-
-  componentDidMount() {
-    this.container = document.createElement('div');
-    this.renderContainer();
-    this.setState({
-      canRender: true
-    });
-  }
-
-  componentWillUnmount() {
-    this.targetEl?.removeChild(this.container);
-  }
-
-  componentDidUpdate(_prevProps: Props, _prevState: State) {
-    this.renderContainer();
-  }
-  
-  renderContainer() {
-    const { renderTarget } = this.props;
-    
-    this.targetEl?.removeChild(this.container);
-    this.targetEl = null;
-    if (renderTarget) {
-      this.targetEl = renderTarget();
+  useEffect(() => {
+    let getElement = renderTarget;
+    let el: HTMLElement | null = null;
+    if (!!getElement) {
+      el = getElement();
     }
-    if (!this.targetEl)
-      this.targetEl = document.body;
-    this.targetEl.appendChild(this.container);
+
+    let createdEl = false;
+    if (!el && typeof document !== 'undefined') {
+      el = document.createElement('div');
+      document.body.appendChild(el);
+      createdEl = true;
+    }
+    containerRef.current = el;
+    toggleRerender(p => !p);
+    return () => {
+      if (!!createdEl && !!el) {
+        el.remove();
+      }
+      containerRef.current = null;
+      toggleRerender(p => !p);
+    }
+  }, [renderTarget]);
+
+  if (!containerRef.current) {
+    return null;
   }
-  
-  render() {
-    return (
-      this.state.canRender && createPortal(this.props.children, this.container)
-    );
-  }
-}
+  return createPortal(children, containerRef.current);
+});
