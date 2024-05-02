@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## [2.0.0] - 2024-05-02
 ### Updated
 - Updated types and references for compatability with React 18
 ### Breaking
