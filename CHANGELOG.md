@@ -1,6 +1,8 @@
 ## [Unreleased]
 ### Updated
 - Updated types and references for compatability with React 18
+### Breaking
+- Removed internal custom context provider in favor of using external library `@borvik/react-selector-context`
 
 ## [1.9.2]
 ### Updated
