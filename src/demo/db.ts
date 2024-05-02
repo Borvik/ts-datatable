@@ -41,7 +41,7 @@ export function sqliteParams(obj: any): any {
   return result;
 }
 
-export function initializeDB(setDB: React.Dispatch<React.SetStateAction<SQLDatabase>>) {
+export function initializeDB(setDB: React.Dispatch<React.SetStateAction<SQLDatabase | null>>) {
   initSqlJs({
     locateFile: file => {
       return `/sqljs/${file}`
@@ -134,6 +134,9 @@ export interface DataState {
 }
 
 export function query(sql: string, params?: any) {
+  if (!DB) {
+    throw new Error('Database not initialized');
+  }
   console.groupCollapsed('Running Query:', sql.trim().replace(/\s{2,}/g, ' '));
   console.log('Params:', params);
 
@@ -156,7 +159,7 @@ export function query(sql: string, params?: any) {
   return result;
 }
 
-export async function onQueryChange({ pagination, search, sorts, filters }: DataProps, setDataState: React.Dispatch<React.SetStateAction<DataState>>) {
+export async function onQueryChange({ pagination, search, sorts, filters }: DataProps<any>, setDataState: React.Dispatch<React.SetStateAction<DataState>>) {
   console.log('Running static list with filters:', filters);
   let filterSql = buildSQL(filters);
 

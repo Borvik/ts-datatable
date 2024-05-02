@@ -1,4 +1,4 @@
-import { createContext as createSelContext } from '../../utils/updater-context';
+import { createContext as createSelContext } from '@borvik/react-selector-context';
 import React, { createContext, DetailedHTMLProps, TdHTMLAttributes, HTMLAttributes } from 'react';
 import {
   DataColumn,
@@ -110,10 +110,11 @@ export const TableContext = createSelContext<TableContextInterface<any>>({
 
 interface TableContextProviderProps {
   editMode: EditModes
+  children?: React.ReactNode
 }
 
-export const useTableContexSetter = TableContext.useContextSetter;
-export const useTableSelector = TableContext.useSelector;
+export const useTableContexSetter = TableContext.useSetter;
+export const useTableSelector = TableContext.useState;
 export const TableContextProvider: React.FC<TableContextProviderProps> = ({ editMode, children }) => {
   return (
     <TableContext.Provider initialValue={{

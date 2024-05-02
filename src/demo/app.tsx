@@ -43,13 +43,13 @@ function App() {
   }, []);
 
   const saveFilter = useCallback(() => {
-    testData = tableRef.current.getState();
+    testData = tableRef.current?.getState() || null;
     debugger;
   }, []);
 
   const loadFilter = useCallback(() => {
     if (!testData) return;
-    tableRef.current.setState(testData);
+    tableRef.current?.setState(testData);
   }, []);
 
   if (!theDb) return <></>;
