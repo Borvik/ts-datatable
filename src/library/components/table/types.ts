@@ -109,6 +109,12 @@ export interface DataTableProperties<T, FooterData extends T = T> {
   doNotUseHTML5Dialog?: boolean
   doNotUseRefetchAfterSave?: boolean
   methodRef?: React.Ref<RefMethods>
+  scrollConfig?: ScrollConfig
+}
+
+interface ScrollConfig {
+  path: string; 
+  enableScroll: boolean;  
 }
 
 export interface RefState {

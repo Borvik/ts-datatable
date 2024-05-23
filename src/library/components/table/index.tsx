@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useEffect, useRef, useCallback, useMemo, useImperativeHandle } from 'react';
+import React, { PropsWithChildren, useEffect, useRef, useCallback, useMemo, useImperativeHandle, useState, useLayoutEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { DataTableProperties, ColumnVisibilityStorage, ColumnSorts, QSColumnSorts, QueryFilterGroup, QSGroupBy, GroupBy, ColumnConfigurationWithGroup, Pagination } from './types';
 import { useDeepDerivedState } from '../../utils/useDerivedState';
@@ -32,7 +32,7 @@ const primaryKeyWarned: {[x:string]: boolean} = {};
 const fixedLeftWarned: Record<string, boolean> = {};
 const fixedRightWarned: Record<string, boolean> = {};
 
-const DataTableCore = function DataTableCore<T, FooterData extends T = T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, defaultFilter, methodRef, passColumnsToQuery, ...props}: PropsWithChildren<DataTableProperties<T, FooterData>>) {
+const DataTableCore = function DataTableCore<T, FooterData extends T = T>({paginate = 'both', quickEditPosition = 'both', hideSearchForm = false, defaultFilter, methodRef, passColumnsToQuery, scrollConfig,...props}: PropsWithChildren<DataTableProperties<T, FooterData>>) {
   const canGroupBy = !!props.canGroupBy && !!props.multiColumnSorts;
 
   /**
@@ -48,6 +48,10 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
    * normal set function from `useState`, but here it also stores it
    * in localStorage at the key specified.
    */
+  const { path, enableScroll }  = scrollConfig || {};
+  const [hasDataLoaded, setHasDataLoaded] = useState(false);
+  const [isLayoutStable, setIsLayoutStable] = useState(false);
+  const observer = useRef<MutationObserver | null>(null);
   const [columnVisibility, setColumnVisibility] = useLocalState<ColumnVisibilityStorage>(
     `table.${props.id}.columns`, {}, [ props.id ]
   );
@@ -348,6 +352,85 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
     scrollToTopLoaded.current = true;
   }, [ pagination, scrollToTopEnabled, scrollToTopLoaded, fixedHeaders ]);
 
+
+  // Callback to save the scroll position
+  const saveScrollPosition = useCallback(() => {
+    if (enableScroll && path && tableWrapperEl.current) {
+      localStorage.setItem(path, tableWrapperEl.current.scrollTop.toString());
+    }
+  }, [enableScroll, path]);
+
+  // Callback to restore the scroll position
+  const restoreScrollPosition = useCallback(() => {
+    if (enableScroll && path && tableWrapperEl.current) {
+      const savedScrollPosition = localStorage.getItem(path);
+      if (savedScrollPosition !== null) {
+        const scrollPosition = parseInt(savedScrollPosition, 10);
+        tableWrapperEl.current.scrollTo({ top: scrollPosition, behavior: 'smooth' });
+      }
+    }
+  }, [enableScroll, path]);
+
+  // Effect to check if data has been loaded
+  useEffect(() => {
+    if (!props.isLoading) {
+        setHasDataLoaded(true);
+    }
+  }, [props.isLoading]);
+
+  // Debounce timeout
+  let debounceTimeout : any;
+  // MutationObserver to detect changes in the DOM
+  useEffect(() => {
+    if (tableWrapperEl.current && hasDataLoaded) {
+      observer.current = new MutationObserver(() => {
+        setIsLayoutStable(false);
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => {
+          setIsLayoutStable(true);
+        }, 500);
+      });
+
+      observer.current.observe(tableWrapperEl.current, {
+        childList: true,
+        subtree: true,
+      });
+
+      return () => {
+        if (observer.current) {
+          observer.current.disconnect();
+        }
+      };
+    }
+  }, [hasDataLoaded]);
+
+  // For synchronous execution after DOM mutations
+  useLayoutEffect(() => {
+    if (hasDataLoaded && isLayoutStable) {
+      restoreScrollPosition();
+    }
+  }, [hasDataLoaded, isLayoutStable, restoreScrollPosition]);
+
+  useEffect(() => {
+    return () => {
+      saveScrollPosition();
+    };
+  }, [saveScrollPosition]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      saveScrollPosition();
+    };
+    const wrapperEl = tableWrapperEl.current;
+    if (wrapperEl) {
+      wrapperEl.addEventListener('scroll', handleScroll, { passive: true });
+    }
+    return () => {
+      if (wrapperEl) {
+        wrapperEl.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [saveScrollPosition]);
 
   function doSetSelectedRows(selection: Record<string | number, T>) {
     if (typeof props.onSelectionChange === 'function') {
