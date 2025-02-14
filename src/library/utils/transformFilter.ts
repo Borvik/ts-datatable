@@ -148,7 +148,7 @@ function convertFilterGroupFromQS<T>(qsFilter: any[], columns: DataColumn<T>[]):
 
     let opIndex = keys.indexOf('op');
     if (opIndex >= 0) {
-      if (keys.length !== 2) {
+      if (keys.length !== 2 && !(keys.length === 3 && keys.includes('meta'))) {
         console.error('Invalid qs QueryFilterItem');
         return list;
       }

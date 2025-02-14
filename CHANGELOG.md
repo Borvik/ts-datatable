@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [2.0.1] - 2025-02-14
+### Updated
+- Fix filter validation when "meta" fields are used with the non-default comparison operator
+
 ## [2.0.0] - 2024-05-02
 ### Updated
 - Updated types and references for compatability with React 18
