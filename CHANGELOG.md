@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [2.0.2] - 2026-09-14
+### Updated
+- Updated DataProvider types to help ts6
+
 ## [2.0.1] - 2025-02-14
 ### Updated
 - Fix filter validation when "meta" fields are used with the non-default comparison operator

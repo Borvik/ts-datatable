@@ -16,6 +16,7 @@ import { CustomFilterButtonProps, FilterSettings } from '../filter/types';
 import { CustomColumnPickerButtonProps } from '../column-picker/types';
 import { CustomRefreshButtonProps, TableActionButtonsProps } from './actions';
 import { RowSelectorCheckboxProps } from '../row-selector/checkbox';
+import type { TableDataProviderProps } from './data-provider';
 
 export type Pagination = { page: number; perPage: number };
 // export type EditFn<T> = (row: T, changes: Partial<T>) => Promise<boolean>;
@@ -129,7 +130,7 @@ export interface CustomComponents<T> {
   Paginate?: React.ElementType<PaginateRequiredProps>;
   SearchForm?: React.ElementType<SearchRequiredProps>;
   ActionButtons?: React.ElementType<TableActionButtonsProps>;
-  DataProvider?: React.ElementType<unknown>;
+  DataProvider?: React.ElementType<TableDataProviderProps>;
   Loading?: ReactRenderable;
   RowCheckbox?: React.ElementType<RowSelectorCheckboxProps<T>>;
   TableWrapper?: React.ElementType<HTMLProps<HTMLDivElement>>;
