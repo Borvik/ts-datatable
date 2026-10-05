@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [3.0.1] - 2026-10-05
+### Updated
+- Fixed main/module links in package.json
+
 ## [3.0.0] - 2026-10-05
 ### Updated
 - Updated libraries to help resolve lodash security advisory

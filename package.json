@@ -1,14 +1,14 @@
 {
   "name": "@borvik/ts-datatable",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "license": "MIT",
   "repository": "github:Borvik/ts-datatable",
   "bugs": {
     "url": "https://github.com/Borvik/ts-datatable/issues"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/library/index.js",
+  "module": "dist/library/index.js",
+  "types": "dist/library/index.d.ts",
   "dependencies": {
     "@borvik/querystring": "^4.0.2",
     "@borvik/react-selector-context": "^1.0.0",
