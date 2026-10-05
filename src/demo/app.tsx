@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { initializeDB, SQLDatabase } from './db';
 import type { RefMethods, RefState } from '../library/';
+import { HistoryProvider } from './historyProvider';
 
 import 'setimmediate';
 
@@ -71,7 +72,9 @@ function App() {
         </select>
       </header>
       <div>
-        <ExampleTag tableRef={tableRef} />
+        <HistoryProvider>
+          <ExampleTag tableRef={tableRef} />
+        </HistoryProvider>
       </div>
     </div>
   );

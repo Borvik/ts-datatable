@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [3.0.0] - 2026-10-05
+### Updated
+- Updated libraries to help resolve lodash security advisory
+
+### Breaking
+- Removed dependency of react-router, and moved use-querystate to a peerDependency
+
 ## [2.0.2] - 2026-09-14
 ### Updated
 - Updated DataProvider types to help ts6

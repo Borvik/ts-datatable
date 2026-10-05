@@ -1,5 +1,5 @@
-@import './editor/style.scss';
-@import './bar/style.scss';
+@use './editor/style.scss' as *;
+@use './bar/style.scss' as *;
 
 .filter-dialog {
   min-width: 500px;

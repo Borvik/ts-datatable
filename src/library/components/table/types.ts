@@ -8,8 +8,8 @@ import React, {
   ReactElement,
   FC
 } from 'react';
-import { QueryStateOptions } from '@borvik/use-querystate/dist/types';
-import { QueryStringFilterTypes } from '@borvik/querystring/dist/types';
+import { QueryStateOptions } from '@borvik/use-querystate';
+import { QueryStringFilterTypes } from '@borvik/querystring';
 import { PaginateRequiredProps, PaginateOptions, PageChange } from '../pagination/types';
 import { SearchRequiredProps } from '../search/types';
 import { CustomFilterButtonProps, FilterSettings } from '../filter/types';

@@ -20,10 +20,9 @@ import { TableActionButtons, TableRefreshButton } from './actions';
 import { getRowKey } from '../../utils/getRowKey';
 import { update } from '../../utils/immutable';
 import { QueryString } from '@borvik/querystring';
-import { DeepPartial } from '@borvik/use-querystate/dist/types';
+import { DeepPartial } from '@borvik/use-querystate';
 import { TableFooter } from './footer';
-import { TableContextProvider, useTableSelector } from './contexts';
-import isEqual from 'lodash/isEqual';
+import { TableContextProvider } from './contexts';
 import { DataProviderContent, TableDataProvider as DefaultDataProvider } from './data-provider';
 
 const preMDR_RenderWarned: Record<string, boolean> = {};
@@ -57,7 +56,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   const [qsGroupBy, setGroupBy] = useParsedQs<GroupBy, QSGroupBy>(
     { group: props.defaultGroupBy ?? [] },
     (qsSort) => ({ // parse
-      group: (qsSort?.group ?? []).map(v => {
+      group: (qsSort?.group ?? []).map((v: string) => {
         let parts = v!.split(' ').filter(a => !!a);
         if (parts.length !== 2) return null;
         return {
@@ -250,7 +249,7 @@ const DataTableCore = function DataTableCore<T, FooterData extends T = T>({pagin
   const [columnSort, setColumnSort] = useParsedQs<ColumnSorts, QSColumnSorts>(
     { sort: props.defaultSort ?? [] },
     (qsSort) => ({ // parse
-      sort: (qsSort?.sort ?? []).map(v => {
+      sort: (qsSort?.sort ?? []).map((v: string) => {
         let parts = v!.split(' ').filter(a => !!a);
         if (parts.length !== 2) return null;
         return {
