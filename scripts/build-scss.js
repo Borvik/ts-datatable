@@ -17,19 +17,16 @@ if (!fs.existsSync(actualFile)) {
 
 console.log('Building css');
 mkdirp.sync(distFolder);
-sass.render({
-  file: actualFile,
-  outFile,
-  outputStyle: 'expanded',
+sass.compileAsync(actualFile, {
+  style: 'expanded',
   sourceMap: true,
-  includePaths: [nodeModulesFolder],
-}, (err, result) => {
-  if (err) {
-    console.error(err.message);
-    process.exit(1);
-  }
-  fs.writeFileSync(outFile, result.css);
-  fs.writeFileSync(outFile + '.map', result.map);
+  loadPaths: [nodeModulesFolder],
+}).then((result) => {
+  const mapFileName = path.basename(outFile);
+  fs.writeFileSync(outFile, result.css + `\n\n/*# sourceMappingURL=${mapFileName}.map */`);
+  fs.writeFileSync(outFile + '.map', JSON.stringify(result.sourceMap));
   console.log('  ...completed');
-  process.exit(0);
+}).catch((error) => {
+  console.error(error.message);
+  process.exitCode = 1;
 });

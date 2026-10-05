@@ -1,14 +1,14 @@
 @charset "UTF-8";
 
 //ContextMenu,Separator,Item------------------------------------------ //
-@import 'menu';
+@use 'menu';
 
 //Themes ------------------------------------------------------------ //
-@import "themes/dark";
-@import "themes/light";
+@use "themes/dark";
+@use "themes/light";
 
 //Animations -------------------------------------------------------- //
-@import "animations/pop";
-@import "animations/zoom";
-@import "animations/fade";
-@import "animations/flip";
+@use "animations/pop";
+@use "animations/zoom";
+@use "animations/fade";
+@use "animations/flip";

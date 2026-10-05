@@ -1,6 +1,6 @@
 import { AllFilterOperators, QueryFilterGroup, DataColumn, ColumnFilter, isFilterItem, QueryFilterItem, FilterCollection } from "../components/table/types";
-import { QueryStringFilterTypes } from '@borvik/querystring/dist/types';
-import { convertValue } from '@borvik/querystring/dist/convert/convertValue';
+import { QueryStringFilterTypes } from '@borvik/querystring';
+import { convertValue } from '@borvik/querystring';
 import { getDefaultOperator } from "../components/filter/helpers";
 
 export function transformTableFiltersToColumns<T>(filters: ColumnFilter[]): DataColumn<T>[] {

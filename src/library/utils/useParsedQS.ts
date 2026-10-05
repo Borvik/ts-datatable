@@ -1,5 +1,5 @@
 import { useQueryState } from '@borvik/use-querystate';
-import { QueryStateOptions, DeepPartial } from '@borvik/use-querystate/dist/types';
+import { QueryStateOptions, DeepPartial } from '@borvik/use-querystate';
 import { useDeepDerivedState } from "./useDerivedState";
 import { useCallback, useDebugValue } from "react";
 

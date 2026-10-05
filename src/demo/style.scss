@@ -1,3 +1,8 @@
+/**
+ * Table library
+ */
+@use '../library/style.scss' as *;
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -207,8 +212,3 @@ code {
 
 .multiselect-dropdown span.maxselected {width:100%;}
 .multiselect-dropdown-all-selector {border-bottom:solid 1px #999;}
-
-/**
- * Table library
- */
-@import '../library/style.scss';
