@@ -22,7 +22,8 @@ sass.compileAsync(actualFile, {
   sourceMap: true,
   loadPaths: [nodeModulesFolder],
 }).then((result) => {
-  fs.writeFileSync(outFile, result.css);
+  const mapFileName = path.basename(outFile);
+  fs.writeFileSync(outFile, result.css + `\n\n/*# sourceMappingURL=${mapFileName}.map */`);
   fs.writeFileSync(outFile + '.map', JSON.stringify(result.sourceMap));
   console.log('  ...completed');
 }).catch((error) => {
